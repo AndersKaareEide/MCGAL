@@ -1,9 +1,10 @@
 module Base where
 
 data Formula p =
-    Prop p                          |        Neg  (Formula p)
-  | Conj (Formula p) (Formula p)    |        Disj (Formula p) (Formula p)
--- TODO Expand with complete list of symbols
+    Prop p                            |        Neg  (Formula p)
+  | Conj (Formula p) (Formula p)      |        Disj (Formula p) (Formula p)
+  | Knows Agent (Formula p)           |        Announce (Formula p) (Formula p)
+  | GroupAnnounce [Agent] (Formula p)
 
 newtype Agent = Ag Int deriving (Eq, Ord)
 instance Show Agent where
