@@ -15,6 +15,7 @@ data Model state prop = Mo {
       props       :: [prop],
       valuation   :: prop -> [state]
 }
+-- TODO Represent the knowledge of each Agent
 
 instance (Show state, Show prop) => Show (Model state prop) where
   show (Mo states actors props valuation) =
@@ -22,7 +23,7 @@ instance (Show state, Show prop) => Show (Model state prop) where
         "Actors: "       ++ show actors ++ " "  ++
         "Propositions:"  ++ show props  ++ " "  ++
         "Valuations: "   ++ valuations  ++ " }" where
-          valuations = show $ map (\prop -> show prop ++ " -> " ++ (show $ valuation prop)) props
+          valuations = show $ map (\prop -> show prop ++ " -> " ++ show (valuation prop)) props
 
 
 -- Each prop is tied to a list of states where the prop holds
@@ -31,6 +32,13 @@ instance (Show state, Show prop) => Show (Model state prop) where
 
 check :: (Eq state) => Model state a -> state -> Formula a -> Bool
 check model state (Prop prop) = state `elem` valuation model prop
+check model state (Neg formula) = not $ check model state formula
+check model state (Conj formula1 formula2) = check model state formula1 &&
+                                             check model state formula2
+check model state (Disj formula1 formula2) = check model state formula1 ||
+                                             check model state formula2
+
+
 
 
 exampleModel :: Model Int String
