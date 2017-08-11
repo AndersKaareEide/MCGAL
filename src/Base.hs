@@ -1,5 +1,9 @@
 module Base where
 
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Debug.Trace
+
 data Formula p =
     Prop p                            |        Neg  (Formula p)
   | Conj (Formula p) (Formula p)      |        Disj (Formula p) (Formula p)
@@ -10,20 +14,25 @@ newtype Agent = Ag Int deriving (Eq, Ord)
 instance Show Agent where
   show (Ag n) = "a" ++ show n
 
+type ErelMap state = Map.Map Agent [[state]]
+-- ErelMaps are maps that bind agents to an equivalence relation
+
 data Model state prop = Mo {
       states      :: [state],
       actors      :: [Agent],
       props       :: [prop],
+      erels       :: ErelMap state,
       valuation   :: prop -> [state]
 }
 -- TODO Represent the knowledge of each Agent
 
 instance (Show state, Show prop) => Show (Model state prop) where
-  show (Mo states actors props valuation) =
-        "{ States: "     ++ show states ++ " "  ++
-        "Actors: "       ++ show actors ++ " "  ++
-        "Propositions:"  ++ show props  ++ " "  ++
-        "Valuations: "   ++ valuations  ++ " }" where
+  show (Mo states actors props erels valuation) =
+        "{ States: "              ++ show states ++ " "  ++
+        "Actors: "                ++ show actors ++ " "  ++
+        "Propositions:"           ++ show props  ++ " "  ++
+        "Equivalence relations:"  ++ show erels  ++ " "  ++
+        "Valuations: "            ++ valuations  ++ " }" where
           valuations = show $ map (\prop -> show prop ++ " -> " ++ show (valuation prop)) props
 
 
@@ -47,8 +56,12 @@ exampleModel = Mo {
     states = [1..3],
     actors = [Ag x | x <- [1..3]],
     props = ["p", "q"],
+    erels = exampleErels,
     valuation = exampleValuation
   }
+
+exampleErels :: ErelMap Int
+exampleErels = Map.fromList [(Ag 1, []), (Ag 2, [[1,2]]), (Ag 3, [[1,2,3]])]
 
 exampleValuation :: String -> [Int]
 exampleValuation "p" = [1,2]
