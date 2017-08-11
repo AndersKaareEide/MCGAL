@@ -40,13 +40,19 @@ instance (Show state, Show prop) => Show (Model state prop) where
 -- TODO Represent the knowledge of each Agent
 -- TODO Fix quotes around each state when the valuation function is printed
 
-check :: (Eq state) => Model state a -> state -> Formula a -> Bool
+check :: (Eq state, Ord state, Show state) => Model state a -> state -> Formula a -> Bool
 check model state (Prop prop) = state `elem` valuation model prop
 check model state (Neg formula) = not $ check model state formula
 check model state (Conj formula1 formula2) = check model state formula1 &&
                                              check model state formula2
 check model state (Disj formula1 formula2) = check model state formula1 ||
                                              check model state formula2
+check model state (Knows agent formula) =
+    case Map.lookup agent (erels model) of
+      Just [] -> check model state formula -- Agent has complete knowledge, can distinguish any states
+      Just stateSets -> all (\x -> check model x formula) indishtinguableStates where
+        indishtinguableStates = Set.fromList (concat (filter (elem state) stateSets))
+      Nothing -> error ("Agent " ++ show agent ++ " is not in model")
 
 
 
