@@ -24,7 +24,6 @@ data Model state prop = Mo {
       erels     :: ErelMap state,
       valuation :: Map.Map prop [state]
 }
--- TODO Represent the knowledge of each Agent
 
 instance (Show state, Show prop) => Show (Model state prop) where
   show (Mo states actors props erels valuation) =
@@ -34,11 +33,6 @@ instance (Show state, Show prop) => Show (Model state prop) where
         "Equivalence relations:"  ++ show erels  ++ " "  ++
         "Valuations: "            ++ show valuation  ++ " }"
 
-
-
--- Each prop is tied to a list of states where the prop holds
--- TODO Represent the knowledge of each Agent
--- TODO Fix quotes around each state when the valuation function is printed
 
 check :: (Eq state, Ord state, Show state, Ord p) =>
           Model state p -> state -> Formula p -> Bool
@@ -57,8 +51,10 @@ check model state (Knows agent formula) =
         indishtinguableStates = Set.fromList (concat (filter (elem state) stateSets))
       Nothing -> error ("Agent " ++ show agent ++ " is not in model")
 check model state (Announce announcement formula) =
+  not (check model state announcement) ||
   check updatedModel state formula where
     updatedModel = updateModel model announcement
+-- If not M,s |= announcement then the formula is true
 
 updateModel :: (Show state, Ord state, Eq state, Ord prop) =>
                 Model state prop -> Formula prop -> Model state prop
@@ -69,8 +65,5 @@ updateModel model@(Mo states actors props erels valuation) announcement =
   temp = Map.map (map (filter (`elem` states'))) erels
 
 -- TODO Find out if I need to update valuation function
--- Note: Data.Map.filter is strictly evaluated, this might be a problem
 -- Is there any reason to remove singleton lists in the epistemic relations?
-
-
 -- Check if state actually exists in updatedModel
