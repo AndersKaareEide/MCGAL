@@ -1,6 +1,7 @@
-import Test.HUnit
-import Data.Map as Map
-import Checker
+import           Checker
+import           Data.Map   as Map
+import           Examples
+import           Test.HUnit
 
 main :: IO Counts
 main = Test.HUnit.runTestTT tests
@@ -23,21 +24,3 @@ testModelUpdate =
   TestCase (assertEqual "Updates should be true if the announcement is untrue in the present state" True result) where
     result = check exampleModel2 2 formula where
       formula = Announce (Prop "p") (Prop "p")
-
-exampleModel :: Model Int String
-exampleModel = Mo {
-    states = [1..3],
-    actors = [Ag x | x <- [1..3]],
-    props = ["p", "q"],
-    erels = Map.fromList [(Ag 1, []), (Ag 2, [[1,2]]), (Ag 3, [[1,2,3]])],
-    valuation = Map.fromList [("p", [1,2]),("q", [1])]
-  }
-
-exampleModel2 :: Model Int String
-exampleModel2 = Mo {
-    states = [1,2],
-    actors = [Ag 1],
-    props = ["p"],
-    erels = Map.fromList [(Ag 1, [[1,2]])],
-    valuation = Map.fromList [("p", [1])]
-}
