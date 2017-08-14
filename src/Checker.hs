@@ -36,24 +36,23 @@ instance (Show state, Show prop) => Show (Model state prop) where
 
 check :: (Eq state, Ord state, Show state, Ord p) =>
           Model state p -> state -> Formula p -> Bool
-check model state (Prop prop) = case Map.lookup prop (valuation model) of
-  Just states -> state `elem` states
-  Nothing     -> False
-check model state (Neg formula) = not $ check model state formula
-check model state (Conj formula1 formula2) = check model state formula1 &&
-                                             check model state formula2
-check model state (Disj formula1 formula2) = check model state formula1 ||
-                                             check model state formula2
-check model state (Knows agent formula) =
-    case Map.lookup agent (erels model) of
+check model state formula = case formula of
+  (Prop prop) -> case Map.lookup prop (valuation model) of
+      Just states -> state `elem` states
+      Nothing     -> False
+  (Neg formula) -> not $ check model state formula
+  (Conj formula1 formula2) -> check model state formula1 &&
+                              check model state formula2
+  (Disj formula1 formula2) -> check model state formula1 ||
+                              check model state formula2
+  (Knows agent formula) -> case Map.lookup agent (erels model) of
       Just [] -> check model state formula -- Agent has complete knowledge, can distinguish any states
       Just stateSets -> all (\x -> check model x formula) indishtinguableStates where
         indishtinguableStates = Set.fromList (concat (filter (elem state) stateSets))
-      Nothing -> error ("Agent " ++ show agent ++ " is not in model")
-check model state (Announce announcement formula) =
-  not (check model state announcement) ||
-  check updatedModel state formula where
-    updatedModel = updateModel model announcement
+      Nothing -> error ("Model does not contain " ++ show agent)
+  (Announce announcement formula) -> not (check model state announcement) ||
+                                     check updatedModel state formula where
+      updatedModel = updateModel model announcement
 -- If not M,s |= announcement then the formula is true
 
 updateModel :: (Show state, Ord state, Eq state, Ord prop) =>
@@ -66,4 +65,3 @@ updateModel model@(Mo states actors props erels valuation) announcement =
 
 -- TODO Find out if I need to update valuation function
 -- Is there any reason to remove singleton lists in the epistemic relations?
--- Check if state actually exists in updatedModel
