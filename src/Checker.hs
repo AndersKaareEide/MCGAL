@@ -5,11 +5,21 @@ import qualified Data.Set    as Set
 import           Data.List
 import           Debug.Trace
 
+infixr 5 |=
+(|=) :: (Ord state, Show state, Ord prop) =>
+  (Model state prop, state) -> Formula prop -> Bool
+(model, state) |= form = check model state form
+
+
 data Formula p =
     Prop p                            |        Neg  (Formula p)
   | Conj (Formula p) (Formula p)      |        Disj (Formula p) (Formula p)
   | Knows Agent (Formula p)           |        Announce (Formula p) (Formula p)
   | GroupAnnounce [Agent] (Formula p) deriving (Eq)
+
+p, q, r ,s :: Formula String
+p = Prop "p"; q = Prop "q"
+r = Prop "r"; s = Prop "s"
 
 newtype Agent = Ag Int deriving (Eq, Ord)
 instance Show Agent where
