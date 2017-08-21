@@ -3,7 +3,6 @@ module Checker where
 import qualified Data.Map    as Map
 import qualified Data.Set    as Set
 import           Data.List
-import           Debug.Trace
 
 infixr 5 |=
 (|=) :: (Ord state, Show state, Ord prop) =>
@@ -15,13 +14,13 @@ data Formula p =
     Prop p                            |        Neg  (Formula p)
   | Conj (Formula p) (Formula p)      |        Disj (Formula p) (Formula p)
   | Knows Agent (Formula p)           |        Announce (Formula p) (Formula p)
-  | GroupAnnounce [Agent] (Formula p) deriving (Eq)
+  | GroupAnnounce [Agent] (Formula p) deriving (Eq, Show, Read)
 
 p, q, r ,s :: Formula String
 p = Prop "p"; q = Prop "q"
 r = Prop "r"; s = Prop "s"
 
-newtype Agent = Ag Int deriving (Eq, Ord)
+newtype Agent = Ag Int deriving (Eq, Ord, Read)
 instance Show Agent where
   show (Ag n) = "a" ++ show n
 
@@ -84,6 +83,7 @@ checkGroupAnnouncement model state formula =
 
 -- TODO Verify that this shit is even remotely sane
 
+
 updateModel :: (Show state, Ord state, Eq state, Ord prop) =>
                 Model state prop -> Formula prop -> Model state prop
 updateModel model@(Mo states actors erels valuation) announcement =
@@ -124,7 +124,7 @@ extractProps' form =
       foldr (\form' props -> extractProps' form' ++ props) [] [formula1, formula2]
     Knows _ form' -> extractProps' form'
     Announce announcement form' -> extractProps' announcement ++ extractProps' form'
-    GroupAnnounce agents form' -> extractProps' form'
+    GroupAnnounce _ form' -> extractProps' form'
 
 -- Function which checks if a group can publicly announce a formula, that is
 -- if the group has distributed knowledge of the formula being true
@@ -144,8 +144,8 @@ genAnnouncementSet model state =
 -- Generates intersection of equivalence relations of all agents in a group,
 -- by creating a new model where 'agent' -1 has the combined knowledge of the group
 poolGroupKnowledge :: (Eq state) => Model state prop -> state -> [Agent] -> Model state prop
-poolGroupKnowledge model@(Mo states actors erels valuations) actualState coalition = model' where
-  allRels = concatMap (\agent -> Map.findWithDefault [] agent erels) coalition
+poolGroupKnowledge model actualState coalition = model' where
+  allRels = concatMap (\agent -> Map.findWithDefault [] agent (erels model)) coalition
   relevantRels = filter (actualState `elem`) allRels
   distributedRels = [foldl1 intersect relevantRels]
   model' = model {erels = Map.fromList [(Ag $ -1, distributedRels)]}
