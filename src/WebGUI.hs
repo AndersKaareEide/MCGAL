@@ -53,9 +53,7 @@ setup w = do
             redoLayout :: UI ()
             redoLayout = void $ do
                 layout <- mkLayout =<< liftIO (readIORef inputs)
-                let body = getBody w
-                let mainDiv = fromJust <$> getElementById w "mainDiv"
-                mainDiv # set children  (elCanvas : [layout])
+                getBody w # set children  (elCanvas : [layout])
                 displayTotal
 
             mkLayout :: [Element] -> UI Element
