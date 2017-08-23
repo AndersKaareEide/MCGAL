@@ -62,9 +62,8 @@ setup w = do
             redoLayout = void $ do
                 layout <- mkLayout =<< liftIO (readIORef inputs)
                 let body = getBody w
-                let mainDiv = fromJust <$> getElementById w "mainDiv"
-                mainDiv # set children  (elCanvas : [layout])
-                -- TODO Figure out why div doesn't work
+                body # set children  (elCanvas : [layout])
+                -- TODO Figure out why using mainDiv doesn't work
                 displayTotal
 
             mkLayout :: [Element] -> UI Element
@@ -90,7 +89,8 @@ setup w = do
             removeInput :: UI ()
             removeInput = liftIO $ writeIORef inputs []
 
-        on UI.mousedown elCanvas $ \pos -> addInput pos   >> redoLayout
+        -- TODO Crop elements that fit outside the canvas
+        on UI.mousedown elCanvas $ \pos -> addInput pos >> redoLayout
         on UI.click elRemove $ \_ -> removeInput >> redoLayout
 
         -- Try stopping event propagation by storing each event in an IORef
