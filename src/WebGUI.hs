@@ -35,6 +35,7 @@ setup w = do
 
 
         -- active elements
+        elBody   <- UI.getBody w
         elRemove <- UI.button # set UI.text "Clear"
         elResult <- UI.span
         elCanvas <- UI.div # set style [("height", "500px"), ("width", "100%"),
@@ -48,7 +49,7 @@ setup w = do
         UI.pure elParent #+ [UI.pure elChild]
 
         eventsRef   <- liftIO $ newIORef [] :: UI (IORef [(String, IO ())])
-        dragableRef <- liftIO $ newIORef (False, startPos) :: UI (IORef (Bool,(Int, Int)))
+        dragableRef <- liftIO $ newIORef (Nothing, startPos) :: UI (IORef (Maybe Element,(Int, Int)))
         inputs      <- liftIO $ newIORef [] :: UI (IORef [Element])
 
 
@@ -79,16 +80,38 @@ setup w = do
 
             addInput :: (Int, Int) ->  UI ()
             addInput position = do
-                elBox <- UI.div # set style (styles position)
+                let elInput = UI.input # set value "Dixxxx"
+                                       # set style inputStyle
+                elBox <- UI.div # set style boxStyle #+ [elInput]
+                makeDragable elBox
                 liftIO $ modifyIORef inputs (elBox:)
                 where
-                  styles (x,y) = [("position", "absolute"), ("background", "red"),
-                                  ("top", show y ++ "px"), ("left", show x ++ "px"),
-                                  ("height", "50px"), ("width", "50px")]
+                  boxStyle = getDragableStyle ++ mkPosAttr position
+                  inputStyle = [("width", "80%")]
 
             removeInput :: UI ()
             removeInput = liftIO $ writeIORef inputs []
 
+            makeDragable :: Element -> UI ()
+            makeDragable element = do
+              -- Register that the user is about to drag
+              on UI.mousedown element $ const $ void $
+                liftIO $ modifyIORef dragableRef (\(_, pos) -> (Just element, pos))
+
+              on UI.mouseup elBody $ const $ void $
+                liftIO $ modifyIORef dragableRef (\(_, pos) -> (Nothing, pos))
+
+              on UI.mousemove elBody $ \mousePos -> do
+                dragging <- liftIO $ fst <$> readIORef dragableRef
+                case dragging of
+                  Just element -> do
+                    oldPos <- snd <$> liftIO (readIORef dragableRef)
+                    void $ liftIO $ modifyIORef dragableRef (\(bool, _) -> (bool, mousePos))
+                    moveElement element mousePos
+                  _ ->
+                    UI.pure () -- Do nothing
+
+        makeDragable elDragable
         -- TODO Crop elements that fit outside the canvas
         on UI.mousedown elCanvas $ \pos -> addInput pos >> redoLayout
         on UI.click elRemove $ \_ -> removeInput >> redoLayout
@@ -111,23 +134,7 @@ setup w = do
           void $ liftIO $ modifyIORef eventsRef (("child", print "child") :)
           liftIO $ handleEvents eventsRef
 
-        -- Register that the user is about to drag
-        on UI.mousedown elDragable $ const $ void $
-          liftIO $ modifyIORef dragableRef (\(_, pos) -> (True, pos))
 
-        on UI.mouseup elDragable $ const $ void $
-          liftIO $ modifyIORef dragableRef (\(_, pos) -> (False, pos))
-
-        on UI.mousemove elDragable $ \mousePos -> do
-          dragging <- liftIO $ fst <$> readIORef dragableRef
-          if dragging
-            then do
-              oldPos <- snd <$> liftIO (readIORef dragableRef)
-              let newPos = calculatePos mousePos oldPos elDragDims
-              void $ liftIO $ modifyIORef dragableRef (\(bool, _) -> (bool, newPos))
-              moveElement elDragable newPos
-            else
-              UI.pure () -- Do nothing
 
 
         redoLayout
@@ -137,25 +144,27 @@ handleEvents ref = do
   list <- readIORef ref
   snd . head $ list
 
--- Makes top and left style attributes with the input position values
-mkPosAttr :: (Int, Int) -> [(String, String)]
-mkPosAttr (x,y) = [("left", show x ++ "px"),
-                   ("top", show y ++ "px")]
-
+-- Moves element to the given position
 moveElement :: Element -> (Int, Int) -> UI ()
 moveElement element (x,y) = do
   let pos = [("left", show x ++ "px"), ("top", show y ++ "px")]
   void $ UI.pure element # set style (getDragableStyle ++ pos)
 
-
+-- Returns style tuples for dragable elements
 getDragableStyle :: [(String, String)]
 getDragableStyle = [("height", "50px"), ("width", "50px"),
                     ("border-style", "solid"),
                     ("position", "absolute"),
                     ("background", "blue")]
 
+-- Makes top and left style attributes with the input position values
+mkPosAttr :: (Int, Int) -> [(String, String)]
+mkPosAttr (x,y) = [("left", show x ++ "px"),
+                   ("top", show y ++ "px")]
+
+
 -- Calculates the new position of an element based on the position of the mouse,
 -- the elements current position and its dimensions
-calculatePos :: (Int, Int) -> (Int, Int) -> (Int, Int) -> (Int, Int)
-calculatePos mousePos oldPos dims =
+calcRelPos :: (Int, Int) -> (Int, Int) -> (Int, Int) -> (Int, Int)
+calcRelPos mousePos oldPos dims =
   (fst mousePos + (fst oldPos - fst dims `div` 2), snd mousePos + (snd oldPos - snd dims `div` 2))
