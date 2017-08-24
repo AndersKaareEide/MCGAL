@@ -44,7 +44,6 @@ setup w = do
         elParent <- UI.div #  set style [("height", "100px"), ("width", "100px"),
                                         ("border-style", "solid")]
         elChild <- UI.button # set text "Child"
-        elDragable <- UI.div # set style (getDragableStyle ++ mkPosAttr startPos)
 
         UI.pure elParent #+ [UI.pure elChild]
 
@@ -75,7 +74,6 @@ setup w = do
                 [UI.hr
                 ,row [UI.span # set text "Sum: ", element elResult]
                 ,UI.pure elParent
-                ,UI.pure elDragable
                 ]
 
             addInput :: (Int, Int) ->  UI ()
@@ -94,7 +92,8 @@ setup w = do
 
             makeDragable :: Element -> UI ()
             makeDragable element = do
-              -- Register that the user is about to drag
+
+              -- Drag functionality
               on UI.mousedown element $ const $ void $
                 liftIO $ modifyIORef dragableRef (\(_, pos) -> (Just element, pos))
 
@@ -111,7 +110,6 @@ setup w = do
                   _ ->
                     UI.pure () -- Do nothing
 
-        makeDragable elDragable
         -- TODO Crop elements that fit outside the canvas
         on UI.mousedown elCanvas $ \pos -> addInput pos >> redoLayout
         on UI.click elRemove $ \_ -> removeInput >> redoLayout
@@ -164,7 +162,7 @@ mkPosAttr (x,y) = [("left", show x ++ "px"),
 
 
 -- Calculates the new position of an element based on the position of the mouse,
--- the elements current position and its dimensions
+-- the element's current position and its dimensions
 calcRelPos :: (Int, Int) -> (Int, Int) -> (Int, Int) -> (Int, Int)
 calcRelPos mousePos oldPos dims =
   (fst mousePos + (fst oldPos - fst dims `div` 2), snd mousePos + (snd oldPos - snd dims `div` 2))
