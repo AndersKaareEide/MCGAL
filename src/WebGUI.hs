@@ -64,15 +64,17 @@ setup w = do
 
 
     eventsRef    <- liftIO $ newIORef [] :: UI (IORef [(String, IO ())])
-    draggableRef <- liftIO $ newIORef Nothing :: UI (IORef (Maybe (Element,(Int, Int))))
-    inputs       <- liftIO $ newIORef [] :: UI (IORef [Element])
+    draggableRef <- liftIO $ newIORef Nothing :: UI (IORef (Maybe Element))
+
+    statesRef    <- liftIO $ newIORef [] :: UI (IORef [Element])
+
     drawingRef   <- liftIO $ newIORef False :: UI (IORef Bool)
 
     -- functionality
     let
         redoLayout :: UI ()
         redoLayout = void $ do
-            layout <- mkLayout =<< liftIO (readIORef inputs)
+            layout <- mkLayout =<< liftIO (readIORef statesRef)
             let body = getBody w
             body # set children  (elCanvas : [layout, elDrawCheck, elCheckText])
             -- TODO Figure out why using mainDiv doesn't work
@@ -90,13 +92,13 @@ setup w = do
                                    # set style inputStyle
             elBox <- UI.div # set style boxStyle #+ [elInput]
             makeDraggable elBox
-            liftIO $ modifyIORef inputs (elBox:)
+            liftIO $ modifyIORef statesRef (elBox:)
             where
               boxStyle = getDraggableStyle ++ mkPosAttr position
               inputStyle = [("width", "80%")]
 
         clearCanvas :: UI ()
-        clearCanvas = liftIO $ writeIORef inputs []
+        clearCanvas = liftIO $ writeIORef statesRef []
 
         -- Adds event listeners to the element to allow it to be
         -- dragged around on the canvas
@@ -105,16 +107,15 @@ setup w = do
           -- TODO Eat event and do nothing if a child element was clicked
           --      rather than the state itself
           on UI.mousedown element $ const $ void $
-            liftIO $ modifyIORef draggableRef (\(Just (_, pos)) -> (Just (element, pos)))
+            liftIO $ writeIORef draggableRef (Just element)
 
           on UI.mouseup elBody $ const $ void $
-            liftIO $ modifyIORef draggableRef (\(Just (_, pos)) -> Nothing)
+            liftIO $ writeIORef draggableRef Nothing
 
           on UI.mousemove elBody $ \mousePos -> do
             dragging <- liftIO $ readIORef draggableRef
             case dragging of
-              Just (element, oldPos) -> do
-                void $ liftIO $ modifyIORef draggableRef (\(Just (element', _)) -> Just (element', mousePos))
+              Just element ->
                 moveElement element mousePos
               _ ->
                 UI.pure () -- Do nothing
@@ -191,6 +192,7 @@ getSVGtestElem =
               # set SVG.y2 "450"
               # set SVG.stroke "blue"
               # set SVG.stroke_width "5"
+
 
 
 -- Calculates the new position of an element based on the position of the mouse,
