@@ -24,6 +24,7 @@ executable             Webinterface
   hs-source-dirs:      src
   main-is:             WebGUI.hs
   other-modules:       Checker
+                     , Types
                      , Examples
                      , Paths
                      , Paths_Masterprosjekt
