@@ -12,10 +12,12 @@ category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
-                   , src/web/*.html
+                   , src/static/*.html
+                   , src/static/css/*.css
 
 Data-dir:            .
-Data-files:          src/web/*.html
+Data-files:          src/static/*.html
+Data-files:          src/static/css/*.css
 
 
 

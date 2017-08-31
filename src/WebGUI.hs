@@ -1,8 +1,8 @@
 import           Control.Monad
-import           Checker
+import qualified Checker
 import           Examples
 import qualified Graphics.UI.Threepenny      as UI
-import           Graphics.UI.Threepenny.Core
+import           Graphics.UI.Threepenny.Core hiding (empty)
 import qualified Graphics.UI.Threepenny.SVG  as SVG
 import qualified Text.Read as Text
 import           Data.Maybe (fromJust)
@@ -30,28 +30,16 @@ setup w = do
     let startPos = (200,200)
     let elDragDims = (50,50)
 
-    -- IORef structure for updating SVG lines
-    -- Redraw line every time one of its "parents" are moved
-    -- (Element, Pos, Pos)
-
-    -- State element needs to which SVG lines it is connected to
-    -- and if it is the start or end point for each line
-
-    -- Model creator needs to know of all state elements and the
-    -- lines between them as well as the value of the text fields
-    -- within each state element
-
-    -- Click listener for "canvas" needs to know if the user is drawing
-    -- states or lines
-
-
     -- active elements
     elBody   <- UI.getBody w
     elRemove <- UI.button # set UI.text "Clear"
+
     elCanvas <- SVG.svg # set SVG.height "500"
                         # set SVG.width  "500"
                         # set style [("height", "500px"), ("width", "100%"),
                                      ("border-style", "solid")]
+    elCanvDiv <- UI.div # set style [("height", "500px"), ("width", "100%")]
+                        #+ [element elCanvas]
 
     elParent <- UI.div #  set style [("height", "100px"), ("width", "100px"),
                                     ("border-style", "solid")]
@@ -62,156 +50,169 @@ setup w = do
 
     element elParent #+ [element elChild]
 
+
+
     -- TODO Refactor these into a state object?
+    let initialState = AppState w empty empty StateMode Nothing Nothing "s1"
+
+    stateRef     <- liftIO $ newIORef initialState :: UI (IORef AppState)
     eventsRef    <- liftIO $ newIORef [] :: UI (IORef [(String, IO ())])
-    draggableRef <- liftIO $ newIORef Nothing :: UI (IORef (Maybe Element))    -- Used to keep track of which element the user is dragging around
-    tempLineRef  <- liftIO $ newIORef Nothing :: UI (IORef (Maybe ElemData))   -- Temporarily stores one of the 'parents' while the user is drawing lines
 
-    stateIDs     <- liftIO $ newIORef ["s" ++ show x | x <- [1..]] :: UI (IORef [String]) -- Used to make IDs for each new state
 
-    statesRef    <- liftIO $ newIORef Data.Map.empty :: UI (IORef (Map String ElemData))  -- Map of the id of state elements and data about them
-    linesRef     <- liftIO $ newIORef Data.Map.empty :: UI (IORef (Map String LineData))  -- Map of the id of line elements and data about their parents
-    drawingRef   <- liftIO $ newIORef StateMode :: UI (IORef ClickMode)
 
     -- functionality
     let
-        redoLayout :: UI ()
-        redoLayout = void $ do
-          let states = map (Types.elem . snd) . toList <$> readIORef statesRef
-          let body = getBody w
-          layout <- mkLayout =<< liftIO states
-          body # set children  (elCanvas : [layout, elDrawCheck, elCheckText])
+      -- Function responsible for updating app state based on AppEvents
+      update :: AppEvent -> UI ()
+      update event = do
+        state <- liftIO $ readIORef stateRef
+        updState <- case event of
+          MouseClick pos -> handleMClick pos state
+          ClearCanvas -> do
+            let state' = state { states = empty, edges = empty }
+            redoLayout state'
+            return state'
+          StateMDown element -> handleMouseDown state element
+          StateMUp element -> handleMouseUp state element
+          MovState pos -> moveStateElem state pos
+          UpdClickMode clickMode' -> UI.pure state { clickMode = clickMode'}
+        liftIO $ writeIORef stateRef updState
+        -- redoLayout updState
 
-        mkLayout :: [Element] -> UI Element
-        mkLayout xs = column $
-          [row [element elRemove]]
-          ++ map element xs ++
-          [element elParent]
+      redoLayout :: AppState -> UI ()
+      redoLayout state = void $ do
+        let stateList = map (Types.elem . snd) $ toList (states state) :: [Element]
+        let edgeList = map (Types.lineElem . snd) $ toList (edges state) :: [Element]
+        layout <- mkLayout stateList
+        element elCanvas # set children edgeList
+        element elCanvDiv # set children (elCanvas : stateList) -- TODO Render lines / edges
+        element elBody # set children (elCanvDiv : [layout, elDrawCheck, elCheckText])
+
+      mkLayout :: [Element] -> UI Element
+      mkLayout xs = column $
+        [row [element elRemove]] ++ [element elParent]
+
+      handleMouseDown :: AppState -> Element -> UI AppState
+      handleMouseDown state element =
+        case clickMode state of
+          StateMode -> UI.pure state { dragRef = Just element }
+          LineMode  -> do
+            refValue <- lookupElemData state element
+            UI.pure state { tempRef = Just refValue } where
+
+      handleMouseUp :: AppState -> Element -> UI AppState
+      handleMouseUp state element =
+        case clickMode state of
+          StateMode -> UI.pure state { dragRef = Nothing }
+          LineMode -> do
+            let parent1 = fromJust $ tempRef state
+            parent2 <- lookupElemData state element
+            lineData <- mkSVGLine parent1 parent2
+            let state' = state {
+              edges = insert (lineId lineData) lineData (edges state),
+              states = insertLineData (states state) parent1 parent2 lineData
+            }
+            redoLayout state'
+            return state'
+            --   void $ UI.element elCanvas #+ [UI.element lineElem] -- TODO Find better solution so I can remove lines again
+            --   UI.element elCanvas #+ [UI.element lineElem]
 
 
-        addState :: Pos ->  UI ()
-        addState position = do
-          newID <- liftIO $ getNextID stateIDs
-          elInput <- UI.input # set style inputStyle
-          elBox <- UI.div # set style boxStyle #+ [UI.element elInput]
-                          # set value newID
-          addStateListener elBox
-          let inputData = ElemData newID elBox position []
-          liftIO $ modifyIORef statesRef (insert newID inputData)
-          where
-            boxStyle = getDraggableStyle ++ mkPosAttr position
-            inputStyle = [("width", "80%")]
+      handleMClick :: Pos -> AppState -> UI AppState
+      handleMClick position state =
+        case clickMode state of
+          StateMode -> do
+            let nextID = nxtStID state
+            elInput <- UI.input # set style inputStyle
+            elBox <- UI.div # set style boxStyle #+ [UI.element elInput]
+                            # set value nextID
+                            # set UI.id_ nextID
+            handleMClickListener elBox
+            let inputData = ElemData nextID elBox position []
+            let nextID' = getNextID (nxtStID state)
+            let state' = state {nxtStID = nextID', states = insert nextID inputData (states state)}
+            redoLayout state' -- TODO Find smart way of updating layout without redrawing entire DOM
+            return state'
+          LineMode -> return state -- Do nothing
+        -- return state {nxtStID = nextID', states = insert nextID inputData (states state)}
+        where
+          boxStyle = getDraggableStyle ++ mkPosAttr position -- TODO Look into if ++ is causing slowdown
+          inputStyle = [("width", "80%")]
 
-        clearCanvas :: UI ()
-        clearCanvas = liftIO $ writeIORef statesRef Data.Map.empty
 
-        addStateListener :: Element -> UI ()
-        addStateListener element = do
-          -- TODO Eat event and do nothing if a child element like the input box was clicked
-          --      rather than the state itself
-          on UI.mousedown element $ \pos -> do
-            clickMode <- liftIO $ readIORef drawingRef
-            case clickMode of
-              StateMode -> void $ liftIO $ writeIORef draggableRef (Just element)
-              LineMode -> do
-                refValue <- getElemFromRef element statesRef
-                liftIO $ writeIORef tempLineRef $ Just refValue
-
-          -- TODO Somehow find position of elements when drawing line
-          on UI.mouseup element $ const $ do
-            clickMode <- liftIO $ readIORef drawingRef
-            case clickMode of
-              StateMode -> void $ liftIO $ writeIORef draggableRef Nothing
-              LineMode -> do -- TODO Find out if I need to check what kind of element the user 'drops' on
-                elemid <- element # get value
-                parent1 <- liftIO $ fromJust <$> readIORef tempLineRef :: UI ElemData
-                parent2 <- getElemFromRef element statesRef            :: UI ElemData
-                lineElem <- mkSVGLine parent1 parent2
-                let lineID = elemId parent1 ++ elemId parent2
-                let lineData = LineData lineID lineElem (elemId parent1, elemId parent2)
-                void $ UI.element elCanvas #+ [UI.element lineElem] -- TODO Find better solution so I can remove lines again
-                liftIO $ modifyIORef linesRef (insert lineID lineData)
-                liftIO $ modifyIORef statesRef (insert (elemId parent1) (parent1 {edges = lineID : edges parent1} ) )
-                liftIO $ modifyIORef statesRef (insert (elemId parent1) (parent2 {edges = lineID : edges parent2} ) )
-                UI.element elCanvas #+ [UI.element lineElem]
-                redoLayout
-
-          on UI.mousemove elBody $ \mousePos -> do
-            clickMode <- liftIO $ readIORef drawingRef
-            case clickMode of
-              StateMode -> do
-                dragging <- liftIO $ readIORef draggableRef
-                case dragging of
-                  Just element ->
-                    moveStateElem element mousePos
-                  _ ->
-                    UI.pure () -- No element selected, do nothing
-              LineMode ->
-                    UI.pure () -- Do nothing
-
-                -- 1. Check if drawing lines
-                -- 2. Check if selected start point
-                -- 3. On mouseup check if dropping on valid end point
-                -- 4. If 3., draw actual line on canvas
-                -- 5. Store reference to drawn line and update start / end points
-                --    if either of them are moved by the user
-
-    -- Event listeners
+      handleMClickListener :: Element -> UI ()
+      handleMClickListener element = do
+        -- TODO Eat event and do nothing if a child element like the input box was clicked
+        --      rather than the state itself
+        on UI.mousedown element $ const $ update $ StateMDown element
+        on UI.mouseup element $ const $ update $ StateMUp element
+        on UI.mousemove elBody $ \pos -> update $ MovState pos -- TODO Check if dragRef is Nothing
 
     -- TODO Crop elements that fit outside the canvas
-    on UI.mousedown elCanvas $ \pos -> addState pos >> redoLayout
-    on UI.click elRemove $ \_ -> clearCanvas >> redoLayout
+    on UI.mousedown elCanvas $ \pos -> update $ MouseClick pos
+    on UI.click elRemove $ const $ update ClearCanvas
 
-    on UI.mouseup elBody $ const $ do
-      clickMode <- liftIO $ readIORef drawingRef
-      case clickMode of
-        StateMode -> void $ liftIO $ writeIORef draggableRef Nothing
-        LineMode -> liftIO $ liftIO $ writeIORef tempLineRef Nothing -- Line drawing failed, clear reference
-
-    -- Try stopping event propagation by storing each event in an IORef
-    -- and only dispatch event from parent if the child element has not
-    -- already fired one
-    -- TODO Make generic system that automagically checks for events from
-    -- child elements before handling event
-    on UI.click elParent $ \event -> do
-      events <- liftIO $ readIORef eventsRef
-      if "child" `notElem` map fst events
-        then do
-          liftIO $ modifyIORef eventsRef (("parent", print "parent") :)
-          liftIO $ handleEvents eventsRef
-        else
-          liftIO $ writeIORef eventsRef []
-          -- Clear events if event from elChild is found
-
-    on UI.click elChild $ \_ -> do
-      void $ liftIO $ modifyIORef eventsRef (("child", print "child") :)
-      liftIO $ handleEvents eventsRef
 
     on UI.checkedChange elDrawCheck $ \checked ->
       let newMode = if checked
                     then LineMode
                     else StateMode
-      in void $ liftIO $ writeIORef drawingRef newMode
-
+      in update $ UpdClickMode newMode
 
 
     -- Run setup functions
-    redoLayout
+    UI.addStyleSheet w "default.css"
+    redoLayout initialState
 
-handleEvents :: IORef [(String, IO ())] -> IO ()
-handleEvents ref = do
-  list <- readIORef ref
-  snd . head $ list
 
 -- Moves state to the given position and updates all edges
 -- tied to this state
-moveStateElem :: Element -> Pos -> UI ()
-moveStateElem element (x,y) = do
-  let pos = [("left", show x ++ "px"), ("top", show y ++ "px")]
-  void $ UI.pure element # set style (getDraggableStyle ++ pos)
+moveStateElem :: AppState -> Pos -> UI AppState
+moveStateElem state pos@(x,y) =
+  case dragRef state of
+    Nothing -> UI.pure state
+    Just element -> do
+      let styling = getDraggableStyle ++ [("left", show x ++ "px"), ("top", show y ++ "px")]
+      elemData <- lookupElemData state element :: UI ElemData
+      element' <- UI.element element # set style styling
+      let elemData' = elemData { Types.elem = element', Types.pos = pos }
+      let state' = state { states = insert (elemId elemData') elemData' (states state)}
+      movStateEdges state' elemData pos
 -- TODO move edges as well
 
+movStateEdges :: AppState -> ElemData -> Pos -> UI AppState
+movStateEdges state elemData pos = do
+  let edges = Types.edges state       :: Map String LineData
+  let edgeIDs = Types.edgeIDs elemData :: [String]
+  let edges' = map (\id_ -> (!) edges id_ ) edgeIDs :: [LineData]
+  let updTups = map (\edge -> findStartOrEnd edge (elemId elemData)) edges' :: [(LineData, Int)]
+  movedEdges <- mapM (\tuple -> movStateEdge tuple pos) updTups :: UI [LineData]
+  let edges'' = foldr (\lData acc -> insert (lineId lData) lData acc) edges movedEdges :: Map String LineData
+  return state { Types.edges = edges'' }
 
+movStateEdge :: (LineData, Int) -> Pos -> UI LineData
+movStateEdge (line, posNum) (newX, newY) = do
+  elem' <- case posNum of
+    1 -> (element (lineElem line)) # set SVG.x1 (show newX)
+                      # set SVG.y1 (show newY)
+    2 -> (element (lineElem line)) # set SVG.x2 (show newX)
+                      # set SVG.y2 (show newY)
+  return line { lineElem = elem' }
+
+
+findStartOrEnd :: LineData -> String -> (LineData, Int)
+findStartOrEnd edge parID =
+  if (fst $ parents edge) == parID
+    then (edge, 1)
+    else (edge, 2) -- Pattern match redundant ???
+    -- _ -> error "Found invalid LineData while moving edge"
+
+-- Find relevant edges
+-- Figure out if start or endPos is being updated
+-- Update relevant pos
+-- Insert back into state and return
+
+-- TODO Replace with css
 -- Returns style tuples for Draggable elements
 getDraggableStyle :: [(String, String)]
 getDraggableStyle = [("height", "50px"), ("width", "50px"),
@@ -232,36 +233,35 @@ calcRelPos :: Pos -> Pos -> Pos -> Pos
 calcRelPos mousePos oldPos dims =
   (fst mousePos + (fst oldPos - fst dims `div` 2), snd mousePos + (snd oldPos - snd dims `div` 2))
 
--- Horrible mess of an IORef based counter to generate IDs for state elements
-getNextID :: IORef [String] -> IO String
-getNextID ref = do
-  ids <- readIORef ref :: IO [String]
-  writeIORef ref (drop 1 ids)
-  return (head ids)
+-- Generates the ID of the next state by incrementing the old stateID by 1
+getNextID :: String -> String
+getNextID (_:stateNum) = "s" ++ show nextNum where
+  nextNum = 1 + read stateNum :: Int
 
--- Convenience function for looking up data about elements from an IORef
--- based on their id, which is stored in the 'value' attribute of the element
--- since that is the only attribute TPG allows you to read the value of
-getElemFromRef :: Element -> IORef (Map String ElemData) -> UI ElemData
-getElemFromRef element ref = do
-  elemid  <- element # get value
-  elemMap <- liftIO $ readIORef ref
+-- Convenience function for finding elements from their ID
+lookupElemData :: AppState -> Element -> UI ElemData
+lookupElemData state element = do
+  elemid <- element # get value
+  let elemMap = states state
   UI.pure $ elemMap ! elemid
 
 -- Creates a new SVG line between the two input elements and
 -- stores a reference to it in linesRef
-mkSVGLine :: ElemData -> ElemData -> UI Element
-mkSVGLine strtNode endNode =
-   SVG.line # set SVG.x1 (show $ fst $ pos strtNode)
-            # set SVG.y1 (show $ snd $ pos strtNode)
-            # set SVG.x2 (show $ fst $ pos endNode)
-            # set SVG.y2 (show $ snd $ pos endNode)
-            # set SVG.stroke "blue"
-            # set SVG.stroke_width "5"
+mkSVGLine :: ElemData -> ElemData -> UI LineData
+mkSVGLine strtNode endNode = do
+    lineElem <- SVG.line # set SVG.x1 (show $ fst $ pos strtNode)
+                         # set SVG.y1 (show $ snd $ pos strtNode)
+                         # set SVG.x2 (show $ fst $ pos endNode)
+                         # set SVG.y2 (show $ snd $ pos endNode)
+                         #. "edge"
+    let lineID = elemId strtNode ++ elemId endNode
+    UI.pure $ LineData lineID lineElem (elemId strtNode, elemId endNode)
 
-
--- State and Event notes
--- Event types:
---  AddState Pos
---  MovState (Elem, Pos)
---
+-- Utility function for inserting LineData into ElemData to keep
+-- track of which states have edges connected to them
+insertLineData :: Map String ElemData -> ElemData -> ElemData ->
+                  LineData -> Map String ElemData
+insertLineData elemMap par1 par2 edge =
+  insert (elemId par2) (par2 { edgeIDs = edgeID:(edgeIDs par2) }) elemMap' where
+    elemMap' = insert (elemId par1) (par1 { edgeIDs = edgeID:(edgeIDs par1) }) elemMap
+    edgeID = lineId edge
