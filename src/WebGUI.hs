@@ -41,24 +41,12 @@ setup w = do
     elCanvDiv <- UI.div # set style [("height", "500px"), ("width", "100%")]
                         #+ [element elCanvas]
 
-    elParent <- UI.div #  set style [("height", "100px"), ("width", "100px"),
-                                    ("border-style", "solid")]
-    elChild <- UI.button # set text "Child" # set UI.id_ "child"
     elDrawCheck <- UI.input # set UI.type_ "checkbox"
     elCheckText <- UI.span # set UI.text "Line drawing mode"
 
 
-    element elParent #+ [element elChild]
-
-
-
-    -- TODO Refactor these into a state object?
     let initialState = AppState w empty empty StateMode Nothing Nothing "s1"
-
-    stateRef     <- liftIO $ newIORef initialState :: UI (IORef AppState)
-    eventsRef    <- liftIO $ newIORef [] :: UI (IORef [(String, IO ())])
-
-
+    stateRef <- liftIO $ newIORef initialState :: UI (IORef AppState)
 
     -- functionality
     let
@@ -83,14 +71,10 @@ setup w = do
       redoLayout state = void $ do
         let stateList = map (Types.elem . snd) $ toList (states state) :: [Element]
         let edgeList = map (Types.lineElem . snd) $ toList (edges state) :: [Element]
-        layout <- mkLayout stateList
         element elCanvas # set children edgeList
         element elCanvDiv # set children (elCanvas : stateList) -- TODO Render lines / edges
-        element elBody # set children (elCanvDiv : [layout, elDrawCheck, elCheckText])
+        element elBody # set children (elCanvDiv : [elRemove, elDrawCheck, elCheckText])
 
-      mkLayout :: [Element] -> UI Element
-      mkLayout xs = column $
-        [row [element elRemove]] ++ [element elParent]
 
       handleMouseDown :: AppState -> Element -> UI AppState
       handleMouseDown state element =
@@ -114,31 +98,30 @@ setup w = do
             }
             redoLayout state'
             return state'
-            --   void $ UI.element elCanvas #+ [UI.element lineElem] -- TODO Find better solution so I can remove lines again
-            --   UI.element elCanvas #+ [UI.element lineElem]
-
 
       handleMClick :: Pos -> AppState -> UI AppState
       handleMClick position state =
         case clickMode state of
           StateMode -> do
-            let nextID = nxtStID state
-            elInput <- UI.input # set style inputStyle
-            elBox <- UI.div # set style boxStyle #+ [UI.element elInput]
-                            # set value nextID
-                            # set UI.id_ nextID
-            handleMClickListener elBox
-            let inputData = ElemData nextID elBox position []
-            let nextID' = getNextID (nxtStID state)
-            let state' = state {nxtStID = nextID', states = insert nextID inputData (states state)}
+            state' <- addState state position
             redoLayout state' -- TODO Find smart way of updating layout without redrawing entire DOM
             return state'
           LineMode -> return state -- Do nothing
         -- return state {nxtStID = nextID', states = insert nextID inputData (states state)}
-        where
-          boxStyle = getDraggableStyle ++ mkPosAttr position -- TODO Look into if ++ is causing slowdown
-          inputStyle = [("width", "80%")]
 
+
+      addState :: AppState -> Pos -> UI AppState
+      addState state pos = do
+        let nextID = nxtStID state
+        elBox <- UI.div #+ [UI.input]
+                        #. "state"
+                        # set style (mkPosAttr pos)
+                        # set value nextID
+                        # set UI.id_ nextID
+        handleMClickListener elBox
+        let inputData = ElemData nextID elBox pos []
+        let nextID' = getNextID (nxtStID state)
+        return state {nxtStID = nextID', states = insert nextID inputData (states state)}
 
       handleMClickListener :: Element -> UI ()
       handleMClickListener element = do
@@ -172,14 +155,15 @@ moveStateElem state pos@(x,y) =
   case dragRef state of
     Nothing -> UI.pure state
     Just element -> do
-      let styling = getDraggableStyle ++ [("left", show x ++ "px"), ("top", show y ++ "px")]
+      let styling = [("left", show x ++ "px"), ("top", show y ++ "px")]
       elemData <- lookupElemData state element :: UI ElemData
       element' <- UI.element element # set style styling
       let elemData' = elemData { Types.elem = element', Types.pos = pos }
       let state' = state { states = insert (elemId elemData') elemData' (states state)}
       movStateEdges state' elemData pos
--- TODO move edges as well
 
+-- Function that based on a state, and a position, updates the position of all
+-- edges connected to that state
 movStateEdges :: AppState -> ElemData -> Pos -> UI AppState
 movStateEdges state elemData pos = do
   let edges = Types.edges state       :: Map String LineData
@@ -189,6 +173,7 @@ movStateEdges state elemData pos = do
   movedEdges <- mapM (\tuple -> movStateEdge tuple pos) updTups :: UI [LineData]
   let edges'' = foldr (\lData acc -> insert (lineId lData) lData acc) edges movedEdges :: Map String LineData
   return state { Types.edges = edges'' }
+
 
 movStateEdge :: (LineData, Int) -> Pos -> UI LineData
 movStateEdge (line, posNum) (newX, newY) = do
@@ -204,28 +189,12 @@ findStartOrEnd :: LineData -> String -> (LineData, Int)
 findStartOrEnd edge parID =
   if (fst $ parents edge) == parID
     then (edge, 1)
-    else (edge, 2) -- Pattern match redundant ???
-    -- _ -> error "Found invalid LineData while moving edge"
-
--- Find relevant edges
--- Figure out if start or endPos is being updated
--- Update relevant pos
--- Insert back into state and return
-
--- TODO Replace with css
--- Returns style tuples for Draggable elements
-getDraggableStyle :: [(String, String)]
-getDraggableStyle = [("height", "50px"), ("width", "50px"),
-                    ("border-style", "solid"),
-                    ("position", "absolute"),
-                    ("background", "blue")]
-
+    else (edge, 2)
+    
 -- Makes top and left style attributes with the input position values
 mkPosAttr :: Pos -> [(String, String)]
 mkPosAttr (x,y) = [("left", show x ++ "px"),
                    ("top", show y ++ "px")]
-
-
 
 -- Calculates the new position of an element based on the position of the mouse,
 -- the element's current position and its dimensions
