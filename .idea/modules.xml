@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Masterprosjekt.iml" filepath="$PROJECT_DIR$/.idea/modules/Masterprosjekt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Masterprosjekt_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Masterprosjekt_main.iml" group="Masterprosjekt" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Masterprosjekt_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Masterprosjekt_test.iml" group="Masterprosjekt" />
+    </modules>
+  </component>
+</project>

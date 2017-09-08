@@ -190,7 +190,7 @@ findStartOrEnd edge parID =
   if (fst $ parents edge) == parID
     then (edge, 1)
     else (edge, 2)
-    
+
 -- Makes top and left style attributes with the input position values
 mkPosAttr :: Pos -> [(String, String)]
 mkPosAttr (x,y) = [("left", show x ++ "px"),
@@ -234,3 +234,7 @@ insertLineData elemMap par1 par2 edge =
   insert (elemId par2) (par2 { edgeIDs = edgeID:(edgeIDs par2) }) elemMap' where
     elemMap' = insert (elemId par1) (par1 { edgeIDs = edgeID:(edgeIDs par1) }) elemMap
     edgeID = lineId edge
+
+onClick :: WriteAttr Element String
+onClick = UI.mkWriteAttr $ \el s ->
+    runFunction $ ffi "$(%1).on('mousedown', (alert(%2))" el s
