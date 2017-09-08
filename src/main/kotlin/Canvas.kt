@@ -17,6 +17,11 @@ class Canvas : View("My View") {
 
         center = stackpane {
             anchorpane {
+                bindChildren(edges) {
+                    EdgeFragment(it).root
+                }
+            }
+            anchorpane {
                 bindChildren(states) {
                     StateFragment(it).root
                 }
