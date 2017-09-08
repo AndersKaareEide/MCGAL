@@ -3,7 +3,7 @@ import tornadofx.*
 
 class Edge(val parent1: State, val parent2: State) {
 
-    val id: String by property { SimpleStringProperty(this, "id", ) }
+    val id: String = parent1.name + parent2.name
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

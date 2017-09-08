@@ -1,13 +1,5 @@
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.geometry.Pos
-import javafx.scene.layout.*
-import javafx.scene.paint.Color
-import javafx.scene.shape.Circle
-import javafx.scene.text.TextAlignment
 import tornadofx.*
-import javax.naming.ldap.Control
 
 class Canvas : View("My View") {
 
@@ -20,16 +12,18 @@ class Canvas : View("My View") {
         prefHeight = 600.0
         prefWidth = 600.0
 
+//        setOnMouseClicked { controller.handle }
+
         center = anchorpane {
             bindChildren(states) {
                 StateView(it).root
             }
-            setOnMouseDragReleased { controller.handleDragEnd(null) }
+//            setOnMouseDragReleased { controller.handleDragEnd(null) }
         }
 
         bottom = hbox {
             checkbox {
-                controller.isDrawingLinesProperty.bind(selectedProperty())
+                controller.isDrawingStatesProperty.bind(selectedProperty())
             }
             label("Line drawing mode")
         }
