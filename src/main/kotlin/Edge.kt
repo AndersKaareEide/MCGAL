@@ -2,8 +2,13 @@ import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
 class Edge(val parent1: State, val parent2: State) {
-
     val id: String = parent1.name + parent2.name
+
+    init {
+        parent1.inEdges.add(this)
+        parent2.outEdges.add(this)
+    }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

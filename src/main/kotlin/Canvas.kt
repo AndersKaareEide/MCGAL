@@ -4,26 +4,28 @@ import tornadofx.*
 class Canvas : View("My View") {
 
     val controller: CanvasStateController by inject()
-    val states = FXCollections.observableArrayList(
-            State("s1", 0.0, 0.0),
-            State("s2", 50.0, 70.0, "p, q"))
+    val state1 = State("s1", 150.0, 200.0)
+    val state2 = State("s2", 50.0, 70.0, "p, q")
+    val states = FXCollections.observableArrayList(state1, state2)
+    val edges = FXCollections.observableArrayList(Edge(state1, state2))
 
     override val root = borderpane {
         prefHeight = 600.0
         prefWidth = 600.0
 
-//        setOnMouseClicked { controller.handle }
 
-        center = anchorpane {
-            bindChildren(states) {
-                StateView(it).root
+
+        center = stackpane {
+            anchorpane {
+                bindChildren(states) {
+                    StateView(it).root
+                }
             }
-//            setOnMouseDragReleased { controller.handleDragEnd(null) }
         }
 
         bottom = hbox {
             checkbox {
-                controller.isDrawingStatesProperty.bind(selectedProperty())
+                controller.isDrawingLinesProperty.bind(selectedProperty())
             }
             label("Line drawing mode")
         }

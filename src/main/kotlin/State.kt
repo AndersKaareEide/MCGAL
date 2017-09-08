@@ -19,10 +19,10 @@ class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0, props: String 
     val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
     var yPos by yProperty
 
-    val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges")
+    val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
     var inEdges by inEdgesProperty
 
-    val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges")
+    val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
     var outEdges by outEdgesProperty
 
     val propsProperty = SimpleStringProperty(this, "props", props)

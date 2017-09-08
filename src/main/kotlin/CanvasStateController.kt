@@ -1,41 +1,46 @@
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.scene.Node
+import javafx.scene.input.MouseEvent
 import tornadofx.*
 
 class CanvasStateController : Controller() {
 
+    val canvas: Canvas by inject()
     val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
-    var isDrawingLines by isDrawingLinesProperty
+    val isDrawingLines by isDrawingLinesProperty
     var lastClickedState: State? = null
 
     var deltaX = 0.0
     var deltaY = 0.0
 
-    fun handleMPress(item: State, sceneX: Double, sceneY: Double){
+    fun handleMPress(item: State, event: MouseEvent){
+        if (!isDrawingLines)
+            setDragDelta(item, event)
+    }
+
+    fun setDragDelta(item: State, event: MouseEvent){
+        deltaX = item.xPos - event.sceneX
+        deltaY = item.yPos - event.sceneY
+    }
+
+    fun handleMDrag(item: State, event: MouseEvent) {
+        if (isDrawingLines.not())
+            dragItem(item, event)
+    }
+
+    fun handleDragEnd(item: State){
+        println("Draw line from ${lastClickedState?.name} to ${item.name}")
+    }
+
+    fun dragItem(item: State, event:MouseEvent){
+        item.xPos = deltaX + event.sceneX
+        item.yPos = deltaY + event.sceneY
+    }
+
+    fun startLineDrawing(item: State, node: Node) {
         if (isDrawingLines)
             lastClickedState = item
-        else
-            startDrag(item, sceneX, sceneY)
-    }
-
-    fun handleMDrag(item: State, sceneX: Double, sceneY: Double) {
-        if (isDrawingLines)
-            dragItem(item, sceneX, sceneY)
-    }
-
-    fun handleDragEnd(item: State?){
-        if (item != null){
-
-        }
-    }
-
-    fun startDrag(item: State, xPos: Double, yPos: Double){
-        deltaX = item.xPos - xPos
-        deltaY = item.yPos - yPos
-    }
-
-    fun dragItem(item: State, xPos: Double, yPos: Double){
-        item.xPos = deltaX + xPos
-        item.yPos = deltaY + yPos
+            node.startFullDrag()
     }
 
 }
