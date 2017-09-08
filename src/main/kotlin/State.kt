@@ -8,7 +8,7 @@ import tornadofx.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0, props: String = "") {
+class State(name: String, xPos: Double, yPos: Double, props: String = "") {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty

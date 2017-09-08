@@ -18,7 +18,7 @@ class Canvas : View("My View") {
         center = stackpane {
             anchorpane {
                 bindChildren(states) {
-                    StateView(it).root
+                    StateFragment(it).root
                 }
             }
         }
@@ -30,5 +30,4 @@ class Canvas : View("My View") {
             label("Line drawing mode")
         }
     }
-
 }

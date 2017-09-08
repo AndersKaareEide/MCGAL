@@ -5,7 +5,6 @@ import tornadofx.*
 
 class CanvasStateController : Controller() {
 
-    val canvas: Canvas by inject()
     val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
     val isDrawingLines by isDrawingLinesProperty
     var lastClickedState: State? = null

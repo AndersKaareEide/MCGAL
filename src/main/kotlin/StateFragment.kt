@@ -3,7 +3,7 @@ import javafx.scene.paint.Color
 import tornadofx.*
 
 
-class StateView(val item: State) : Fragment() {
+class StateFragment(val item: State) : Fragment() {
     val controller = find(CanvasStateController::class)
 
     override val root =
