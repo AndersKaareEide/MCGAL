@@ -1,4 +1,5 @@
 import javafx.beans.property.DoubleProperty
+import javafx.scene.text.TextAlignment
 import tornadofx.*
 
 class EdgeFragment(val item: Edge) : Fragment("My View") {
@@ -20,16 +21,17 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
         label("List of agents goes here") {
             translateXProperty().bind((x1 + x2) / 2)
             translateYProperty().bind((y1 + y2) / 2)
-            rotateProperty().doubleBinding(x1, y1, x2, y2) {
+            rotateProperty().bind(doubleBinding(x1, y1, x2, y2) {
                 getAngle(x1.value, y1.value, x2.value, y2.value)
-            } //TODO Fix rotation of label, getAngle() is never called
+            })
         }
 
     }
 
     fun getAngle(x1: Double, y1: Double, x2: Double, y2: Double): Double{
-
-        val difX = x2 - x1; val difY = y2 - y1
-        return Math.toDegrees(Math.atan2(difY, difX))
+        //TODO Fix so label is never upside-down
+        val difX = x1 - x2; val difY = y1 - y2
+        var degrees = Math.toDegrees(Math.atan2(difY, difX))
+        return degrees
     }
 }
