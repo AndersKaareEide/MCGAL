@@ -29,7 +29,8 @@ class CanvasStateController : Controller() {
     }
 
     fun handleDragEnd(item: State){
-        println("Draw line from ${lastClickedState?.name} to ${item.name}")
+        if (isDrawingLines)
+            println("Draw line from ${lastClickedState?.name} to ${item.name}")
     }
 
     fun dragItem(item: State, event:MouseEvent){
