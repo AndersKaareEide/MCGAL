@@ -19,7 +19,7 @@ class StateFragment(val item: State) : Fragment() {
 
                 center = stackpane {
                     circle {
-                        radius = 25.0
+                        radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
                     }
                     label { textProperty().bind(item.nameProperty) }

@@ -25,7 +25,7 @@ class State(name: String, xPos: Double, yPos: Double, props: String = "") {
     val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
     var outEdges by outEdgesProperty
 
-    val propsProperty = SimpleStringProperty(this, "props", props)
+    val propsProperty = SimpleStringProperty(this, "agents", props)
     var props by propsProperty
 
 

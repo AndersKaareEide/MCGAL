@@ -1,14 +1,17 @@
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
-class Edge(val parent1: State, val parent2: State) {
+class Edge(val parent1: State, val parent2: State, agents: String) {
+
     val id: String = parent1.name + parent2.name
+
+    val agentsProperty = SimpleStringProperty(this, "agents", agents)
+    var agents by agentsProperty
 
     init {
         parent1.inEdges.add(this)
         parent2.outEdges.add(this)
     }
-
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
