@@ -1,3 +1,5 @@
+package canvas
+
 import javafx.beans.property.DoubleProperty
 import javafx.geometry.Pos
 import tornadofx.*

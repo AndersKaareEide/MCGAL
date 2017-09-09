@@ -1,3 +1,5 @@
+package canvas
+
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent

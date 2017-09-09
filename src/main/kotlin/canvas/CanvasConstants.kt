@@ -1,3 +1,5 @@
+package canvas
+
 /**
  * File containing various constants used in layouts related to the Canvas
  */

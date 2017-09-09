@@ -1,12 +1,10 @@
+package canvas
+
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import tornadofx.*
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 class State(name: String, xPos: Double, yPos: Double, props: String = "") {
 

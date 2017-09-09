@@ -1,3 +1,5 @@
+package canvas
+
 import javafx.collections.FXCollections
 import tornadofx.*
 
@@ -12,8 +14,6 @@ class Canvas : View("My View") {
     override val root = borderpane {
         prefHeight = 600.0
         prefWidth = 600.0
-
-
 
         center = stackpane {
             anchorpane {

@@ -1,3 +1,5 @@
+package canvas
+
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import tornadofx.*
@@ -16,7 +18,6 @@ class StateFragment(val item: State) : Fragment() {
                 setOnMouseDragged { controller.handleMDrag(item, it) }
                 setOnMouseDragReleased { controller.handleDragEnd(item) }
 
-
                 center = stackpane {
                     circle {
                         radius = STATE_CIRCLE_RADIUS
@@ -29,8 +30,6 @@ class StateFragment(val item: State) : Fragment() {
                     textProperty().bind(item.propsProperty)
                     useMaxWidth = true
                     alignment = Pos.CENTER
-//                    border = Border(BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT))
-//                    For debugging purposes
                 }
             }
 }

@@ -1,3 +1,5 @@
+package canvas
+
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
