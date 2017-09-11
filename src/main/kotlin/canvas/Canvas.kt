@@ -1,6 +1,7 @@
 package canvas
 
 import javafx.collections.FXCollections
+import javafx.scene.input.KeyCombination
 import tornadofx.*
 
 class Canvas : View("My View") {
@@ -35,8 +36,9 @@ class Canvas : View("My View") {
             //TODO Prevent from being squeezed out of view
             checkbox {
                 controller.isDrawingLinesProperty.bind(selectedProperty())
+                text = "_Line drawing mode"
+                accelerators.put(KeyCombination.keyCombination("ALT+L")) { fire() }
             }
-            label("Line drawing mode")
         }
     }
 }
