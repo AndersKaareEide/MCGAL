@@ -1,13 +1,14 @@
 package canvas
 
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
-class Edge(val parent1: State, val parent2: State, agents: String) {
+class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
 
     val id: String = parent1.name + parent2.name
 
-    val agentsProperty = SimpleStringProperty(this, "agents", agents)
+    val agentsProperty = SimpleObjectProperty(this, "agents", agents)
     var agents by agentsProperty
 
     init {

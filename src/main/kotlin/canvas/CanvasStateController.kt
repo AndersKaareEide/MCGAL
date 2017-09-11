@@ -9,6 +9,7 @@ import tornadofx.*
 class CanvasStateController : Controller() {
 
     val canvas: Canvas by inject()
+    val agentController: AgentPanelController by inject()
 
     val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
     val isDrawingLines by isDrawingLinesProperty
@@ -34,8 +35,7 @@ class CanvasStateController : Controller() {
 
     fun handleDragEnd(item: State){
         if (isDrawingLines && lastClickedState != null) {
-            //TODO Actually add agents to string
-            canvas.edges.add(Edge(lastClickedState!!, item, "a"))
+            canvas.edges.add(Edge(lastClickedState!!, item, agentController.getSelected()))
         }
     }
 

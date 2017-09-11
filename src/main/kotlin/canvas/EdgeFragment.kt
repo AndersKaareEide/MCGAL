@@ -22,7 +22,10 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
         label {
             //TODO Bind positioning to angle as well so it looks good at 90* angles and such
             alignment = Pos.CENTER
-            textProperty().bind(item.agentsProperty)
+            textProperty().bind(stringBinding(item.agentsProperty) {
+                item.agentsProperty.value.joinToString(",") { it.name }
+            })
+
 
             translateXProperty().bind((((x1 + x2) / 2) - widthProperty() / 2) + STATE_CIRCLE_RADIUS)
             translateYProperty().bind((((y1 + y2) / 2) - heightProperty() / 2) + (STATE_CIRCLE_RADIUS - 10.0))

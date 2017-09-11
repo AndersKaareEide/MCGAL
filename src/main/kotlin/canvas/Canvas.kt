@@ -10,13 +10,13 @@ class Canvas : View("My View") {
     val state1 = State("s1", 150.0, 200.0)
     val state2 = State("s2", 50.0, 70.0, "p, q")
     val states = FXCollections.observableArrayList(state1, state2)
-    val edges = FXCollections.observableArrayList(Edge(state1, state2, "a, b, c"))
+    val edges = FXCollections.observableArrayList(Edge(state1, state2, listOf(AgentItem("a", true))))
 
     override val root = borderpane {
         prefWidth = 800.0
         prefHeight = 600.0
 
-          right = AgentPanel().root
+        right = AgentPanel().root
 
         center = stackpane {
 
