@@ -1,11 +1,14 @@
 package canvas
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.collections.FXCollections
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import tornadofx.*
 
 class CanvasStateController : Controller() {
+
+    val canvas: Canvas by inject()
 
     val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
     val isDrawingLines by isDrawingLinesProperty
@@ -30,8 +33,10 @@ class CanvasStateController : Controller() {
     }
 
     fun handleDragEnd(item: State){
-        if (isDrawingLines)
-            println("Draw line from ${lastClickedState?.name} to ${item.name}")
+        if (isDrawingLines && lastClickedState != null) {
+            //TODO Actually add agents to string
+            canvas.edges.add(Edge(lastClickedState!!, item, "a"))
+        }
     }
 
     fun dragItem(item: State, event:MouseEvent){
@@ -43,6 +48,16 @@ class CanvasStateController : Controller() {
         if (isDrawingLines)
             lastClickedState = item
             node.startFullDrag()
+    }
+
+    fun handleCanvasClick(event: MouseEvent) {
+        if (!isDrawingLines)
+            addState(event)
+    }
+
+    private fun addState(event: MouseEvent) {
+        //TODO Add props to state
+        canvas.states.add(State("s${canvas.states.size + 1}", event.sceneX, event.sceneY))
     }
 
 }

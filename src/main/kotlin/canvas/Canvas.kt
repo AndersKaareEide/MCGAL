@@ -15,6 +15,9 @@ class Canvas : View("My View") {
         prefHeight = 600.0
         prefWidth = 600.0
 
+
+        setOnMouseClicked { controller.handleCanvasClick(it) }
+
         center = stackpane {
             anchorpane {
                 bindChildren(edges) {
@@ -29,6 +32,7 @@ class Canvas : View("My View") {
         }
 
         bottom = hbox {
+            //TODO Prevent from being squeezed out of view
             checkbox {
                 controller.isDrawingLinesProperty.bind(selectedProperty())
             }
