@@ -57,7 +57,9 @@ class CanvasStateController : Controller() {
 
     private fun addState(event: MouseEvent) {
         //TODO Add props to state
-        canvas.states.add(State("s${canvas.states.size + 1}", event.sceneX, event.sceneY))
+        val posX = event.sceneX - STATE_CIRCLE_RADIUS
+        val posY = event.sceneY - STATE_CIRCLE_RADIUS
+        canvas.states.add(State("s${canvas.states.size + 1}", posX, posY))
     }
 
 }
