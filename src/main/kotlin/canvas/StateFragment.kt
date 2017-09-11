@@ -13,15 +13,17 @@ class StateFragment(val item: State) : Fragment() {
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 
-                setOnMousePressed { controller.handleMPress(item, it) }
-                setOnDragDetected { controller.startLineDrawing(item, this) }
-                setOnMouseDragged { controller.handleMDrag(item, it) }
-                setOnMouseDragReleased { controller.handleDragEnd(item) }
-
                 center = stackpane {
                     circle {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
+
+                        setOnMousePressed { controller.handleMPress(item, it); it.consume() }
+                        setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
+                        setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
+                        setOnMouseDragReleased { controller.handleDragEnd(item); it.consume() }
+                        setOnMouseClicked { it.consume() } // Only used to stop events from bubbling upwards to the Canvas
+
                     }
                     label { textProperty().bind(item.nameProperty) }
                 }
