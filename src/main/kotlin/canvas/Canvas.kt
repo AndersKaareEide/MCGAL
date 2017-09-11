@@ -13,10 +13,10 @@ class Canvas : View("My View") {
     val edges = FXCollections.observableArrayList(Edge(state1, state2, "a, b, c"))
 
     override val root = borderpane {
+        prefWidth = 800.0
         prefHeight = 600.0
-        prefWidth = 600.0
 
-
+          right = AgentPanel().root
 
         center = stackpane {
 
