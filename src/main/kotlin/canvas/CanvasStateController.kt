@@ -45,9 +45,10 @@ class CanvasStateController : Controller() {
     }
 
     fun startLineDrawing(item: State, node: Node) {
-        if (isDrawingLines)
+        if (isDrawingLines) {
             lastClickedState = item
             node.startFullDrag()
+        }
     }
 
     fun handleCanvasClick(event: MouseEvent) {

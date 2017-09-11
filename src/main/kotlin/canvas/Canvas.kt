@@ -17,9 +17,11 @@ class Canvas : View("My View") {
         prefWidth = 600.0
 
 
-        setOnMouseClicked { controller.handleCanvasClick(it) }
 
         center = stackpane {
+
+            setOnMouseClicked { controller.handleCanvasClick(it) }
+
             anchorpane {
                 bindChildren(edges) {
                     EdgeFragment(it).root

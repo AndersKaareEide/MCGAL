@@ -25,7 +25,10 @@ class StateFragment(val item: State) : Fragment() {
                         setOnMouseClicked { it.consume() } // Only used to stop events from bubbling upwards to the Canvas
 
                     }
-                    label { textProperty().bind(item.nameProperty) }
+                    label {
+                        textProperty().bind(item.nameProperty)
+                        isMouseTransparent = true
+                    }
                 }
 
                 bottom = label {
