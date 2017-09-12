@@ -6,7 +6,7 @@ import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import tornadofx.*
 
-class CanvasStateController : Controller() {
+class CanvasController : Controller() {
 
     val canvas: Canvas by inject()
     val agentController: AgentPanelController by inject()
@@ -35,7 +35,13 @@ class CanvasStateController : Controller() {
 
     fun handleDragEnd(item: State){
         if (isDrawingLines && lastClickedState != null) {
-            canvas.edges.add(Edge(lastClickedState!!, item, agentController.getSelected()))
+            val agents = agentController.getSelected()
+            if (!agents.isEmpty()) {
+                canvas.edges.add(Edge(lastClickedState!!, item, ArrayList(agents)))
+            } else {
+                //TODO Provide visual feedback
+                println("Can't create edge without selecting agents first")
+            }
         }
     }
 
@@ -62,5 +68,4 @@ class CanvasStateController : Controller() {
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
         canvas.states.add(State("s${canvas.states.size + 1}", posX, posY))
     }
-
 }

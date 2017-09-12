@@ -6,7 +6,7 @@ import tornadofx.*
 
 
 class StateFragment(val item: State) : Fragment() {
-    val controller = find(CanvasStateController::class)
+    val controller = find(CanvasController::class)
 
     override val root =
             borderpane {

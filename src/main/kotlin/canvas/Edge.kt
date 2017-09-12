@@ -1,5 +1,6 @@
 package canvas
 
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
@@ -8,7 +9,7 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
 
     val id: String = parent1.name + parent2.name
 
-    val agentsProperty = SimpleObjectProperty(this, "agents", agents)
+    val agentsProperty = SimpleListProperty<AgentItem>(this, "agents", agents.observable())
     var agents by agentsProperty
 
     init {
