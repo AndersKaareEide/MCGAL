@@ -26,7 +26,7 @@ class AgentPanel : View() {
             }
         }
 
-        listview(controller.agents) {
+        listview(controller.agents.sorted()) {
             cellFragment(AgentListFragment::class)
             vgrow = Priority.ALWAYS
         }

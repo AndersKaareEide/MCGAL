@@ -10,8 +10,7 @@ class AgentPanelController: Controller() {
 
     init {
         //TODO Remove, used for manual testing
-        agents.addAll(AgentItem("a0",true), AgentItem("a1",false),
-                      AgentItem("c",true), AgentItem("b",true))
+        agents.addAll(AgentItem("a",true), AgentItem("b",true), AgentItem("c",true))
     }
 
     fun getSelected(): ObservableList<AgentItem> {

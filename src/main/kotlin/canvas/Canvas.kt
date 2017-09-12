@@ -12,7 +12,7 @@ class Canvas : View("My View") {
 
     //TODO Remove, used for manual testing purposes only
     val states = FXCollections.observableArrayList(state1, state2)
-    val edges = FXCollections.observableArrayList(Edge(state1, state2, listOf(AgentItem("a", true))))
+    val edges = FXCollections.observableArrayList(Edge(state1, state2, listOf(AgentItem("a0", true))))
 
     override val root = borderpane {
         prefWidth = 800.0
