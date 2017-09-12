@@ -18,7 +18,7 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other is Edge && parent1.equals(other.parent2)) return true //Edges have same parents
+        if (other is Edge && (parent1 == other.parent2 && parent2 == other.parent1)) return true //Edges have same parents
         return false
     }
 
