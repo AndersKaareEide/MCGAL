@@ -18,8 +18,14 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other is Edge && (parent1 == other.parent2 && parent2 == other.parent1)) return true //Edges have same parents
+        if (this === other)
+            return true
+        //Edges have same parents
+        if (other is Edge &&
+                ((parent1 == other.parent2 && parent2 == other.parent1)
+             || (parent1 == other.parent1) && parent2 == other.parent2)) {
+            return true
+        }
         return false
     }
 
@@ -31,8 +37,3 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
     }
 }
 
-class EdgeModel : ItemViewModel<Edge>() {
-    val parent1 = bind(Edge::parent1)
-    val parent2 = bind(Edge::parent2)
-    val id = bind(Edge::id)
-}
