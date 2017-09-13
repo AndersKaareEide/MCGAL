@@ -8,6 +8,7 @@ class AgentPanelController: Controller() {
     val edgeController: EdgeController by inject()
     val agents = SortedFilteredList<AgentItem>()
 
+
     init {
         //TODO Remove, used for manual testing
         agents.addAll(AgentItem("a",true), AgentItem("b",true), AgentItem("c",true))
@@ -23,9 +24,19 @@ class AgentPanelController: Controller() {
         agents.remove(agent.item)
     }
 
+    //TODO Make it so that agents are sorted on edges as well
     fun addAgent(agentName: String){
         if (agentName != "") {
-            agents.add(AgentItem(agentName, true))
+            val newAgent = AgentItem(agentName, true)
+            if (agents.contains(newAgent)) {
+                var agentNumber = 0
+                newAgent.name = agentName + agentNumber
+                while (agents.contains(newAgent)) {
+                    agentNumber++
+                    newAgent.name = agentName + agentNumber
+                }
+            }
+            agents.add(newAgent)
         }
     }
 }
