@@ -2,6 +2,7 @@ package canvas
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import tornadofx.*
@@ -37,11 +38,22 @@ class CanvasController : Controller() {
         if (isDrawingLines && lastClickedState != null) {
             val agents = agentController.getSelected()
             if (!agents.isEmpty()) {
-                canvas.edges.add(Edge(lastClickedState!!, item, ArrayList(agents)))
+                addEdge(item, agents)
             } else {
                 //TODO Provide visual feedback
                 println("Can't create edge without selecting agents first")
             }
+        }
+    }
+
+    private fun addEdge(item: State, agents: ObservableList<AgentItem>) {
+        val newEdge = Edge(lastClickedState!!, item, ArrayList(agents))
+        if (canvas.edges.contains(newEdge)){
+            //Get reference to existing edge with same parents
+            val oldEdge = canvas.edges.get(canvas.edges.indexOf(newEdge))
+            oldEdge.agents.setAll(agents)
+        } else {
+            canvas.edges.add(newEdge)
         }
     }
 
