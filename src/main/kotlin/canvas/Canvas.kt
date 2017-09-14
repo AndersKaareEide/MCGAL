@@ -12,7 +12,7 @@ class Canvas : View("My View") {
 
     //TODO Remove, used for manual testing purposes only
     val states = FXCollections.observableArrayList(state1, state2)
-    val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a0", true))))
+    val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
 
     override val root = borderpane {
         prefWidth = 800.0
@@ -25,11 +25,13 @@ class Canvas : View("My View") {
             setOnMouseClicked { controller.handleCanvasClick(it) }
 
             anchorpane {
+                isManaged = false
                 bindChildren(edges) {
                     EdgeFragment(it).root
                 }
             }
             anchorpane {
+                isManaged = false
                 bindChildren(states) {
                     StateFragment(it).root
                 }
