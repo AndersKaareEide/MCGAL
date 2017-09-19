@@ -1,5 +1,7 @@
 package formulaParser
 
+import canvas.AgentItem
+
 abstract class Formula {
 
     abstract fun check(): Boolean
@@ -43,7 +45,7 @@ class Implication(left: Formula, right: Formula): BinaryOperator(left, right){
 
 }
 
-class Knows(val agent: String, val inner: Formula): Formula() {
+class Knows(val agent: AgentItem, val inner: Formula): Formula() {
     override fun check(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -55,7 +57,7 @@ class Announcement(left: Formula, right: Formula): BinaryOperator(left, right){
     }
 }
 
-class GroupAnn(val agents: List<String>, val inner: Formula): Formula() {
+class GroupAnn(val agents: MutableList<AgentItem>, val inner: Formula): Formula() {
     override fun check(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
