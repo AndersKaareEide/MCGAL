@@ -32,7 +32,9 @@ class StateFragment(val item: State) : Fragment() {
                 }
 
                 bottom = label {
-                    textProperty().bind(item.propsProperty)
+                    textProperty().bind(stringBinding(item.propsProperty) {
+                        item.propsProperty.value.joinToString(",")
+                    })
                     useMaxWidth = true
                     alignment = Pos.CENTER
                 }
