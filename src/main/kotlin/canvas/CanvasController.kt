@@ -27,6 +27,8 @@ class CanvasController : Controller() {
     var deltaX = 0.0
     var deltaY = 0.0
 
+    val model = Model(states, edges, agentController.agents)
+
     fun handleMPress(item: State, event: MouseEvent){
         if (!isDrawingLines)
             setDragDelta(item, event)
