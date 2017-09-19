@@ -7,12 +7,6 @@ import tornadofx.*
 class Canvas : View("My View") {
 
     val controller: CanvasController by inject()
-    val state1 = State("s1", 150.0, 200.0)
-    val state2 = State("s2", 50.0, 70.0, "p, q")
-
-    //TODO Remove, used for manual testing purposes only
-    val states = FXCollections.observableArrayList(state1, state2)
-    val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
 
     override val root = borderpane {
         prefWidth = 800.0
@@ -26,13 +20,13 @@ class Canvas : View("My View") {
 
             anchorpane {
                 isManaged = false
-                bindChildren(edges) {
+                bindChildren(controller.edges) {
                     EdgeFragment(it).root
                 }
             }
             anchorpane {
                 isManaged = false
-                bindChildren(states) {
+                bindChildren(controller.states) {
                     StateFragment(it).root
                 }
             }
