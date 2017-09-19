@@ -1,27 +1,26 @@
-import canvas.AgentItem
+package formulaParser
+
 import canvas.AgentPanelController
-import formulaParser.*
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
+import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 import tornadofx.*
 
-fun main(args: Array<String>){
-    val testForm = FormulaParser().parse("[a,b0,c24]Ka12([p|q](p&q)->r34)")
-    println(testForm)
-}
-
-class FormulaParser() : Controller() {
+object FormulaParser : Controller() {
     val agentController: AgentPanelController by inject()
-    fun parse(input: String): Formula {
+
+    fun parse(input: String, errorListener: ANTLRErrorListener): Formula {
         val lexer = GALLexer(CharStreams.fromString(input))
+        lexer.addErrorListener(errorListener)
         val tokens = CommonTokenStream(lexer)
         val parser = GALParser(tokens)
 
-        val tree = parser.form()
+        parser.addErrorListener(errorListener)
 
+        val tree = parser.formula().form()
         return recursiveTransform(tree)
     }
 
@@ -48,29 +47,20 @@ class FormulaParser() : Controller() {
                 return makeGroupAnnouncement(tree)
         }
 
-        throw RuntimeException("Error in parsing: ${tree.text}")
+        throw FormulaParsingException(tree.text)
     }
 
     private fun makeKnowsFormula(tree: GALParser.KnowsFormContext): Formula {
-        try {
-            val agent = agentController.getAgent(tree.agent.text)!!
-            return Knows(agent, recursiveTransform(tree.inner))
-        } catch (e: NullPointerException){
-            throw AgentNotFoundException(tree.agent.text)
-        }
+        val agent = agentController.getAgent(tree.agent.text)
+        return Knows(agent, recursiveTransform(tree.inner))
     }
 
     private fun makeGroupAnnouncement(tree: GALParser.GroupannFormContext): Formula {
-        val agents = mutableListOf<AgentItem>()
-            tree.agents().PROP().forEach {
-                try {
-                    agents.add(agentController.getAgent(it.text)!!)
-                }catch (e: NullPointerException){
-                    throw AgentNotFoundException(it.text)
-                }
-            }
+        val agents = tree.agents().PROP().map { agentController.getAgent(it.text) }
+
         return GroupAnn(agents, recursiveTransform(tree.inner))
     }
 }
 
+class FormulaParsingException(input: String): RuntimeException("Failed to parse formula: $input")
 class AgentNotFoundException(agentName: String): RuntimeException("Agent: $agentName not found in model")
