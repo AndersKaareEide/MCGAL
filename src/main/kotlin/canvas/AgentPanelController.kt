@@ -1,4 +1,5 @@
 package canvas
+import formulaParser.AgentNotFoundException
 import javafx.collections.ObservableList
 import javafx.collections.transformation.FilteredList
 import tornadofx.*
@@ -43,12 +44,12 @@ class AgentPanelController: Controller() {
     /**
      * Method used to retrieve AgentItems by name from the list of agents
      */
-    fun getAgent(agentName: String): AgentItem?{
+    fun getAgent(agentName: String): AgentItem{
         for (agent in agents){
             if (agent.name == agentName){
                 return agent
             }
         }
-        return null
+        throw AgentNotFoundException(agentName)
     }
 }

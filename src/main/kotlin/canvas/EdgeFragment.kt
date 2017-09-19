@@ -40,7 +40,7 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
     /**
      * Function used to calculate the rotation of the label on edges
      */
-    fun getAngle(x1: Double, y1: Double, x2: Double, y2: Double): Double{
+    private fun getAngle(x1: Double, y1: Double, x2: Double, y2: Double): Double{
         val difX = x1 - x2; val difY = y1 - y2
         var degrees = Math.toDegrees(Math.atan2(difY, difX)) - 180.0
         if (Math.abs(degrees) > 90 && Math.abs(degrees) < 270)
