@@ -39,4 +39,16 @@ class AgentPanelController: Controller() {
             agents.add(newAgent)
         }
     }
+
+    /**
+     * Method used to retrieve AgentItems by name from the list of agents
+     */
+    fun getAgent(agentName: String): AgentItem?{
+        for (agent in agents){
+            if (agent.name == agentName){
+                return agent
+            }
+        }
+        return null
+    }
 }
