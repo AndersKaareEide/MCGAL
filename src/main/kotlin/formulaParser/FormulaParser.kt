@@ -31,7 +31,7 @@ object FormulaParser : Controller() {
             is GALParser.ParensFormContext ->
                 return recursiveTransform(tree.inner)
             is GALParser.AtomicFormContext ->
-                return Property(tree.prop.text)
+                return Proposition(tree.prop.text)
             is GALParser.NegFormContext ->
                 return Negation(recursiveTransform(tree.inner))
             is GALParser.ConjFormContext ->

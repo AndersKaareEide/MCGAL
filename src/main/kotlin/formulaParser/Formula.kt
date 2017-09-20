@@ -11,7 +11,7 @@ abstract class Formula {
 
 abstract class BinaryOperator(val left: Formula, val right: Formula): Formula()
 
-class Property(val propString: String): Formula() {
+class Proposition(val propString: String): Formula() {
 
     override fun check(state: State, model: Model): Boolean {
         return state.props.contains(propString)
@@ -48,7 +48,7 @@ class Implication(left: Formula, right: Formula): BinaryOperator(left, right){
 
 class Knows(val agent: AgentItem, val inner: Formula): Formula() {
     override fun check(state: State, model: Model): Boolean {
-        val indishStates = getIndishStates(agent, state)
+        val indishStates = getIndishStates(agent, state) //TODO Fix not using updated model
         if (indishStates.all { inner.check(it, model) }){
             return true
         }
@@ -69,9 +69,31 @@ class Announcement(val announcement: Formula, val inner: Formula): BinaryOperato
     }
 }
 
+//TODO Look into optimizing by caching as well
 class GroupAnn(val agents: List<AgentItem>, val inner: Formula): Formula() {
     override fun check(state: State, model: Model): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //Formula is already true, agents simply announce Top
+        if (inner.check(state, model)) {
+            println("Already true")
+            return true
+        }
+
+        //Atomic permanence and empty group is powerless
+        if (agents.isEmpty() || !containsKnowsOp(inner)) {
+            println("Atomic permanence or empty group")
+            return inner.check(state, model)
+        }
+
+        //Is it really enough to only look at props contained in the formula?
+        val pooledModel = poolGroupKnowledge(agents, model)
+        val extractProps = extractProps(inner)
+        val knownProps = extractProps.filter {
+            Knows(agents.first(),Proposition(it)).check(state, pooledModel) //TODO Fix
+        }
+
+        //Update model by simulating successive announcements
+        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop), acc) }
+        return inner.check(state, updatedModel)
     }
 
 }
