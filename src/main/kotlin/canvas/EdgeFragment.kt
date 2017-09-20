@@ -12,6 +12,10 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
         val x2 = item.parent2.xProperty
         val y2 = item.parent2.yProperty
 
+        visibleProperty().bind(booleanBinding(item.parent1.visibleProperty, item.parent2.visibleProperty) {
+            item.parent1.visibleProperty.value && item.parent2.visibleProperty.value
+        })
+
         line {
             startXProperty().bind(x1 + STATE_CIRCLE_RADIUS)
             startYProperty().bind(y1 + STATE_CIRCLE_RADIUS)

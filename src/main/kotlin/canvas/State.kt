@@ -1,5 +1,6 @@
 package canvas
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
@@ -26,6 +27,9 @@ class State(name: String, xPos: Double, yPos: Double, props: ObservableList<Stri
 
     val propsProperty = SimpleListProperty<String>(this, "agents", props)
     var props by propsProperty
+
+    val visibleProperty = SimpleBooleanProperty(this, "visible", true)
+    var visible by visibleProperty
 
 }
 

@@ -13,6 +13,10 @@ class StateFragment(val item: State) : Fragment() {
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 
+                visibleProperty().bind(booleanBinding(item.visibleProperty) {
+                    item.visibleProperty.value
+                })
+
                 center = stackpane {
                     circle {
                         radius = STATE_CIRCLE_RADIUS
