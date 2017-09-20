@@ -19,6 +19,7 @@ class State(name: String, xPos: Double, yPos: Double, props: ObservableList<Stri
     val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
     var yPos by yProperty
 
+    //TODO Maybe merge in and outEdges into a single list? Only makes sense to keep for directed graphs
     val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
     var inEdges by inEdgesProperty
 

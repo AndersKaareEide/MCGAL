@@ -4,6 +4,7 @@ import canvas.AgentItem
 import canvas.Model
 import canvas.State
 
+//TODO Implement dualities such as <Phi>Psi
 abstract class Formula {
     abstract fun check(state: State, model: Model): Boolean
 }
@@ -55,9 +56,16 @@ class Knows(val agent: AgentItem, val inner: Formula): Formula() {
     }
 }
 
-class Announcement(left: Formula, right: Formula): BinaryOperator(left, right){
+//TODO Look into optimizing by reusing the same updated model when checking multiple states
+class Announcement(val announcement: Formula, val inner: Formula): BinaryOperator(announcement, inner){
     override fun check(state: State, model: Model): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (!announcement.check(state, model)) {
+            return true
+        }
+        else {
+            val updModel = updateModel(announcement, model)
+            return inner.check(state, updModel)
+        }
     }
 }
 

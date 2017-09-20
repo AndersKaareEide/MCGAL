@@ -2,6 +2,6 @@ package canvas
 
 import javafx.collections.ObservableList
 
-class Model(val states: ObservableList<State>,
-            val edges: ObservableList<Edge>,
-            val agents: ObservableList<AgentItem>)
+class Model(val states: List<State>,
+            val edges: List<Edge>,
+            val agents: List<AgentItem>)

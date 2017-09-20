@@ -1,6 +1,7 @@
 package formulaParser
 
 import canvas.AgentItem
+import canvas.Model
 import canvas.State
 
 /**
@@ -14,8 +15,12 @@ fun getIndishStates(agent: AgentItem, state: State): List<State> {
     val outStates = outEdges.map { it.parent1 }
     val inStates = inEdges.map { it.parent2 }
 
+    return inStates + outStates + state
+}
 
-    val list = inStates + outStates + state
-    list.forEach{(println(it.name))}
-    return list
+fun updateModel(announcement: Formula, model: Model): Model {
+    val updStates = model.states.filter { announcement.check(it, model) }
+    val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
+
+    return Model(updStates, updEdges, model.agents)
 }
