@@ -1,6 +1,8 @@
 package canvas
 
+import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
+import javafx.scene.input.KeyEvent
 import tornadofx.*
 
 class Canvas : View("My View") {
@@ -52,6 +54,10 @@ class Canvas : View("My View") {
                     //TODO Clear error field when user resumes editing formula
                     promptText = "Write formulas here"
                     setOnAction { formulaController.validateFormString(text, controller.model) }
+                    accelerators.put(KeyCombination.keyCombination("Esc")) {
+                        formulaController.clearValidation(controller.model)
+                    }
+//                    textProperty().onChange { formulaController.clearValidation(controller.model) }
                 }
             }
 

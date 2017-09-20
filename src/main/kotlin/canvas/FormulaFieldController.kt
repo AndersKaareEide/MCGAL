@@ -9,6 +9,8 @@ import tornadofx.*
 class FormulaFieldController : Controller() {
 
     var formula: Formula? = null
+    var validating: Boolean = false
+
     val errorMsgProperty = SimpleStringProperty("")
     val errorListener = GALErrorListener(errorMsgProperty)
 
@@ -28,6 +30,19 @@ class FormulaFieldController : Controller() {
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
             state.visible = formula.check(state, model)
+        }
+        validating = true
+    }
+
+    /**
+     * Makes all states visible again
+     */
+    fun clearValidation(model: Model) {
+        if (validating) {
+            for (state in model.states) {
+                state.visible = true
+            }
+            validating = false
         }
     }
 }

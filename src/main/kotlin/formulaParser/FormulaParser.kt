@@ -12,6 +12,7 @@ import tornadofx.*
 object FormulaParser : Controller() {
     val agentController: AgentPanelController by inject()
 
+    //TODO Change Lexer to allow for agents with proper names
     fun parse(input: String, errorListener: ANTLRErrorListener): Formula {
         val lexer = GALLexer(CharStreams.fromString(input))
         lexer.addErrorListener(errorListener)
