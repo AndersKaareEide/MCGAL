@@ -47,7 +47,11 @@ class Implication(left: Formula, right: Formula): BinaryOperator(left, right){
 
 class Knows(val agent: AgentItem, val inner: Formula): Formula() {
     override fun check(state: State, model: Model): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val indishStates = getIndishStates(agent, state)
+        if (indishStates.all { inner.check(it, model) }){
+            return true
+        }
+        return false
     }
 }
 
