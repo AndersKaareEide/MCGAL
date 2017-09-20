@@ -10,7 +10,7 @@ import tornadofx.*
 class CanvasController : Controller() {
 
     //TODO Remove, used for manual testing purposes only
-    val state1 = State("s1", 150.0, 200.0)
+    val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList("p"))
     val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList("p", "q"))
 
     val states = FXCollections.observableArrayList(state1, state2)

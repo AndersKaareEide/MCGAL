@@ -18,9 +18,16 @@ class FormulaFieldController : Controller() {
         errorMsgProperty.value = "" //Clear error message
         try {
             val formula = FormulaParser.parse(input, errorListener)
+            //TODO Make own button for checking? Also needs way to reset all states to being visible
+            checkFormula(formula, model)
         } catch (e: Exception){
-//            errorMsgProperty.value = e.message
+            errorMsgProperty.value = e.message
         }
     }
 
+    fun checkFormula(formula: Formula, model: Model){
+        for (state in model.states){
+            state.visible = formula.check(state, model)
+        }
+    }
 }
