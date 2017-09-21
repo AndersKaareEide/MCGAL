@@ -1,5 +1,6 @@
 package canvas.data
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import tornadofx.*
 
@@ -10,9 +11,15 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
     val agentsProperty = SimpleListProperty<AgentItem>(this, "agents", agents.observable())
     var agents by agentsProperty
 
+    val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)
+    var hidden by hiddenProperty
+
     init {
         parent1.inEdges.add(this)
         parent2.outEdges.add(this)
+        hiddenProperty.bind(booleanBinding(parent1.hiddenProperty, parent2.hiddenProperty){
+            parent1.hiddenProperty.value or parent2.hiddenProperty.value
+        })
     }
 
     override fun equals(other: Any?): Boolean {

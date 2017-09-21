@@ -30,18 +30,18 @@ class FormulaFieldController : Controller() {
 
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
-            state.visible = formula.check(state, model)
+            state.hiddenProperty.set(!formula.check(state, model))
         }
         validating = true
     }
 
     /**
-     * Makes all states visible again
+     * Makes all states hidden again
      */
     fun clearValidation(model: Model) {
         if (validating) {
             for (state in model.states) {
-                state.visible = true
+                state.hiddenProperty.set(false)
             }
             validating = false
         }

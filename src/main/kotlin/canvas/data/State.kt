@@ -29,8 +29,8 @@ class State(name: String, xPos: Double, yPos: Double, props: ObservableList<Stri
     val propsProperty = SimpleListProperty<String>(this, "agents", props)
     var props by propsProperty
 
-    val visibleProperty = SimpleBooleanProperty(this, "visible", true)
-    var visible by visibleProperty
+    val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)
+    var hidden by hiddenProperty
 
 }
 
