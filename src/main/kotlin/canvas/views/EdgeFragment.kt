@@ -1,5 +1,7 @@
-package canvas
+package canvas.views
 
+import canvas.data.Edge
+import canvas.STATE_CIRCLE_RADIUS
 import javafx.beans.property.DoubleProperty
 import javafx.geometry.Pos
 import tornadofx.*

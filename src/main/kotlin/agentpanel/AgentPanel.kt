@@ -1,4 +1,4 @@
-package canvas
+package agentpanel
 
 import javafx.event.ActionEvent
 import javafx.scene.layout.Priority

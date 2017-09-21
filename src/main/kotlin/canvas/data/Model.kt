@@ -1,6 +1,4 @@
-package canvas
-
-import javafx.collections.ObservableList
+package canvas.data
 
 class Model(val states: List<State>,
             val edges: List<Edge>,

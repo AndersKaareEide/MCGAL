@@ -1,7 +1,9 @@
-package canvas
+package agentpanel
+import canvas.controllers.EdgeController
+import canvas.data.AgentItem
+import canvas.data.AgentItemModel
 import formulaParser.AgentNotFoundException
 import javafx.collections.ObservableList
-import javafx.collections.transformation.FilteredList
 import tornadofx.*
 
 class AgentPanelController: Controller() {
@@ -12,7 +14,7 @@ class AgentPanelController: Controller() {
 
     init {
         //TODO Remove, used for manual testing
-        agents.addAll(AgentItem("a",true), AgentItem("b",true), AgentItem("c",true))
+        agents.addAll(AgentItem("a", true), AgentItem("b", true), AgentItem("c", true))
     }
 
     fun getSelected(): ObservableList<AgentItem> {
@@ -44,7 +46,7 @@ class AgentPanelController: Controller() {
     /**
      * Method used to retrieve AgentItems by name from the list of agents
      */
-    fun getAgent(agentName: String): AgentItem{
+    fun getAgent(agentName: String): AgentItem {
         for (agent in agents){
             if (agent.name == agentName){
                 return agent

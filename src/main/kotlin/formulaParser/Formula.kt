@@ -1,8 +1,8 @@
 package formulaParser
 
-import canvas.AgentItem
-import canvas.Model
-import canvas.State
+import canvas.data.AgentItem
+import canvas.data.Model
+import canvas.data.State
 
 //TODO Implement dualities such as <Phi>Psi
 abstract class Formula {

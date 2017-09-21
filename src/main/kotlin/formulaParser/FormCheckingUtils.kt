@@ -1,8 +1,8 @@
 package formulaParser
 
-import canvas.AgentItem
-import canvas.Model
-import canvas.State
+import canvas.data.AgentItem
+import canvas.data.Model
+import canvas.data.State
 
 /**
  * Based on an agent and a state, returns all states the given agent considers

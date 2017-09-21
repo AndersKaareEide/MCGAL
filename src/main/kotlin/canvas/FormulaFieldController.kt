@@ -1,5 +1,6 @@
 package canvas
 
+import canvas.data.Model
 import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.GALErrorListener

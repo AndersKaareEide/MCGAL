@@ -1,8 +1,7 @@
-package canvas
+package agentpanel
 
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleStringProperty
+import canvas.data.AgentItem
+import canvas.data.AgentItemModel
 import javafx.scene.layout.Priority
 import tornadofx.*
 

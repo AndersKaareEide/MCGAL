@@ -1,6 +1,6 @@
 package formulaParser
 
-import canvas.AgentPanelController
+import agentpanel.AgentPanelController
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
 import org.antlr.v4.runtime.ANTLRErrorListener

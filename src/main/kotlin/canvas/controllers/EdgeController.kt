@@ -1,5 +1,7 @@
-package canvas
+package canvas.controllers
 
+import canvas.data.AgentItem
+import canvas.data.Edge
 import tornadofx.*
 
 class EdgeController: Controller() {

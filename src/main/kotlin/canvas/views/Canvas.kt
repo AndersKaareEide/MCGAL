@@ -1,8 +1,9 @@
-package canvas
+package canvas.views
 
-import javafx.scene.input.KeyCode
+import agentpanel.AgentPanel
+import canvas.FormulaFieldController
+import canvas.controllers.CanvasController
 import javafx.scene.input.KeyCombination
-import javafx.scene.input.KeyEvent
 import tornadofx.*
 
 class Canvas : View("My View") {

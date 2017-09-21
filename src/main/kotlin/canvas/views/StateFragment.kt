@@ -1,5 +1,8 @@
-package canvas
+package canvas.views
 
+import canvas.STATE_CIRCLE_RADIUS
+import canvas.data.State
+import canvas.controllers.CanvasController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import tornadofx.*
