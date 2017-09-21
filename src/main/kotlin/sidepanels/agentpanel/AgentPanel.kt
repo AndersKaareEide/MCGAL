@@ -1,4 +1,4 @@
-package agentpanel
+package sidepanels.agentpanel
 
 import javafx.event.ActionEvent
 import javafx.scene.layout.Priority

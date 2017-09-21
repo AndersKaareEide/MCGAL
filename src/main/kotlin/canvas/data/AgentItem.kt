@@ -7,16 +7,19 @@ import tornadofx.*
 
 class AgentItem(name: String, isSelected: Boolean): Comparable<AgentItem> {
 
+    val nameProperty = SimpleStringProperty(this, "name", name)
+    var name by nameProperty
+
+    val isSelectedProperty = SimpleBooleanProperty(this, "isSelected", isSelected)
+    var isSelected by isSelectedProperty
+
     //TODO Flesh out to make a2 < a12
     override fun compareTo(other: AgentItem): Int {
         return name.compareTo(other.name)
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other is AgentItem && other.name == name) {
-            return true
-        }
-        return false
+        return other is AgentItem && other.name == name
     }
 
     override fun hashCode(): Int {
@@ -25,11 +28,6 @@ class AgentItem(name: String, isSelected: Boolean): Comparable<AgentItem> {
         return result
     }
 
-    val nameProperty = SimpleStringProperty(name)
-    var name by nameProperty
-
-    val isSelectedProperty = SimpleBooleanProperty(isSelected)
-    var isSelected by isSelectedProperty
 }
 
 class AgentItemModel(property: ObjectProperty<AgentItem>):

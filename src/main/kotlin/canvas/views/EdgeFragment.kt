@@ -28,6 +28,7 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
 
         label {
             //TODO Bind positioning to angle as well so it looks good at 90* angles and such
+            //TODO Bind max size to distance between states and make it use multiple lines on large amounts of agents (or ...)
             alignment = Pos.CENTER
             textProperty().bind(stringBinding(item.agentsProperty) {
                 item.agentsProperty.value.joinToString(",") { it.name }

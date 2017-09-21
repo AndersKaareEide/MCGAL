@@ -3,6 +3,7 @@ package formulaParser
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
+import sidepanels.propertypanel.PropositionItem
 
 //TODO Implement dualities such as <Phi>Psi
 abstract class Formula {
@@ -11,10 +12,10 @@ abstract class Formula {
 
 abstract class BinaryOperator(val left: Formula, val right: Formula): Formula()
 
-class Proposition(val propString: String): Formula() {
+class Proposition(val proposition: PropositionItem): Formula() {
 
     override fun check(state: State, model: Model): Boolean {
-        return state.props.contains(propString)
+        return state.props.contains(proposition)
     }
 }
 

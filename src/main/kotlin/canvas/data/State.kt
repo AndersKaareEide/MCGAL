@@ -6,9 +6,10 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 
-class State(name: String, xPos: Double, yPos: Double, props: ObservableList<String> = FXCollections.observableArrayList()) {
+class State(name: String, xPos: Double, yPos: Double, props: ObservableList<PropositionItem> = FXCollections.observableArrayList()) {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty
@@ -26,7 +27,7 @@ class State(name: String, xPos: Double, yPos: Double, props: ObservableList<Stri
     val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
     var outEdges by outEdgesProperty
 
-    val propsProperty = SimpleListProperty<String>(this, "agents", props)
+    val propsProperty = SimpleListProperty<PropositionItem>(this, "agents", props)
     var props by propsProperty
 
     val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)

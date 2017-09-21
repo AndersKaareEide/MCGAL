@@ -4,7 +4,7 @@ import canvas.data.AgentItem
 import canvas.data.Edge
 import canvas.data.Model
 import canvas.STATE_CIRCLE_RADIUS
-import agentpanel.AgentPanelController
+import sidepanels.agentpanel.AgentPanelController
 import canvas.views.Canvas
 import canvas.data.State
 import javafx.beans.property.SimpleBooleanProperty
@@ -12,20 +12,24 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
+import sidepanels.propertypanel.PropPanelController
+import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 
 class CanvasController : Controller() {
 
     //TODO Remove, used for manual testing purposes only
-    val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList("p"))
+    val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList(PropositionItem("p", false)))
+    val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList(PropositionItem("p", false), PropositionItem("q", false)))
 
-    val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList("p", "q"))
     val states = FXCollections.observableArrayList(state1, state2)
 
     val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
     val canvas: Canvas by inject()
 
     val agentController: AgentPanelController by inject()
+    val propController: PropPanelController by inject()
+
     val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
 
     val isDrawingLines by isDrawingLinesProperty
@@ -95,6 +99,6 @@ class CanvasController : Controller() {
         //TODO Add props to state
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
-        states.add(State("s${states.size + 1}", posX, posY))
+        states.add(State("s${states.size + 1}", posX, posY, propController.getSelected()))
     }
 }

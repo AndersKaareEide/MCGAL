@@ -1,9 +1,11 @@
 package canvas.views
 
-import agentpanel.AgentPanel
+import sidepanels.agentpanel.AgentPanel
 import canvas.FormulaFieldController
 import canvas.controllers.CanvasController
+import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCombination
+import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 
 class Canvas : View("My View") {
@@ -17,7 +19,12 @@ class Canvas : View("My View") {
         prefWidth = 800.0
         prefHeight = 600.0
 
-        right = AgentPanel().root
+        right = tabpane() {
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+
+            tab("Agents", AgentPanel().root)
+            tab("Propositions", PropositionPanel().root)
+        }
 
         center = stackpane {
 
@@ -58,6 +65,8 @@ class Canvas : View("My View") {
                     accelerators.put(KeyCombination.keyCombination("Esc")) {
                         formulaController.clearValidation(controller.model)
                     }
+                    //TODO Do I want to clear the validation when the user edits the formula? Live validation perhaps?
+                    //Might be really slow for more complex formulas / models
 //                    textProperty().onChange { formulaController.clearValidation(controller.model) }
                 }
             }
@@ -65,3 +74,4 @@ class Canvas : View("My View") {
         }
     }
 }
+

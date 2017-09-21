@@ -3,6 +3,7 @@ package formulaParser
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
+import sidepanels.propertypanel.PropositionItem
 
 /**
  * Based on an agent and a state, returns all states the given agent considers
@@ -28,9 +29,9 @@ fun updateModel(announcement: Formula, model: Model): Model {
 /**
  * Extracts all the propositions the input formula is built on
  */
-fun extractProps(formula: Formula): Set<String> {
+fun extractProps(formula: Formula): Set<PropositionItem> {
     return when (formula){
-        is Proposition -> setOf(formula.propString)
+        is Proposition -> setOf(formula.proposition)
         is Negation -> extractProps(formula.inner)
         is BinaryOperator -> extractProps(formula.left) + extractProps(formula.right)
         is Knows -> extractProps(formula.inner)

@@ -1,18 +1,20 @@
 package formulaParser
 
-import agentpanel.AgentPanelController
+import sidepanels.agentpanel.AgentPanelController
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
+import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
 
 object FormulaParser : Controller() {
     val agentController: AgentPanelController by inject()
+    val propController: PropPanelController by inject()
 
-    //TODO Change Lexer to allow for agents with proper names
+    //TODO Change Lexer to allow for agents and propositions with longer names
     fun parse(input: String, errorListener: ANTLRErrorListener): Formula {
         val lexer = GALLexer(CharStreams.fromString(input))
         lexer.addErrorListener(errorListener)
@@ -31,7 +33,7 @@ object FormulaParser : Controller() {
             is GALParser.ParensFormContext ->
                 return recursiveTransform(tree.inner)
             is GALParser.AtomicFormContext ->
-                return Proposition(tree.prop.text)
+                return Proposition(propController.getProposition(tree.prop.text))
             is GALParser.NegFormContext ->
                 return Negation(recursiveTransform(tree.inner))
             is GALParser.ConjFormContext ->
@@ -65,3 +67,4 @@ object FormulaParser : Controller() {
 
 class FormulaParsingException(input: String): RuntimeException("Failed to parse formula: $input")
 class AgentNotFoundException(agentName: String): RuntimeException("Agent: $agentName not found in model")
+class PropertyNotFoundException(propString: String): RuntimeException("Property: $propString not found in model")

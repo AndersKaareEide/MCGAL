@@ -1,4 +1,4 @@
-package agentpanel
+package sidepanels.agentpanel
 import canvas.controllers.EdgeController
 import canvas.data.AgentItem
 import canvas.data.AgentItemModel
