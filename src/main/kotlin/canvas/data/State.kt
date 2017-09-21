@@ -9,7 +9,7 @@ import javafx.collections.ObservableList
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 
-class State(name: String, xPos: Double, yPos: Double, props: ObservableList<PropositionItem> = FXCollections.observableArrayList()) {
+class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()) {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty
@@ -20,14 +20,13 @@ class State(name: String, xPos: Double, yPos: Double, props: ObservableList<Prop
     val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
     var yPos by yProperty
 
-    //TODO Maybe merge in and outEdges into a single list? Only makes sense to keep for directed graphs
     val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
     var inEdges by inEdgesProperty
 
     val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
     var outEdges by outEdgesProperty
 
-    val propsProperty = SimpleListProperty<PropositionItem>(this, "agents", props)
+    val propsProperty = SimpleListProperty<PropositionItem>(this, "agents", props.observable())
     var props by propsProperty
 
     val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)
