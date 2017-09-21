@@ -1,6 +1,9 @@
 package canvas.controllers
 
 import canvas.data.AgentItem
+import canvas.data.Edge
+import canvas.data.Model
+import canvas.STATE_CIRCLE_RADIUS
 import agentpanel.AgentPanelController
 import canvas.views.Canvas
 import canvas.data.State
@@ -14,12 +17,12 @@ import tornadofx.*
 class CanvasController : Controller() {
 
     //TODO Remove, used for manual testing purposes only
-    val state1 = canvas.State("s1", 150.0, 200.0, FXCollections.observableArrayList("p"))
-    val state2 = canvas.State("s2", 50.0, 70.0, FXCollections.observableArrayList("p", "q"))
+    val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList("p"))
 
+    val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList("p", "q"))
     val states = FXCollections.observableArrayList(state1, state2)
-    val edges = FXCollections.observableArrayList(canvas.Edge(state1, state2, mutableListOf(canvas.AgentItem("a", true))))
 
+    val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
     val canvas: Canvas by inject()
 
     val agentController: AgentPanelController by inject()
@@ -31,7 +34,7 @@ class CanvasController : Controller() {
     var deltaX = 0.0
     var deltaY = 0.0
 
-    val model = canvas.Model(states, edges, agentController.agents)
+    val model = Model(states, edges, agentController.agents)
 
     fun handleMPress(item: State, event: MouseEvent){
         if (!isDrawingLines)
@@ -61,7 +64,7 @@ class CanvasController : Controller() {
     }
 
     private fun addEdge(item: State, agents: ObservableList<AgentItem>) {
-        val newEdge = canvas.Edge(lastClickedState!!, item, ArrayList(agents))
+        val newEdge = Edge(lastClickedState!!, item, ArrayList(agents))
         if (edges.contains(newEdge)){
             //Get reference to existing edge with same parents
             val oldEdge = edges[edges.indexOf(newEdge)]
@@ -90,8 +93,8 @@ class CanvasController : Controller() {
 
     private fun addState(event: MouseEvent) {
         //TODO Add props to state
-        val posX = event.sceneX - canvas.STATE_CIRCLE_RADIUS
-        val posY = event.sceneY - canvas.STATE_CIRCLE_RADIUS
-        states.add(canvas.State("s${states.size + 1}", posX, posY))
+        val posX = event.sceneX - STATE_CIRCLE_RADIUS
+        val posY = event.sceneY - STATE_CIRCLE_RADIUS
+        states.add(State("s${states.size + 1}", posX, posY))
     }
 }
