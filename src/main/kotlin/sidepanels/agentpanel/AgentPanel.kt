@@ -9,7 +9,6 @@ class AgentPanel : View() {
     val controller: AgentPanelController by inject()
 
     override val root = vbox {
-        prefWidth = 200.0
 
         hbox {
             val agentField = textfield {

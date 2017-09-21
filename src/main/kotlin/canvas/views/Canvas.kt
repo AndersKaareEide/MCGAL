@@ -20,6 +20,8 @@ class Canvas : View("My View") {
         prefHeight = 600.0
 
         right = tabpane() {
+            prefWidth = 200.0
+
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
             tab("Agents", AgentPanel().root)
