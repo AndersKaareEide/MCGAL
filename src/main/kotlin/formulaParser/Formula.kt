@@ -48,7 +48,7 @@ class Implication(left: Formula, right: Formula): BinaryOperator(left, right){
 
 class Knows(val agent: AgentItem, val inner: Formula): Formula() {
     override fun check(state: State, model: Model): Boolean {
-        val indishStates = getIndishStates(agent, state) //TODO Fix not using updated model
+        val indishStates = getIndishStates(agent, state, model) //TODO Fix not using updated model
         if (indishStates.all { inner.check(it, model) }){
             return true
         }
