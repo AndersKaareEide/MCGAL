@@ -4,8 +4,9 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
+import java.io.Serializable
 
-class AgentItem(name: String, isSelected: Boolean): Comparable<AgentItem> {
+class AgentItem(name: String, isSelected: Boolean): Comparable<AgentItem>, Serializable {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty

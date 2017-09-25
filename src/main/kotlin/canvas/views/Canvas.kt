@@ -3,6 +3,7 @@ package canvas.views
 import sidepanels.agentpanel.AgentPanel
 import canvas.FormulaFieldController
 import canvas.controllers.CanvasController
+import javafx.scene.control.MenuBar
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCombination
 import sidepanels.propertypanel.PropositionPanel
@@ -18,6 +19,13 @@ class Canvas : View("My View") {
     override val root = borderpane {
         prefWidth = 800.0
         prefHeight = 600.0
+
+        top = menubar {
+            menu("File") {
+                item("Save").action { controller.save() }
+                item("Load").action { controller.load() }
+            }
+        }
 
         right = tabpane() {
             prefWidth = 200.0

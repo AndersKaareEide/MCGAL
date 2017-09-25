@@ -1,18 +1,19 @@
 package canvas.controllers
 
+import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.AgentItem
 import canvas.data.Edge
 import canvas.data.Model
-import canvas.STATE_CIRCLE_RADIUS
-import sidepanels.agentpanel.AgentPanelController
-import canvas.views.Canvas
 import canvas.data.State
+import canvas.views.Canvas
 import canvas.views.StateFragment
+import io.ModelSerializer
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
+import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
@@ -23,9 +24,9 @@ class CanvasController : Controller() {
     val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList(PropositionItem("p", false)))
     val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList(PropositionItem("p", false), PropositionItem("q", false)))
 
-    val states = FXCollections.observableArrayList(state1, state2)
+    var states = FXCollections.observableArrayList(state1, state2)
+    var edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
 
-    val edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
     val canvas: Canvas by inject()
 
     val agentController: AgentPanelController by inject()
@@ -39,7 +40,7 @@ class CanvasController : Controller() {
     var deltaX = 0.0
     var deltaY = 0.0
 
-    val model = Model(states, edges, agentController.agents)
+    val model = Model(states, edges, agentController.agents.items, propController.propositions)
 
     fun handleMPress(item: State, event: MouseEvent){
         if (!isDrawingLines)
@@ -111,5 +112,17 @@ class CanvasController : Controller() {
         }
         states.remove(state)
         stateFragment.close()
+    }
+
+    fun save() {
+        ModelSerializer.serializeModel(model)
+    }
+
+    fun load() {
+        val loadedModel = ModelSerializer.deserializeModel()
+        states.setAll(loadedModel.states)
+        edges.setAll(loadedModel.edges)
+        agentController.agents.clear()
+        agentController.agents.addAll(loadedModel.agents)
     }
 }

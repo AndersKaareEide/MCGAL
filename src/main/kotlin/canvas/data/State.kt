@@ -8,8 +8,9 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
+import java.io.Serializable
 
-class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()) {
+class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty

@@ -3,8 +3,9 @@ package canvas.data
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import tornadofx.*
+import java.io.Serializable
 
-class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) {
+class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Serializable {
 
     val id: String = parent1.name + parent2.name
 

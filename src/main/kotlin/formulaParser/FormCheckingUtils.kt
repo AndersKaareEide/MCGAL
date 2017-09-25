@@ -23,7 +23,7 @@ fun updateModel(announcement: Formula, model: Model): Model {
     val updStates = model.states.filter { announcement.check(it, model) }
     val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
 
-    return Model(updStates, updEdges, model.agents)
+    return Model(updStates, updEdges, model.agents, model.props)
 }
 
 /**
@@ -65,5 +65,5 @@ fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
         it.agents.containsAll(agents)
     }
 
-    return Model(model.states, filteredEdges, model.agents)
+    return Model(model.states, filteredEdges, model.agents, model.props)
 }

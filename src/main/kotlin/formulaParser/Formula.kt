@@ -83,11 +83,10 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula): Formula() {
             return inner.check(state, model)
         }
 
-        //Is it really enough to only look at props contained in the formula?
         val pooledModel = poolGroupKnowledge(agents, model)
         val extractProps = extractProps(inner)
         val knownProps = extractProps.filter {
-            Knows(agents.first(),Proposition(it)).check(state, pooledModel) //TODO Fix
+            Knows(agents.first(),Proposition(it)).check(state, pooledModel)
         }
 
         //Update model by simulating successive announcements
