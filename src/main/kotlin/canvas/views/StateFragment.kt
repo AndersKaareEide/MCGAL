@@ -4,6 +4,7 @@ import canvas.STATE_CIRCLE_RADIUS
 import canvas.controllers.CanvasController
 import canvas.data.State
 import canvas.styles.StateStyles
+import javafx.beans.value.ChangeListener
 import javafx.beans.value.WeakChangeListener
 import javafx.geometry.Pos
 import javafx.scene.input.KeyCode
@@ -27,7 +28,7 @@ class StateFragment(val item: State) : Fragment() {
                         fill = Color.WHITE
 
                         toggleClass(StateStyles.focused, focusedProperty())
-                        focusedProperty().addListener(WeakChangeListener {
+                        focusedProperty().addListener({
                             _, _, newValue ->
                             when (newValue) {
                                 true -> this@circle.setOnKeyPressed {
