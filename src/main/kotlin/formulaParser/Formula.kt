@@ -75,13 +75,11 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula): Formula() {
     override fun check(state: State, model: Model): Boolean {
         //Formula is already true, agents simply announce Top
         if (inner.check(state, model)) {
-            println("Already true")
             return true
         }
 
         //Atomic permanence and empty group is powerless
         if (agents.isEmpty() || !containsKnowsOp(inner)) {
-            println("Atomic permanence or empty group")
             return inner.check(state, model)
         }
 
