@@ -7,6 +7,7 @@ import canvas.STATE_CIRCLE_RADIUS
 import sidepanels.agentpanel.AgentPanelController
 import canvas.views.Canvas
 import canvas.data.State
+import canvas.views.StateFragment
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -100,5 +101,15 @@ class CanvasController : Controller() {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
         states.add(State("s${states.size + 1}", posX, posY, propController.getSelected()))
+    }
+
+    //TODO Find out if this potentially leaks memory due to loose references
+    fun removeState(stateFragment: StateFragment) {
+        val state = stateFragment.item
+        for (edge in state.inEdges + state.outEdges){
+            edges.remove(edge)
+        }
+        states.remove(state)
+        stateFragment.close()
     }
 }

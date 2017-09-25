@@ -1,10 +1,12 @@
 package canvas.views
 
 import canvas.STATE_CIRCLE_RADIUS
-import canvas.data.State
 import canvas.controllers.CanvasController
+import canvas.data.State
 import canvas.styles.StateStyles
+import javafx.beans.value.WeakChangeListener
 import javafx.geometry.Pos
+import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -24,11 +26,24 @@ class StateFragment(val item: State) : Fragment() {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
+                        toggleClass(StateStyles.focused, focusedProperty())
+                        focusedProperty().addListener(WeakChangeListener {
+                            _, _, newValue ->
+                            when (newValue) {
+                                true -> this@circle.setOnKeyPressed {
+                                    if (it.code == KeyCode.DELETE){
+                                        controller.removeState(this@StateFragment)
+                                    }
+                                }
+                                false -> this@circle.setOnKeyPressed {}
+                            }
+                        })
+
                         setOnMousePressed { controller.handleMPress(item, it); it.consume() }
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased { controller.handleDragEnd(item); it.consume() }
-                        setOnMouseClicked { it.consume() } // Only used to stop events from bubbling upwards to the Canvas
+                        setOnMouseClicked { this@circle.requestFocus(); it.consume() }
 
                     }
                     label {
