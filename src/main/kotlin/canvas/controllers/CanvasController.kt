@@ -114,15 +114,10 @@ class CanvasController : Controller() {
         stateFragment.close()
     }
 
-    fun save() {
-        ModelSerializer.serializeModel(model)
-    }
-
-    fun load() {
-        val loadedModel = ModelSerializer.deserializeModel()
-        states.setAll(loadedModel.states)
-        edges.setAll(loadedModel.edges)
+    fun loadModel(model: Model) {
+        states.setAll(model.states)
+        edges.setAll(model.edges)
         agentController.agents.clear()
-        agentController.agents.addAll(loadedModel.agents)
+        agentController.agents.addAll(model.agents)
     }
 }

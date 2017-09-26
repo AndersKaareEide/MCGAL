@@ -4,8 +4,6 @@ import canvas.STATE_CIRCLE_RADIUS
 import canvas.controllers.CanvasController
 import canvas.data.State
 import canvas.styles.StateStyles
-import javafx.beans.value.ChangeListener
-import javafx.beans.value.WeakChangeListener
 import javafx.geometry.Pos
 import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color

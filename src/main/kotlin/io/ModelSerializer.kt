@@ -12,10 +12,8 @@ object ModelSerializer {
 
     private const val DEFAULT_FILENAME = "testModel.mdl"
 
-    fun serializeModel(model: Model){
+    fun serializeModel(model: Model, file: File){
         val serializableModel = makeSerializable(model)
-        val file = File(DEFAULT_FILENAME)
-        file.createNewFile()
 
         val fileOutput = FileOutputStream(file)
         val outStream = ObjectOutputStream(fileOutput)
@@ -23,8 +21,8 @@ object ModelSerializer {
         outStream.writeObject(serializableModel)
     }
 
-    fun deserializeModel() : Model {
-        val fileInput = FileInputStream(File(DEFAULT_FILENAME))
+    fun deserializeModel(file: File) : Model {
+        val fileInput = FileInputStream(file)
         val inStream = ObjectInputStream(fileInput)
 
         val deserializedModel = inStream.readObject() as SerializableModel

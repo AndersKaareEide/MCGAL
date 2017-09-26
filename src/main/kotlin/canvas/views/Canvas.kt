@@ -6,6 +6,7 @@ import canvas.controllers.CanvasController
 import javafx.scene.control.MenuBar
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCombination
+import menus.CanvasMenuBar
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 
@@ -20,12 +21,7 @@ class Canvas : View("My View") {
         prefWidth = 800.0
         prefHeight = 600.0
 
-        top = menubar {
-            menu("File") {
-                item("Save").action { controller.save() }
-                item("Load").action { controller.load() }
-            }
-        }
+        top = CanvasMenuBar.root
 
         right = tabpane() {
             prefWidth = 200.0
