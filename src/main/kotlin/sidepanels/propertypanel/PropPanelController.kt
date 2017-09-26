@@ -3,6 +3,7 @@ package sidepanels.propertypanel
 import formulaParser.PropertyNotFoundException
 import javafx.collections.ObservableList
 import tornadofx.*
+import utils.defaultProps
 
 //TODO Make generic superclass to reduce duplication with AgentPanelController
 class PropPanelController : Controller() {
@@ -10,7 +11,7 @@ class PropPanelController : Controller() {
     val propositions = SortedFilteredList<PropositionItem>()
 
     init {
-        propositions.addAll(PropositionItem("p", true), PropositionItem("q", false))
+        propositions.addAll(defaultProps)
     }
 
     fun getSelected() : ObservableList<PropositionItem> {

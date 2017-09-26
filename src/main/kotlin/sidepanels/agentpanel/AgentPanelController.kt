@@ -5,16 +5,15 @@ import canvas.data.AgentItemModel
 import formulaParser.AgentNotFoundException
 import javafx.collections.ObservableList
 import tornadofx.*
+import utils.defaultAgents
 
 class AgentPanelController: Controller() {
 
     val edgeController: EdgeController by inject()
     val agents = SortedFilteredList<AgentItem>()
 
-
     init {
-        //TODO Remove, used for manual testing
-        agents.addAll(AgentItem("a", true), AgentItem("b", true), AgentItem("c", true))
+        agents.addAll(defaultAgents)
     }
 
     fun getSelected(): ObservableList<AgentItem> {

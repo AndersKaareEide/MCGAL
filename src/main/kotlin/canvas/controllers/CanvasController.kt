@@ -7,7 +7,6 @@ import canvas.data.Model
 import canvas.data.State
 import canvas.views.Canvas
 import canvas.views.StateFragment
-import io.ModelSerializer
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -15,17 +14,16 @@ import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
-import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
+import utils.defaultEdges
+import utils.defaultStates
 
 class CanvasController : Controller() {
 
     //TODO Remove, used for manual testing purposes only
-    val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList(PropositionItem("p", false)))
-    val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList(PropositionItem("p", false), PropositionItem("q", false)))
 
-    var states = FXCollections.observableArrayList(state1, state2)
-    var edges = FXCollections.observableArrayList(Edge(state1, state2, mutableListOf(AgentItem("a", true))))
+    var states = FXCollections.observableArrayList(defaultStates)!!
+    var edges = FXCollections.observableArrayList(defaultEdges)!!
 
     val canvas: Canvas by inject()
 
@@ -98,7 +96,6 @@ class CanvasController : Controller() {
     }
 
     private fun addState(event: MouseEvent) {
-        //TODO Add props to state
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
         states.add(State("s${states.size + 1}", posX, posY, propController.getSelected()))
