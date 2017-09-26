@@ -1,18 +1,21 @@
 package canvas.views
 
-import sidepanels.agentpanel.AgentPanel
 import canvas.FormulaFieldController
 import canvas.controllers.CanvasController
-import javafx.scene.control.MenuBar
+import canvas.controllers.EdgeController
+import canvas.controllers.StateController
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCombination
 import menus.CanvasMenuBar
+import sidepanels.agentpanel.AgentPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 
 class Canvas : View("My View") {
 
     val controller: CanvasController by inject()
+    val stateController: StateController by inject()
+    val edgeController: EdgeController by inject()
     val formulaController: FormulaFieldController by inject()
 
     //TODO Move out into own 'view'
@@ -34,11 +37,11 @@ class Canvas : View("My View") {
 
         center = stackpane {
 
-            setOnMouseClicked { controller.handleCanvasClick(it) }
+            setOnMouseClicked { stateController.handleCanvasClick(it) }
 
             anchorpane {
                 isManaged = false
-                bindChildren(controller.edges) {
+                bindChildren(edgeController.edges) {
                     EdgeFragment(it).root
                 }
             }
@@ -46,7 +49,7 @@ class Canvas : View("My View") {
                 isManaged = false
                 //TODO Figure out how to display which states satisfy the formula
                 //Use visibleWhen on both States and Edges? Edges visible only when both of its attached states are
-                bindChildren(controller.states) {
+                bindChildren(stateController.states) {
                     StateFragment(it).root
                 }
             }
@@ -59,7 +62,7 @@ class Canvas : View("My View") {
                 }
             }
             hbox {
-                checkbox(property = controller.isDrawingLinesProperty) {
+                checkbox(property = stateController.isDrawingLinesProperty) {
                     text = "_Line drawing mode"
                     accelerators.put(KeyCombination.keyCombination("ALT+L")) { fire() }
                 }

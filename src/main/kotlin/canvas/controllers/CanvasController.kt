@@ -1,126 +1,33 @@
 package canvas.controllers
 
-import canvas.STATE_CIRCLE_RADIUS
-import canvas.data.AgentItem
-import canvas.data.Edge
 import canvas.data.Model
-import canvas.data.State
-import canvas.views.Canvas
-import canvas.views.StateFragment
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import javafx.scene.Node
-import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
-import utils.defaultEdges
-import utils.defaultStates
 
 class CanvasController : Controller() {
 
     //TODO Remove, used for manual testing purposes only
 
-    var states = FXCollections.observableArrayList(defaultStates)!!
-    var edges = FXCollections.observableArrayList(defaultEdges)!!
-
-    val canvas: Canvas by inject()
-
+    val stateController: StateController by inject()
+    val edgeController: EdgeController by inject()
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
 
-    val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
 
-    val isDrawingLines by isDrawingLinesProperty
-    var lastClickedState: State? = null
-
-    var deltaX = 0.0
-    var deltaY = 0.0
-
-    val model = Model(states, edges, agentController.agents.items, propController.propositions)
-
-    fun handleMPress(item: State, event: MouseEvent){
-        if (!isDrawingLines)
-            setDragDelta(item, event)
-    }
-
-    private fun setDragDelta(item: State, event: MouseEvent){
-        deltaX = item.xPos - event.sceneX
-        deltaY = item.yPos - event.sceneY
-    }
-
-    fun handleMDrag(item: State, event: MouseEvent) {
-        if (isDrawingLines.not())
-            dragItem(item, event)
-    }
-
-    fun handleDragEnd(item: State){
-        if (isDrawingLines && lastClickedState != null) {
-            val agents = agentController.getSelected()
-            if (!agents.isEmpty()) {
-                addEdge(item, agents)
-            } else {
-                //TODO Provide visual feedback
-                println("Can't create edge without selecting agents first")
-            }
-        }
-    }
-
-    private fun addEdge(item: State, agents: ObservableList<AgentItem>) {
-        val newEdge = Edge(lastClickedState!!, item, ArrayList(agents))
-        if (edges.contains(newEdge)){
-            //Get reference to existing edge with same parents
-            val oldEdge = edges[edges.indexOf(newEdge)]
-            oldEdge.agents.setAll(agents)
-        } else {
-            edges.add(newEdge)
-        }
-    }
-
-    private fun dragItem(item: State, event:MouseEvent){
-        item.xPos = deltaX + event.sceneX
-        item.yPos = deltaY + event.sceneY
-    }
-
-    fun startLineDrawing(item: State, node: Node) {
-        if (isDrawingLines) {
-            lastClickedState = item
-            node.startFullDrag()
-        }
-    }
-
-    fun handleCanvasClick(event: MouseEvent) {
-        if (!isDrawingLines)
-            addState(event)
-    }
-
-    private fun addState(event: MouseEvent) {
-        val posX = event.sceneX - STATE_CIRCLE_RADIUS
-        val posY = event.sceneY - STATE_CIRCLE_RADIUS
-        states.add(State("s${states.size + 1}", posX, posY, propController.getSelected()))
-    }
-
-    //TODO Find out if this potentially leaks memory due to loose references
-    fun removeState(stateFragment: StateFragment) {
-        val state = stateFragment.item
-        for (edge in state.inEdges + state.outEdges){
-            edges.remove(edge)
-        }
-        states.remove(state)
-        stateFragment.close()
-    }
+    val model = Model(stateController.states, edgeController.edges,
+            agentController.agents.items, propController.propositions)
 
     fun loadModel(model: Model) {
-        states.setAll(model.states)
-        edges.setAll(model.edges)
+        stateController.states.setAll(model.states)
+        edgeController.edges.setAll(model.edges)
         agentController.agents.clear()
         agentController.agents.addAll(model.agents)
     }
 
     fun clearModel() {
-        states.clear()
-        edges.clear()
+        stateController.states.clear()
+        edgeController.edges.clear()
         agentController.agents.clear()
         propController.propositions.clear()
     }

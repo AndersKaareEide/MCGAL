@@ -1,7 +1,7 @@
 package canvas.views
 
 import canvas.STATE_CIRCLE_RADIUS
-import canvas.controllers.CanvasController
+import canvas.controllers.StateController
 import canvas.data.State
 import canvas.styles.StateStyles
 import javafx.geometry.Pos
@@ -11,7 +11,7 @@ import tornadofx.*
 
 
 class StateFragment(val item: State) : Fragment() {
-    val controller = find(CanvasController::class)
+    val controller = find(StateController::class)
 
     override val root =
             borderpane {
