@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
-import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
 import utils.defaultStates
@@ -19,6 +18,7 @@ class StateController : Controller() {
     val edgeController: EdgeController by inject()
 
     var states = FXCollections.observableArrayList(defaultStates)!!
+    val selectedStates = FXCollections.observableSet<State>()
 
     val canvas: Canvas by inject()
 
@@ -30,10 +30,17 @@ class StateController : Controller() {
     var deltaX = 0.0
     var deltaY = 0.0
 
+    fun handleStateMPress(item: State, event: MouseEvent){
+        if (!event.isShiftDown){
+            selectedStates.forEach { it.isSelected = false }
+            selectedStates.clear()
+        }
+        selectedStates.add(item)
+        item.isSelected = true
 
-    fun handleMPress(item: State, event: MouseEvent){
-        if (!isDrawingLines)
+        if (!isDrawingLines) {
             setDragDelta(item, event)
+        }
     }
 
     private fun setDragDelta(item: State, event: MouseEvent){
@@ -41,9 +48,9 @@ class StateController : Controller() {
         deltaY = item.yPos - event.sceneY
     }
 
-    fun handleMDrag(item: State, event: MouseEvent) {
-        if (isDrawingLines.not())
-            dragItem(item, event)
+    fun handleMDrag(state: State, event: MouseEvent) {
+        if (!isDrawingLines)
+            dragItem(state, event)
     }
 
     fun handleDragEnd(item: State){
@@ -52,9 +59,19 @@ class StateController : Controller() {
         }
     }
 
-    private fun dragItem(item: State, event: MouseEvent){
-        item.xPos = deltaX + event.sceneX
-        item.yPos = deltaY + event.sceneY
+    private fun dragItem(state: State, event: MouseEvent){
+        val newX = deltaX + event.sceneX
+        val newY = deltaY + event.sceneY
+
+        selectedStates.forEach {
+            if (it != state) {
+                it.xPos = newX + (it.xPos - state.xPos)
+                it.yPos = newY + (it.yPos - state.yPos)
+            }
+        }
+
+        state.yPos = newY
+        state.xPos = newX
     }
 
     fun startLineDrawing(item: State, node: Node) {

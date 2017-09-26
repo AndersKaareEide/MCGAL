@@ -19,14 +19,15 @@ class StateFragment(val item: State) : Fragment() {
                 translateYProperty().bind(item.yProperty)
 
                 toggleClass(StateStyles.hidden, item.hiddenProperty)
+                toggleClass(StateStyles.focused, item.selectedProperty)
 
                 center = stackpane {
                     circle {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
-                        toggleClass(StateStyles.focused, focusedProperty())
-                        focusedProperty().addListener({
+                        //TODO Move keybinding into Canvas or something so it reaches all selected States
+                        item.selectedProperty.addListener({
                             _, _, newValue ->
                             when (newValue) {
                                 true -> this@circle.setOnKeyPressed {
@@ -38,7 +39,7 @@ class StateFragment(val item: State) : Fragment() {
                             }
                         })
 
-                        setOnMousePressed { controller.handleMPress(item, it); it.consume() }
+                        setOnMousePressed { controller.handleStateMPress(item, it); it.consume() }
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased { controller.handleDragEnd(item); it.consume() }
@@ -57,6 +58,8 @@ class StateFragment(val item: State) : Fragment() {
                     })
                     useMaxWidth = true
                     alignment = Pos.CENTER
+                    //TODO Find out why mouse events get eaten by this label
+                    isMouseTransparent = true
                 }
             }
 }

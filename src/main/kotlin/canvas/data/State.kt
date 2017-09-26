@@ -30,8 +30,10 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
     val propsProperty = SimpleListProperty<PropositionItem>(this, "agents", props.observable())
     var props by propsProperty
 
-    val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)
-    var hidden by hiddenProperty
+    val hiddenProperty = SimpleBooleanProperty(this, "isHidden", false)
+    var isHidden by hiddenProperty
 
+    val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
+    var isSelected by selectedProperty
 }
 
