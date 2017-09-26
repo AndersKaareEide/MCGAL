@@ -117,4 +117,11 @@ class CanvasController : Controller() {
         agentController.agents.clear()
         agentController.agents.addAll(model.agents)
     }
+
+    fun clearModel() {
+        states.clear()
+        edges.clear()
+        agentController.agents.clear()
+        propController.propositions.clear()
+    }
 }

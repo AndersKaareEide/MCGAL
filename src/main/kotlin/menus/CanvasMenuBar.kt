@@ -2,6 +2,7 @@ package menus
 
 import canvas.controllers.CanvasController
 import io.ModelSerializer
+import javafx.scene.control.ButtonType
 import javafx.stage.FileChooser
 import tornadofx.*
 import java.io.File
@@ -9,7 +10,7 @@ import java.io.File
 object CanvasMenuBar : View() {
 
     val controller: CanvasController by inject()
-    val fileChooser = FileChooser()
+    private val fileChooser = FileChooser()
 
     init {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("Model files", "*.mdl"))
@@ -20,6 +21,15 @@ object CanvasMenuBar : View() {
         menu("File") {
             item("Save").action { openSaveDialog() }
             item("Load").action { openLoadDialog() }
+        }
+
+        menu("Edit") {
+            item("Clear Model").action {
+                confirm("Clear model", "Do you really wish to clear the model?\nThis action is irreversible",
+                        ButtonType.YES, ButtonType.CANCEL){
+                    controller.clearModel()
+                }
+            }
         }
     }
 
