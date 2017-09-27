@@ -26,7 +26,6 @@ class StateFragment(val item: State) : Fragment() {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
-                        //TODO Move keybinding into Canvas or something so it reaches all selected States
                         item.selectedProperty.addListener({
                             _, _, newValue ->
                             when (newValue) {

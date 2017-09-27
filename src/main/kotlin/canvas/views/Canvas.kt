@@ -68,6 +68,7 @@ class Canvas : View("My View") {
             }
         }
 
+        //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
         tabpane {
             prefWidth = 200.0
 

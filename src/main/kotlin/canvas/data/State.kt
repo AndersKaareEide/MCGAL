@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 import java.io.Serializable

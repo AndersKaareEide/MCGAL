@@ -10,8 +10,6 @@ import java.io.*
 
 object ModelSerializer {
 
-    private const val DEFAULT_FILENAME = "testModel.mdl"
-
     fun serializeModel(model: Model, file: File){
         val serializableModel = makeSerializable(model)
 

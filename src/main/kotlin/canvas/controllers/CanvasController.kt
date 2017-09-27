@@ -1,19 +1,17 @@
 package canvas.controllers
 
 import canvas.data.Model
+import javafx.beans.property.SimpleObjectProperty
 import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
 
 class CanvasController : Controller() {
 
-    //TODO Remove, used for manual testing purposes only
-
     val stateController: StateController by inject()
     val edgeController: EdgeController by inject()
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
-
 
     val model = Model(stateController.states, edgeController.edges,
             agentController.agents.items, propController.propositions)
