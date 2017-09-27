@@ -3,8 +3,7 @@ package canvas.controllers
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.State
 import canvas.views.Canvas
-import canvas.views.StateFragment
-import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
@@ -22,9 +21,9 @@ class StateController : Controller() {
 
     val canvas: Canvas by inject()
 
-    val isDrawingLinesProperty = SimpleBooleanProperty(this, "isDrawingLines", false)
+    val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
+    var clickMode by clickModeProperty
 
-    val isDrawingLines by isDrawingLinesProperty
     var lastClickedState: State? = null
 
     var deltaX = 0.0
@@ -38,7 +37,7 @@ class StateController : Controller() {
         selectedStates.add(item)
         item.isSelected = true
 
-        if (!isDrawingLines) {
+        if (clickMode == ClickMode.MOVING) {
             setDragDelta(item, event)
         }
     }
@@ -49,12 +48,13 @@ class StateController : Controller() {
     }
 
     fun handleMDrag(state: State, event: MouseEvent) {
-        if (!isDrawingLines)
+        if (clickMode == ClickMode.MOVING){
             dragItem(state, event)
+        }
     }
 
     fun handleDragEnd(item: State){
-        if (isDrawingLines && lastClickedState != null) {
+        if (clickMode == ClickMode.LINES && lastClickedState != null) {
             edgeController.addEdge(lastClickedState!!, item)
         }
     }
@@ -75,14 +75,14 @@ class StateController : Controller() {
     }
 
     fun startLineDrawing(item: State, node: Node) {
-        if (isDrawingLines) {
+        if (clickMode == ClickMode.LINES) {
             lastClickedState = item
             node.startFullDrag()
         }
     }
 
     fun handleCanvasClick(event: MouseEvent) {
-        if (!isDrawingLines)
+        if (clickMode == ClickMode.STATES)
             addState(event)
     }
 

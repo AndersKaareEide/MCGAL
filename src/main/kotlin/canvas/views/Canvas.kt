@@ -13,60 +13,47 @@ import tornadofx.*
 
 class Canvas : View("My View") {
 
-    val controller: CanvasController by inject()
-    val stateController: StateController by inject()
-    val edgeController: EdgeController by inject()
-    val formulaController: FormulaFieldController by inject()
+    private val controller: CanvasController by inject()
+    private val stateController: StateController by inject()
+    private val edgeController: EdgeController by inject()
+    private val formulaController: FormulaFieldController by inject()
 
     //TODO Move out into own 'view'
 
-    override val root = borderpane {
-        prefWidth = 800.0
-        prefHeight = 600.0
+    override val root = hbox {
+        borderpane {
+            prefWidth = 800.0
+            prefHeight = 600.0
 
-        top = CanvasMenuBar.root
+            top = CanvasMenuBar.root
 
-        right = tabpane() {
-            prefWidth = 200.0
+            center = stackpane {
 
-            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+                setOnMouseClicked { stateController.handleCanvasClick(it) }
 
-            tab("Agents", AgentPanel().root)
-            tab("Propositions", PropositionPanel().root)
-        }
-
-        center = stackpane {
-
-            setOnMouseClicked { stateController.handleCanvasClick(it) }
-
-            anchorpane {
-                isManaged = false
-                bindChildren(edgeController.edges) {
-                    EdgeFragment(it).root
+                anchorpane {
+                    isManaged = false
+                    bindChildren(edgeController.edges) {
+                        EdgeFragment(it).root
+                    }
+                }
+                anchorpane {
+                    isManaged = false
+                    //TODO Figure out how to display which states satisfy the formula
+                    //Use visibleWhen on both States and Edges? Edges visible only when both of its attached states are
+                    bindChildren(stateController.states) {
+                        StateFragment(it).root
+                    }
                 }
             }
-            anchorpane {
-                isManaged = false
-                //TODO Figure out how to display which states satisfy the formula
-                //Use visibleWhen on both States and Edges? Edges visible only when both of its attached states are
-                bindChildren(stateController.states) {
-                    StateFragment(it).root
+            //TODO Make into its own component
+            bottom = vbox {
+                //Label used to display error messages
+                label(formulaController.errorMsgProperty) {
+                    removeWhen {
+                        textProperty().isEmpty
+                    }
                 }
-            }
-        }
-        bottom = vbox {
-            //Label used to display error messages
-            label(formulaController.errorMsgProperty) {
-                removeWhen {
-                    textProperty().isEmpty
-                }
-            }
-            hbox {
-                checkbox(property = stateController.isDrawingLinesProperty) {
-                    text = "_Line drawing mode"
-                    accelerators.put(KeyCombination.keyCombination("ALT+L")) { fire() }
-                }
-                //TODO Make into its own component
                 textfield {
                     //TODO Clear error field when user resumes editing formula
                     promptText = "Write formulas here"
@@ -79,7 +66,15 @@ class Canvas : View("My View") {
 //                    textProperty().onChange { formulaController.clearValidation(controller.model) }
                 }
             }
+        }
 
+        tabpane {
+            prefWidth = 200.0
+
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+
+            tab("Agents", AgentPanel().root)
+            tab("Propositions", PropositionPanel().root)
         }
     }
 }
