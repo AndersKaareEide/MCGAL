@@ -107,4 +107,16 @@ class StateController : Controller() {
         selectedStates.clear()
     }
 
+    private fun getNextStateID(): String {
+        //TODO Find better solution this shit is retardedly slow
+        outer@ for (stateNum in 1 until states.lastIndex + 3) {
+            for (state in states){
+                if (state.name == "s" + stateNum){
+                    continue@outer
+                }
+            }
+            return "s" + stateNum
+        }
+        throw RuntimeException("Failed to get next state id")
+    }
 }
