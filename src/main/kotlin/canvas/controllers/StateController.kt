@@ -89,17 +89,22 @@ class StateController : Controller() {
     private fun addState(event: MouseEvent) {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
-        states.add(State("s${states.size + 1}", posX, posY, propController.getSelected()))
+        //TODO Make it find first 'open' ID, instead of continuing upwards
+        val name = getNextStateID()
+        states.add(State(name, posX, posY, propController.getSelected()))
     }
 
     //TODO Find out if this potentially leaks memory due to loose references
-    fun removeState(stateFragment: StateFragment) {
-        val state = stateFragment.item
-        for (edge in state.inEdges + state.outEdges){
-            edgeController.removeEdge(edge)
+    fun removeSelectedStates() {
+        selectedStates.iterator().forEach {
+            states.remove(it)
+
+            for (edge in it.inEdges + it.outEdges) {
+                edgeController.removeEdge(edge)
+            }
         }
-        states.remove(state)
-        stateFragment.close()
+
+        selectedStates.clear()
     }
 
 }

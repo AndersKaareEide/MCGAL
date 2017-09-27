@@ -32,7 +32,7 @@ class StateFragment(val item: State) : Fragment() {
                             when (newValue) {
                                 true -> this@circle.setOnKeyPressed {
                                     if (it.code == KeyCode.DELETE){
-                                        controller.removeState(this@StateFragment)
+                                        controller.removeSelectedStates()
                                     }
                                 }
                                 false -> this@circle.setOnKeyPressed {}
