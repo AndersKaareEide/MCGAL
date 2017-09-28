@@ -2,18 +2,25 @@ package canvas.views
 
 import canvas.FormulaFieldController
 import canvas.controllers.CanvasController
+import canvas.controllers.DragBoxController
 import canvas.controllers.EdgeController
 import canvas.controllers.StateController
+import javafx.event.EventType
 import javafx.scene.control.TabPane
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.KeyCombination
+import javafx.scene.input.KeyEvent
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
+import javax.swing.event.HyperlinkEvent
 
 class Canvas : View("My View") {
 
     private val controller: CanvasController by inject()
+    private val dBoxController: DragBoxController by inject()
     private val stateController: StateController by inject()
     private val edgeController: EdgeController by inject()
     private val formulaController: FormulaFieldController by inject()
@@ -21,6 +28,7 @@ class Canvas : View("My View") {
     //TODO Move out into own 'view'
 
     override val root = hbox {
+
         borderpane {
             prefWidth = 800.0
             prefHeight = 600.0
@@ -29,7 +37,14 @@ class Canvas : View("My View") {
 
             center = stackpane {
 
+                //Drag selection
                 setOnMouseClicked { stateController.handleCanvasClick(it) }
+                setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
+                setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
+                setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }
+
+
+                dragrectangle()
 
                 anchorpane {
                     isManaged = false
@@ -39,8 +54,6 @@ class Canvas : View("My View") {
                 }
                 anchorpane {
                     isManaged = false
-                    //TODO Figure out how to display which states satisfy the formula
-                    //Use visibleWhen on both States and Edges? Edges visible only when both of its attached states are
                     bindChildren(stateController.states) {
                         StateFragment(it).root
                     }
@@ -69,7 +82,7 @@ class Canvas : View("My View") {
         }
 
         //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
-        tabpane {
+        val sidepanel = tabpane {
             prefWidth = 200.0
 
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
@@ -77,6 +90,16 @@ class Canvas : View("My View") {
             tab("Agents", AgentPanel().root)
             tab("Propositions", PropositionPanel().root)
         }
+
+        //KeyEvent re-routing, here be dragons
+        this@hbox.setOnKeyPressed {
+            if(it.isShortcutDown && it.code == KeyCode.TAB) {
+                sidepanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidepanel
+            } else if (it.code == KeyCode.DELETE) {
+                stateController.removeSelectedStates()
+            }
+        }
+
     }
 }
 

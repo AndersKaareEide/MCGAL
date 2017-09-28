@@ -21,7 +21,7 @@ class FormulaFieldController : Controller() {
         errorMsgProperty.value = "" //Clear error message
         try {
             val formula = FormulaParser.parse(input, errorListener)
-            //TODO Make own button for checking? Also needs way to reset all states to being visible
+            //TODO Make own button for checking?
             checkFormula(formula, model)
         } catch (e: Exception){
             errorMsgProperty.value = e.message

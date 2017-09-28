@@ -41,7 +41,7 @@ class StateFragment(val item: State) : Fragment() {
                         setOnMousePressed { controller.handleStateMPress(item, it); it.consume() }
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
-                        setOnMouseDragReleased { controller.handleDragEnd(item); it.consume() }
+                        setOnMouseDragReleased { controller.handleDragEnd(item, it) }
                         setOnMouseClicked { this@circle.requestFocus(); it.consume() }
 
                     }

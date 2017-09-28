@@ -3,8 +3,11 @@ package canvas.controllers
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.State
 import canvas.views.Canvas
+import canvas.views.DragRectangle
+import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import sidepanels.propertypanel.PropPanelController
@@ -53,9 +56,10 @@ class StateController : Controller() {
         }
     }
 
-    fun handleDragEnd(item: State){
+    fun handleDragEnd(item: State, event: MouseEvent){
         if (clickMode == ClickMode.LINES && lastClickedState != null) {
             edgeController.addEdge(lastClickedState!!, item)
+            event.consume()
         }
     }
 
@@ -86,12 +90,11 @@ class StateController : Controller() {
             addState(event)
     }
 
+    //TODO Make state not positioned at mouse tip
     private fun addState(event: MouseEvent) {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS
-        //TODO Make it find first 'open' ID, instead of continuing upwards
-        val name = getNextStateID()
-        states.add(State(name, posX, posY, propController.getSelected()))
+        states.add(State(getNextStateID(), posX, posY, propController.getSelected()))
     }
 
     //TODO Find out if this potentially leaks memory due to loose references
@@ -118,5 +121,15 @@ class StateController : Controller() {
             return "s" + stateNum
         }
         throw RuntimeException("Failed to get next state id")
+    }
+
+    fun selectStates(states: List<State>, it: MouseEvent){
+        if (!it.isShiftDown){
+            selectedStates.forEach { it.isSelected = false }
+            selectedStates.clear()
+        }
+
+        states.forEach { it.isSelected = true }
+        selectedStates.addAll(states)
     }
 }

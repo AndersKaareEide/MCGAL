@@ -26,7 +26,7 @@ class EdgeController: Controller() {
                 edges.add(newEdge)
             }
         } else {
-            //TODO Provide visual feedback
+            //TODO Provide visual feedback and remove edge if already existing or something
             println("Can't create edge without selecting agents first")
         }
     }
