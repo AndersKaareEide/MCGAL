@@ -2,9 +2,8 @@ package canvas.views
 
 import canvas.data.Edge
 import canvas.STATE_CIRCLE_RADIUS
-import canvas.styles.StateStyles
+import canvas.styles.ModelStyles
 import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Pos
 import tornadofx.*
 
@@ -17,7 +16,7 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
         val y2 = item.parent2.yProperty
 
 
-        toggleClass(StateStyles.hidden, item.hiddenProperty)
+        toggleClass(ModelStyles.hidden, item.hiddenProperty)
 
         line {
             startXProperty().bind(x1 + STATE_CIRCLE_RADIUS)

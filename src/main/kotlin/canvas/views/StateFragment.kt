@@ -3,7 +3,7 @@ package canvas.views
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.controllers.StateController
 import canvas.data.State
-import canvas.styles.StateStyles
+import canvas.styles.ModelStyles
 import javafx.geometry.Pos
 import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color
@@ -18,8 +18,8 @@ class StateFragment(val item: State) : Fragment() {
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 
-                toggleClass(StateStyles.hidden, item.hiddenProperty)
-                toggleClass(StateStyles.focused, item.selectedProperty)
+                toggleClass(ModelStyles.hidden, item.hiddenProperty)
+                toggleClass(ModelStyles.selected, item.selectedProperty)
 
                 center = stackpane {
                     circle {

@@ -2,7 +2,7 @@ grammar GAL;
 
 
 // Parser shit
-
+//TODO Fix ambiguousness between PAs and GAs, allow for normal agent names like Dave
 formula : form EOF;
 form : prop=PROP                        #atomicForm
     | op=NEG inner=form                 #negForm
