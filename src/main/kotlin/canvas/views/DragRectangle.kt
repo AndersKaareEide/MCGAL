@@ -21,6 +21,7 @@ object DragRectangle : Rectangle() {
         height = 0.0
         width = 0.0
         isManaged = false
+        isVisible = false
 
         fill = Color.TRANSPARENT
         stroke = Color.BLUE
