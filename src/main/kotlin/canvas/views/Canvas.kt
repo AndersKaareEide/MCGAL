@@ -5,17 +5,13 @@ import canvas.controllers.CanvasController
 import canvas.controllers.DragBoxController
 import canvas.controllers.EdgeController
 import canvas.controllers.StateController
-import javafx.event.EventType
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.KeyCombination
-import javafx.scene.input.KeyEvent
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
-import javax.swing.event.HyperlinkEvent
 
 class Canvas : View("My View") {
 
@@ -42,6 +38,7 @@ class Canvas : View("My View") {
                 setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
                 setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
                 setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }
+                //TODO Fix other components eating these events
 
 
                 dragrectangle()
@@ -51,6 +48,7 @@ class Canvas : View("My View") {
                     bindChildren(edgeController.edges) {
                         EdgeFragment(it).root
                     }
+
                 }
                 anchorpane {
                     isManaged = false
@@ -76,7 +74,7 @@ class Canvas : View("My View") {
                     }
                     //TODO Do I want to clear the validation when the user edits the formula? Live validation perhaps?
                     //Might be really slow for more complex formulas / models
-//                    textProperty().onChange { formulaController.clearValidation(controller.model) }
+//                    textProperty().onChange { formulaController.clearValidation(edgeController.model) }
                 }
             }
         }
@@ -96,7 +94,7 @@ class Canvas : View("My View") {
             if(it.isShortcutDown && it.code == KeyCode.TAB) {
                 sidepanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidepanel
             } else if (it.code == KeyCode.DELETE) {
-                stateController.removeSelectedStates()
+                stateController.removeSelected()
             }
         }
 

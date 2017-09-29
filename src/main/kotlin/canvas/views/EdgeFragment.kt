@@ -1,28 +1,40 @@
 package canvas.views
 
-import canvas.data.Edge
 import canvas.STATE_CIRCLE_RADIUS
+import canvas.controllers.CanvasController
+import canvas.controllers.EdgeController
+import canvas.data.Edge
 import canvas.styles.ModelStyles
-import javafx.beans.property.DoubleProperty
 import javafx.geometry.Pos
+import javafx.scene.Node
+import javafx.scene.input.KeyCode
 import tornadofx.*
 
 class EdgeFragment(val item: Edge) : Fragment("My View") {
 
-    override val root = anchorpane {
-        val x1: DoubleProperty = item.parent1.xProperty
-        val y1 = item.parent1.yProperty
-        val x2 = item.parent2.xProperty
-        val y2 = item.parent2.yProperty
+    val edgeController: EdgeController by inject()
+    val canvasController: CanvasController by inject()
 
+
+    val x1 = item.parent1.xProperty
+    val y1 = item.parent1.yProperty
+    val x2 = item.parent2.xProperty
+    val y2 = item.parent2.yProperty
+
+
+
+    override val root = anchorpane {
 
         toggleClass(ModelStyles.hidden, item.hiddenProperty)
+        toggleClass(ModelStyles.selected, item.selectedProperty) //TODO Add selection support for Edges as well
 
         line {
             startXProperty().bind(x1 + STATE_CIRCLE_RADIUS)
             startYProperty().bind(y1 + STATE_CIRCLE_RADIUS)
             endXProperty().bind(x2 + STATE_CIRCLE_RADIUS)
             endYProperty().bind(y2 + STATE_CIRCLE_RADIUS)
+
+            addEdgeListeners(this)
         }
 
         label {
@@ -40,8 +52,19 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
             rotateProperty().bind(doubleBinding(x1, y1, x2, y2) {
                 getAngle(x1.value, y1.value, x2.value, y2.value)
             })
+
+            addEdgeListeners(this)
         }
 
+    }
+
+    private fun addEdgeListeners(node: Node) {
+        with(node){
+            setOnMouseClicked { canvasController.handleSelectionClick(it, item) }
+            setOnKeyPressed { if(it.code == KeyCode.DELETE ){
+                canvasController.removeSelected()
+            }}
+        }
     }
 
     /**

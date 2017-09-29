@@ -13,6 +13,7 @@ import tornadofx.*
 class StateFragment(val item: State) : Fragment() {
     val controller = find(StateController::class)
 
+    //TODO Use double-click to set properties or something?
     override val root =
             borderpane {
                 translateXProperty().bind(item.xProperty)
@@ -31,7 +32,7 @@ class StateFragment(val item: State) : Fragment() {
                             when (newValue) {
                                 true -> this@circle.setOnKeyPressed {
                                     if (it.code == KeyCode.DELETE){
-                                        controller.removeSelectedStates()
+                                        controller.removeSelected()
                                     }
                                 }
                                 false -> this@circle.setOnKeyPressed {}

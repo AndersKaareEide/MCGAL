@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import tornadofx.*
 import java.io.Serializable
 
-class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Serializable {
+class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Serializable, ModelComponent {
 
     val id: String = parent1.name + parent2.name
 
@@ -14,6 +14,9 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Se
 
     val hiddenProperty = SimpleBooleanProperty(this, "hidden", false)
     var hidden by hiddenProperty
+
+    val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
+    override var isSelected by selectedProperty
 
     init {
         parent1.inEdges.add(this)

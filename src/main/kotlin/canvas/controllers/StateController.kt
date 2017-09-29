@@ -3,11 +3,8 @@ package canvas.controllers
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.State
 import canvas.views.Canvas
-import canvas.views.DragRectangle
-import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import sidepanels.propertypanel.PropPanelController
@@ -19,7 +16,7 @@ class StateController : Controller() {
     val propController: PropPanelController by inject()
     val edgeController: EdgeController by inject()
 
-    var states = FXCollections.observableArrayList(defaultStates)!!
+    val states = FXCollections.observableArrayList(defaultStates)!!
     val selectedStates = FXCollections.observableSet<State>()
 
     val canvas: Canvas by inject()
@@ -40,7 +37,7 @@ class StateController : Controller() {
         selectedStates.add(item)
         item.isSelected = true
 
-        if (clickMode == ClickMode.MOVING) {
+            if (clickMode == ClickMode.MOVING) {
             setDragDelta(item, event)
         }
     }
@@ -98,7 +95,7 @@ class StateController : Controller() {
     }
 
     //TODO Find out if this potentially leaks memory due to loose references
-    fun removeSelectedStates() {
+    fun removeSelected() {
         selectedStates.iterator().forEach {
             states.remove(it)
 
@@ -108,6 +105,14 @@ class StateController : Controller() {
         }
 
         selectedStates.clear()
+    }
+
+    fun selectState(state: State){
+        selectedStates.add(state)
+    }
+
+    fun selectStates(states: List<State>, it: MouseEvent){
+        selectedStates.addAll(states)
     }
 
     private fun getNextStateID(): String {
@@ -123,13 +128,7 @@ class StateController : Controller() {
         throw RuntimeException("Failed to get next state id")
     }
 
-    fun selectStates(states: List<State>, it: MouseEvent){
-        if (!it.isShiftDown){
-            selectedStates.forEach { it.isSelected = false }
-            selectedStates.clear()
-        }
-
-        states.forEach { it.isSelected = true }
-        selectedStates.addAll(states)
+    fun clearSelected() {
+        selectedStates.clear()
     }
 }
