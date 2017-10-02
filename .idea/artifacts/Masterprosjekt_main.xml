@@ -1,0 +1,29 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="Masterprosjekt_main">
+    <output-path>$PROJECT_DIR$/out/artifacts/Masterprosjekt_main</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="Main" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="exe" />
+        <option name="title" value="" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="Masterprosjekt_main.jar">
+        <element id="module-output" name="Masterprosjekt_main" />
+      </element>
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.51" />
+      <element id="library" level="project" name="Gradle: no.tornado:tornadofx:1.7.10" />
+      <element id="library" level="project" name="Gradle: org.antlr:antlr4-runtime:4.7" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.1.51" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51" />
+      <element id="library" level="project" name="Gradle: org.glassfish:javax.json:1.0.4" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.1.3-2" />
+      <element id="library" level="project" name="Gradle: org.jetbrains:annotations:13.0" />
+    </root>
+  </artifact>
+</component>
