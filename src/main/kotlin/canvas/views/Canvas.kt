@@ -37,7 +37,7 @@ class Canvas : View("My View") {
                 setOnMouseClicked { stateController.handleCanvasClick(it) }
                 setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
                 setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
-                setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }
+                setOnMouseDragReleased { dBoxController.handleCanvasDragEnd() }
                 //TODO Fix other components eating these events
 
 
@@ -48,13 +48,14 @@ class Canvas : View("My View") {
                     bindChildren(edgeController.edges) {
                         EdgeFragment(it).root
                     }
-
+                    isPickOnBounds = false
                 }
                 anchorpane {
                     isManaged = false
                     bindChildren(stateController.states) {
                         StateFragment(it).root
                     }
+                    isPickOnBounds = false
                 }
             }
             //TODO Make into its own component
@@ -94,7 +95,7 @@ class Canvas : View("My View") {
             if(it.isShortcutDown && it.code == KeyCode.TAB) {
                 sidepanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidepanel
             } else if (it.code == KeyCode.DELETE) {
-                stateController.removeSelected()
+                controller.removeSelected()
             }
         }
 

@@ -3,8 +3,9 @@ package canvas.controllers
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.State
 import canvas.views.Canvas
-import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.geometry.Bounds
+import javafx.geometry.Point2D
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import sidepanels.propertypanel.PropPanelController
@@ -15,14 +16,12 @@ class StateController : Controller() {
 
     val propController: PropPanelController by inject()
     val edgeController: EdgeController by inject()
+    val canvasController: CanvasController by inject()
 
     val states = FXCollections.observableArrayList(defaultStates)!!
     val selectedStates = FXCollections.observableSet<State>()
 
     val canvas: Canvas by inject()
-
-    val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
-    var clickMode by clickModeProperty
 
     var lastClickedState: State? = null
 
@@ -30,14 +29,7 @@ class StateController : Controller() {
     var deltaY = 0.0
 
     fun handleStateMPress(item: State, event: MouseEvent){
-        if (!event.isShiftDown){
-            selectedStates.forEach { it.isSelected = false }
-            selectedStates.clear()
-        }
-        selectedStates.add(item)
-        item.isSelected = true
-
-            if (clickMode == ClickMode.MOVING) {
+        if (canvasController.clickMode == ClickMode.MOVING) {
             setDragDelta(item, event)
         }
     }
@@ -48,13 +40,13 @@ class StateController : Controller() {
     }
 
     fun handleMDrag(state: State, event: MouseEvent) {
-        if (clickMode == ClickMode.MOVING){
+        if (canvasController.clickMode == ClickMode.MOVING){
             dragItem(state, event)
         }
     }
 
     fun handleDragEnd(item: State, event: MouseEvent){
-        if (clickMode == ClickMode.LINES && lastClickedState != null) {
+        if (canvasController.clickMode == ClickMode.LINES && lastClickedState != null) {
             edgeController.addEdge(lastClickedState!!, item)
             event.consume()
         }
@@ -76,14 +68,14 @@ class StateController : Controller() {
     }
 
     fun startLineDrawing(item: State, node: Node) {
-        if (clickMode == ClickMode.LINES) {
+        if (canvasController.clickMode == ClickMode.LINES) {
             lastClickedState = item
             node.startFullDrag()
         }
     }
 
     fun handleCanvasClick(event: MouseEvent) {
-        if (clickMode == ClickMode.STATES)
+        if (canvasController.clickMode == ClickMode.STATES)
             addState(event)
     }
 
@@ -111,8 +103,11 @@ class StateController : Controller() {
         selectedStates.add(state)
     }
 
-    fun selectStates(states: List<State>, it: MouseEvent){
-        selectedStates.addAll(states)
+    fun selectFromBounds(bounds: Bounds){
+        val selected = states.filter {
+            bounds.contains(Point2D(it.xPos, it.yPos))
+        }
+        selectedStates.addAll(selected)
     }
 
     private fun getNextStateID(): String {

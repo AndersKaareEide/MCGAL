@@ -4,6 +4,8 @@ import canvas.data.AgentItem
 import canvas.data.Edge
 import canvas.data.State
 import javafx.collections.FXCollections
+import javafx.geometry.Bounds
+import javafx.geometry.Point2D
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
 import tornadofx.*
@@ -54,7 +56,8 @@ class EdgeController: Controller() {
     }
 
     fun removeSelected() {
-        selectedEdges.clear()
+        selectedEdges.filter { it.isSelected }
+                .forEach { edges.remove(it) }
     }
 
     fun clearSelected() {

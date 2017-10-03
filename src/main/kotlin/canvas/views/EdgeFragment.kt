@@ -28,13 +28,13 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
         toggleClass(ModelStyles.hidden, item.hiddenProperty)
         toggleClass(ModelStyles.selected, item.selectedProperty) //TODO Add selection support for Edges as well
 
+        isPickOnBounds = false
+
         line {
             startXProperty().bind(x1 + STATE_CIRCLE_RADIUS)
             startYProperty().bind(y1 + STATE_CIRCLE_RADIUS)
             endXProperty().bind(x2 + STATE_CIRCLE_RADIUS)
             endYProperty().bind(y2 + STATE_CIRCLE_RADIUS)
-
-            addEdgeListeners(this)
         }
 
         label {
@@ -44,7 +44,6 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
             textProperty().bind(stringBinding(item.agentsProperty) {
                 item.agentsProperty.value.joinToString(",") { it.name }
             })
-
 
             translateXProperty().bind((((x1 + x2) / 2) - widthProperty() / 2) + STATE_CIRCLE_RADIUS)
             translateYProperty().bind((((y1 + y2) / 2) - heightProperty() / 2) + (STATE_CIRCLE_RADIUS - 10.0))
@@ -60,8 +59,10 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
 
     private fun addEdgeListeners(node: Node) {
         with(node){
-            setOnMouseClicked { canvasController.handleSelectionClick(it, item) }
+            setOnMousePressed {
+                canvasController.handleSelectionClick(it, item) }
             setOnKeyPressed { if(it.code == KeyCode.DELETE ){
+                println("Delete")
                 canvasController.removeSelected()
             }}
         }
