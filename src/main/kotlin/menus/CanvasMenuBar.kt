@@ -52,7 +52,7 @@ object CanvasMenuBar : View() {
                     runLater { this.scene.accelerators.put(it.accelerator, Runnable { isSelected = true }) }
                 }
             }
-            bind(stateController.clickModeProperty)
+            bind(controller.clickModeProperty)
         }
     }
 

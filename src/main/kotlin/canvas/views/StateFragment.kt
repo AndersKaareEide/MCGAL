@@ -1,6 +1,7 @@
 package canvas.views
 
 import canvas.STATE_CIRCLE_RADIUS
+import canvas.controllers.CanvasController
 import canvas.controllers.StateController
 import canvas.data.State
 import canvas.styles.ModelStyles
@@ -11,8 +12,10 @@ import tornadofx.*
 
 
 class StateFragment(val item: State) : Fragment() {
-    val controller = find(StateController::class)
+    val controller: StateController by inject()
+    val canvasController: CanvasController by inject()
 
+    //TODO Use double-click to set properties or something?
     override val root =
             borderpane {
                 translateXProperty().bind(item.xProperty)
@@ -31,18 +34,21 @@ class StateFragment(val item: State) : Fragment() {
                             when (newValue) {
                                 true -> this@circle.setOnKeyPressed {
                                     if (it.code == KeyCode.DELETE){
-                                        controller.removeSelectedStates()
+                                        controller.removeSelected()
                                     }
                                 }
                                 false -> this@circle.setOnKeyPressed {}
                             }
                         })
 
-                        setOnMousePressed { controller.handleStateMPress(item, it); it.consume() }
+                        setOnMousePressed {
+                            controller.handleStateMPress(item, it)
+                            canvasController.handleSelectionClick(it, item)
+                            it.consume()
+                        }
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased { controller.handleDragEnd(item, it) }
-                        setOnMouseClicked { this@circle.requestFocus(); it.consume() }
 
                     }
                     label {

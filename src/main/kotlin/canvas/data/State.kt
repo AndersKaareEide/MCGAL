@@ -9,7 +9,7 @@ import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 import java.io.Serializable
 
-class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable {
+class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty
@@ -33,6 +33,6 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
     var isHidden by hiddenProperty
 
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
-    var isSelected by selectedProperty
+    override var isSelected by selectedProperty
 }
 

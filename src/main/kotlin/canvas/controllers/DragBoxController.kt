@@ -1,13 +1,12 @@
 package canvas.controllers
 
 import canvas.views.DragRectangle
-import javafx.geometry.Point2D
 import javafx.scene.input.MouseEvent
 import tornadofx.*
 
 class DragBoxController : Controller() {
 
-    val controller: StateController by inject()
+    val controller: CanvasController by inject()
 
 
     fun handleCanvasDragStart(it: MouseEvent) {
@@ -50,14 +49,10 @@ class DragBoxController : Controller() {
     }
 
     //TODO Find way to trigger this even if the drag gesture ends off-screen
-    fun handleCanvasDragEnd(it: MouseEvent){
+    fun handleCanvasDragEnd(){
         val bounds = DragRectangle.boundsInLocal
 
-        val selected = controller.states.filter {
-            bounds.contains(Point2D(it.xPos, it.yPos))
-        }
-
-        controller.selectStates(selected, it)
+        controller.selectStates(bounds)
         DragRectangle.isVisible = false
     }
 
