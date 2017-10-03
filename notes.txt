@@ -1,7 +1,0 @@
-Notater
-
-Demo har egen datastruktur for oppdaterte modeller, hvorfor? - Preconditions
-Demo har preconditions som [(state, precondition)]
-
-NCCTL-sjekkeren sjekker hele modellen og returnerer alle statesa som tilfredstiller
-formelen, noen grunn
