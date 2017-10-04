@@ -40,7 +40,7 @@ class PropPanelController : Controller() {
             }
             propositions.add(newProp)
         }
-
     }
 
+    //TODO Add function for 'duplicating' the graph when adding new props
 }

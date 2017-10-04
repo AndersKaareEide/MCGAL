@@ -96,6 +96,7 @@ class Canvas : View("My View") {
         }
 
         //Drag selection
+        setOnMousePressed { controller.clearSelectedComponents(it) }
         setOnMouseClicked { stateController.handleCanvasClick(it) }
         setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
         setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
