@@ -107,6 +107,7 @@ class StateController : Controller() {
         val selected = states.filter {
             bounds.contains(Point2D(it.xPos, it.yPos))
         }
+        selected.forEach { it.isSelected = true }
         selectedStates.addAll(selected)
     }
 

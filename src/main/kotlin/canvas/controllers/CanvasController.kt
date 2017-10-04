@@ -6,6 +6,7 @@ import canvas.data.Model
 import canvas.data.ModelComponent
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Bounds
+import javafx.scene.input.MouseDragEvent
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
 import sidepanels.propertypanel.PropPanelController
@@ -26,13 +27,8 @@ class CanvasController : Controller() {
             agentController.agents.items, propController.propositions)
 
     fun handleSelectionClick(it: MouseEvent, item: ModelComponent){
-        if (!it.isShiftDown){
-            (stateController.selectedStates + edgeController.selectedEdges).forEach {
-                it as ModelComponent
-                it.isSelected = false
-            }
-            stateController.clearSelected()
-            edgeController.clearSelected()
+        if (!it.isShiftDown) {
+            clearSelectedComponents()
         }
 
         item.isSelected = true
@@ -62,9 +58,22 @@ class CanvasController : Controller() {
         propController.propositions.clear()
     }
 
-    fun selectStates(bounds: Bounds) {
+    fun selectStates(bounds: Bounds, it: MouseDragEvent) {
+        if (!it.isShiftDown) {
+            clearSelectedComponents()
+        }
         stateController.selectFromBounds(bounds)
+
         /*TODO Select edges from bounds as well via position of label? Hard to find coordinates of label without
           TODO introducing extra overhead */
+    }
+
+    private fun clearSelectedComponents() {
+        (stateController.selectedStates + edgeController.selectedEdges).forEach {
+            it as ModelComponent
+            it.isSelected = false
+        }
+        stateController.clearSelected()
+        edgeController.clearSelected()
     }
 }
