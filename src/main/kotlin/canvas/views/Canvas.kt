@@ -28,6 +28,8 @@ class Canvas : View("My View") {
         borderpane {
             prefWidth = 800.0
             prefHeight = 600.0
+            vgrow = Priority.ALWAYS
+            hgrow = Priority.ALWAYS
 
             top = CanvasMenuBar.root
 
