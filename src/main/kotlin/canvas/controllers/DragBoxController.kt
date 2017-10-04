@@ -5,6 +5,8 @@ import javafx.scene.input.MouseDragEvent
 import javafx.scene.input.MouseEvent
 import tornadofx.*
 
+private const val MOUSE_OFFSET = 25
+
 class DragBoxController : Controller() {
 
     val controller: CanvasController by inject()
@@ -21,9 +23,9 @@ class DragBoxController : Controller() {
         DragRectangle.width = 0.0
         DragRectangle.height = 0.0
         DragRectangle.x = it.sceneX
-        DragRectangle.y = it.sceneY
+        DragRectangle.y = it.sceneY - MOUSE_OFFSET
         DragRectangle.origX = it.sceneX
-        DragRectangle.origY = it.sceneY
+        DragRectangle.origY = it.sceneY - MOUSE_OFFSET
         DragRectangle.isVisible = true
     }
 
@@ -41,10 +43,10 @@ class DragBoxController : Controller() {
             }
 
             if (tempHeight < 0){
-                y = it.sceneY
+                y = it.sceneY - MOUSE_OFFSET
                 height = origY - y
             } else {
-                height = it.sceneY - y
+                height = (it.sceneY - MOUSE_OFFSET) - y
             }
         }
     }
