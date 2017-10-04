@@ -8,6 +8,7 @@ import canvas.controllers.StateController
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
+import javafx.scene.layout.Priority
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
 import sidepanels.propertypanel.PropositionPanel
@@ -31,20 +32,7 @@ class Canvas : View("My View") {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
 
-            top = CanvasMenuBar.root
-
             center = stackpane {
-
-                //Drag selection
-                setOnMouseClicked { stateController.handleCanvasClick(it) }
-                setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
-                setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
-                setOnMouseDragReleased { dBoxController.handleCanvasDragEnd() }
-                //TODO Fix other components eating these events
-
-
-                dragrectangle()
-
                 anchorpane {
                     isManaged = false
                     bindChildren(edgeController.edges) {
@@ -59,7 +47,12 @@ class Canvas : View("My View") {
                     }
                     isPickOnBounds = false
                 }
+
+                dragrectangle()
             }
+
+            top = CanvasMenuBar.root
+
             //TODO Make into its own component
             bottom = vbox {
                 //Label used to display error messages
@@ -88,6 +81,7 @@ class Canvas : View("My View") {
 
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
+
             tab("Agents", AgentPanel().root)
             tab("Propositions", PropositionPanel().root)
         }
@@ -101,6 +95,14 @@ class Canvas : View("My View") {
             }
         }
 
+        //Drag selection
+        setOnMouseClicked { stateController.handleCanvasClick(it) }
+        setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
+        setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
+        setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }
+        //TODO Fix OS 'banner' calling onExited somehow
+        setOnMouseDragExited { dBoxController.handleCanvasDragEnd(it) }
     }
 }
+
 
