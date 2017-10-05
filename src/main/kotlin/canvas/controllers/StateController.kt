@@ -82,10 +82,9 @@ class StateController : Controller() {
             addState(event)
     }
 
-    //TODO Make state not positioned at mouse tip
     private fun addState(event: MouseEvent) {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
-        val posY = event.sceneY - STATE_CIRCLE_RADIUS
+        val posY = event.sceneY - STATE_CIRCLE_RADIUS * 2
         states.add(State(getNextStateID(), posX, posY, propController.getSelected()))
     }
 
