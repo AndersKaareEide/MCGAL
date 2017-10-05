@@ -29,23 +29,12 @@ class StateFragment(val item: State) : Fragment() {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
-                        item.selectedProperty.addListener({
-                            _, _, newValue ->
-                            when (newValue) {
-                                true -> this@circle.setOnKeyPressed {
-                                    if (it.code == KeyCode.DELETE){
-                                        controller.removeSelected()
-                                    }
-                                }
-                                false -> this@circle.setOnKeyPressed {}
-                            }
-                        })
-
                         setOnMousePressed {
                             controller.handleStateMPress(item, it)
                             canvasController.handleSelectionClick(it, item)
                             it.consume()
                         }
+                        //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased { controller.handleDragEnd(item, it) }
@@ -63,7 +52,6 @@ class StateFragment(val item: State) : Fragment() {
                     })
                     useMaxWidth = true
                     alignment = Pos.CENTER
-                    //TODO Find out why mouse events get eaten by this label
                     isMouseTransparent = true
                 }
             }
