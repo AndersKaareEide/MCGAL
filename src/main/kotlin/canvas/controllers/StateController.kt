@@ -29,6 +29,9 @@ class StateController : Controller() {
     var deltaY = 0.0
 
     fun handleStateMPress(item: State, event: MouseEvent){
+        if (event.isControlDown){
+            item.props.setAll(propController.getSelected())
+        }
         if (canvasController.clickMode == ClickMode.MOVING) {
             setDragDelta(item, event)
         }
