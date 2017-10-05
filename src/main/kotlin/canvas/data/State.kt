@@ -26,7 +26,7 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
     val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
     var outEdges by outEdgesProperty
 
-    val propsProperty = SimpleListProperty<PropositionItem>(this, "agents", props.observable())
+    val propsProperty = SimpleListProperty<PropositionItem>(this, "props", props.observable())
     var props by propsProperty
 
     val hiddenProperty = SimpleBooleanProperty(this, "isHidden", false)

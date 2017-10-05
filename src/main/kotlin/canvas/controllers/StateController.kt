@@ -85,7 +85,7 @@ class StateController : Controller() {
     private fun addState(event: MouseEvent) {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS * 2
-        states.add(State(getNextStateID(), posX, posY, propController.getSelected()))
+        states.add(State(getNextStateID(), posX, posY, ArrayList(propController.getSelected())))
     }
 
     //TODO Find out if this potentially leaks memory due to loose references

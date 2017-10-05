@@ -38,6 +38,7 @@ class StateFragment(val item: State) : Fragment() {
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased { controller.handleDragEnd(item, it) }
+                        setOnMouseClicked { it.consume() } //Prevent from bubbling up to Canvas and triggering addState()
 
                     }
                     label {
