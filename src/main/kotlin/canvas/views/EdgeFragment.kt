@@ -59,12 +59,8 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
 
     private fun addEdgeListeners(node: Node) {
         with(node){
-            setOnMousePressed {
-                canvasController.handleSelectionClick(it, item) }
-            setOnKeyPressed { if(it.code == KeyCode.DELETE ){
-                println("Delete")
-                canvasController.removeSelected()
-            }}
+            setOnMousePressed { canvasController.handleSelectionClick(it, item); it.consume() }
+            setOnMouseClicked { edgeController.setAgents(item, it); it.consume() }
         }
     }
 
