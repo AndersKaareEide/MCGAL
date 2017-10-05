@@ -2,6 +2,7 @@ package sidepanels.agentpanel
 
 import canvas.data.AgentItem
 import canvas.data.AgentItemModel
+import javafx.geometry.Pos
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -10,8 +11,10 @@ class AgentListFragment: ListCellFragment<AgentItem>() {
     val controller: AgentPanelController by inject()
 
     override val root = hbox {
+        prefHeight = 20.0
+        alignment = Pos.CENTER
 
-        checkbox(property = agent.isSelected) {
+        val checkbox = checkbox(property = agent.isSelected) {
             action {
                 startEdit()
                 commitEdit(item)
@@ -27,5 +30,7 @@ class AgentListFragment: ListCellFragment<AgentItem>() {
             removeWhen { parent.hoverProperty().not() }
             action { controller.removeAgent(agent) }
         }
+
+        setOnMouseClicked { checkbox.fire() }
     }
 }

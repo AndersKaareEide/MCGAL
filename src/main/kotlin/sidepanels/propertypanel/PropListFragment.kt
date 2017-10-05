@@ -1,5 +1,6 @@
 package sidepanels.propertypanel
 
+import javafx.geometry.Pos
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -9,7 +10,10 @@ class PropListFragment() : ListCellFragment<PropositionItem>() {
     val proposition = PropItemModel(itemProperty)
 
     override val root = hbox {
-        checkbox(property = proposition.isSelected) {
+        prefHeight = 20.0
+        alignment = Pos.CENTER
+
+        val checkbox = checkbox(property = proposition.isSelected) {
             action {
                 startEdit()
                 commitEdit(item)
@@ -21,5 +25,11 @@ class PropListFragment() : ListCellFragment<PropositionItem>() {
             useMaxSize = true
         }
 
+        button("Remove") {
+            removeWhen { parent.hoverProperty().not() }
+            action { controller.removeProposition(proposition.item) }
+        }
+
+        setOnMouseClicked { checkbox.fire() }
     }
 }

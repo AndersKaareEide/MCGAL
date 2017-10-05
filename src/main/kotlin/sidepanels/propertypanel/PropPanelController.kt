@@ -1,5 +1,6 @@
 package sidepanels.propertypanel
 
+import canvas.controllers.StateController
 import formulaParser.PropertyNotFoundException
 import javafx.collections.ObservableList
 import tornadofx.*
@@ -8,6 +9,7 @@ import utils.defaultProps
 //TODO Make generic superclass to reduce duplication with AgentPanelController
 class PropPanelController : Controller() {
 
+    val stateController: StateController by inject()
     val propositions = SortedFilteredList<PropositionItem>()
 
     init {
@@ -40,6 +42,11 @@ class PropPanelController : Controller() {
             }
             propositions.add(newProp)
         }
+    }
+
+    fun removeProposition(proposition: PropositionItem) {
+        propositions.remove(proposition)
+        stateController.states.forEach { it.props.remove(proposition) }
     }
 
     //TODO Add function for 'duplicating' the graph when adding new props
