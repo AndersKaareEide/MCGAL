@@ -14,7 +14,7 @@ object FormulaParser : Controller() {
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
 
-    //TODO Change Lexer to allow for agents and propositions with longer names
+    //TODO Properly validate agent and propositions by reusing parser rules
     fun parse(input: String, errorListener: ANTLRErrorListener): Formula {
         val lexer = GALLexer(CharStreams.fromString(input))
         lexer.addErrorListener(errorListener)

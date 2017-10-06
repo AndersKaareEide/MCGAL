@@ -15,7 +15,7 @@ class AgentPanel : View() {
                 promptText = "Agent name here"
                 hgrow = Priority.ALWAYS
                 action {
-                    controller.addAgent(text)
+                    controller.addAgent(text.capitalize())
                     clear()
                 }
             }

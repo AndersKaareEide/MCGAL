@@ -15,7 +15,7 @@ class PropositionPanel : View("My View") {
                 promptText = "Enter propositions here"
                 hgrow = Priority.ALWAYS
                 action {
-                    controller.addProposition(text)
+                    controller.addProposition(text.toLowerCase())
                     clear()
                 }
             }
