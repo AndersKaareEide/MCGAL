@@ -1,5 +1,6 @@
 package canvas
 
+import canvas.controllers.CanvasController
 import canvas.data.Model
 import formulaParser.Formula
 import formulaParser.FormulaParser
@@ -8,6 +9,8 @@ import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
 class FormulaFieldController : Controller() {
+
+    val canvasController: CanvasController by inject()
 
     var formula: Formula? = null
     var validating: Boolean = false
@@ -33,6 +36,7 @@ class FormulaFieldController : Controller() {
             state.hiddenProperty.set(!formula.check(state, model))
         }
         validating = true
+        canvasController.clearSelectedComponents()
     }
 
     /**
