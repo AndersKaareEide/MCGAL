@@ -26,8 +26,18 @@ class CanvasController : Controller() {
     val model = Model(stateController.states, edgeController.edges,
             agentController.agents.items, propController.propositions)
 
+    fun handleCanvasClick(event: MouseEvent) {
+        if (clickMode == ClickMode.STATES) {
+            stateController.addState(event)
+        } else if (!event.isShiftDown){
+            clearSelectedComponents()
+        }
+    }
+
     fun handleSelectionClick(it: MouseEvent, item: ModelComponent){
-        clearSelectedComponents(it)
+        if (!it.isShiftDown) {
+            clearSelectedComponents()
+        }
         item.isSelected = true
 
         when(item){
@@ -57,22 +67,20 @@ class CanvasController : Controller() {
         propController.propositions.clear()
     }
 
-    fun selectStates(bounds: Bounds, it: MouseDragEvent) {
-        clearSelectedComponents(it)
+    fun selectStates(bounds: Bounds) {
+        clearSelectedComponents()
         stateController.selectFromBounds(bounds)
 
         /*TODO Select edges from bounds as well via position of label? Hard to find coordinates of label without
           TODO introducing extra overhead */
     }
 
-    fun clearSelectedComponents(it: MouseEvent) {
-        if (!it.isShiftDown) {
-            (stateController.selectedStates + edgeController.selectedEdges).forEach {
-                it as ModelComponent
-                it.isSelected = false
-            }
-            stateController.clearSelected()
-            edgeController.clearSelected()
+    fun clearSelectedComponents() {
+        (stateController.selectedStates + edgeController.selectedEdges).forEach {
+            it as ModelComponent
+            it.isSelected = false
         }
+        stateController.clearSelected()
+        edgeController.clearSelected()
     }
 }

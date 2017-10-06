@@ -77,12 +77,7 @@ class StateController : Controller() {
         }
     }
 
-    fun handleCanvasClick(event: MouseEvent) {
-        if (canvasController.clickMode == ClickMode.STATES)
-            addState(event)
-    }
-
-    private fun addState(event: MouseEvent) {
+    fun addState(event: MouseEvent) {
         val posX = event.sceneX - STATE_CIRCLE_RADIUS
         val posY = event.sceneY - STATE_CIRCLE_RADIUS * 2
         states.add(State(getNextStateID(), posX, posY, ArrayList(propController.getSelected())))
