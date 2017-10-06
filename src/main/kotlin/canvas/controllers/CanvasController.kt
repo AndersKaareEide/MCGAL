@@ -46,6 +46,8 @@ class CanvasController : Controller() {
         edgeController.edges.setAll(model.edges)
         agentController.agents.clear()
         agentController.agents.addAll(model.agents)
+        propController.propositions.clear()
+        propController.propositions.addAll(model.props)
     }
 
     fun clearModel() {
