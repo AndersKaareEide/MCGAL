@@ -1,10 +1,11 @@
 package canvas.views
 
-import canvas.FormulaFieldController
+import formulafield.FormulaFieldController
 import canvas.controllers.CanvasController
 import canvas.controllers.DragBoxController
 import canvas.controllers.EdgeController
 import canvas.controllers.StateController
+import formulafield.FormulaField
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
@@ -54,25 +55,7 @@ class Canvas : View("My View") {
             top = CanvasMenuBar.root
 
             //TODO Make into its own component
-            bottom = vbox {
-                //Label used to display error messages
-                label(formulaController.errorMsgProperty) {
-                    removeWhen {
-                        textProperty().isEmpty
-                    }
-                }
-                textfield {
-                    //TODO Clear error field when user resumes editing formula
-                    promptText = "Write formulas here"
-                    setOnAction { formulaController.validateFormString(text, controller.model) }
-                    accelerators.put(KeyCombination.keyCombination("Esc")) {
-                        formulaController.clearValidation(controller.model)
-                    }
-                    //TODO Do I want to clear the validation when the user edits the formula? Live validation perhaps?
-                    //Might be really slow for more complex formulas / models
-//                    textProperty().onChange { formulaController.clearValidation(edgeController.model) }
-                }
-            }
+            bottom = FormulaField().root
         }
 
         //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused

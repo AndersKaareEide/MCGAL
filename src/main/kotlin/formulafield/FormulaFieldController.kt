@@ -1,4 +1,4 @@
-package canvas
+package formulafield
 
 import canvas.controllers.CanvasController
 import canvas.data.Model
