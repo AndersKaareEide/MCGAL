@@ -19,7 +19,7 @@ agents : '['AGENT(COMMA AGENT)*']';
 // Lexer rules
 WHITESPACE : ' ' -> skip;
 
-AGENT   : [A-ZÆØÅ][a-zæøå]*([0-1])*;
+AGENT   : [A-ZÆØÅ][a-zæøå]*([0-9])*;
 PROP    : [a-zæøå]+([0-9])*; //Note: PROP is also used for agents
 COMMA   : ',';
 NEG     : '!';
