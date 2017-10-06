@@ -55,7 +55,7 @@ class DragBoxController : Controller() {
     fun handleCanvasDragEnd(it: MouseDragEvent) {
         val bounds = DragRectangle.boundsInLocal
 
-        controller.selectStates(bounds, it)
+        controller.selectStates(bounds)
         DragRectangle.isVisible = false
     }
 

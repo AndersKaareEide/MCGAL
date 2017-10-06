@@ -1,8 +1,8 @@
 package formulaParser
 
-import sidepanels.agentpanel.AgentPanelController
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
+import sidepanels.agentpanel.AgentPanelController
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -59,7 +59,7 @@ object FormulaParser : Controller() {
     }
 
     private fun makeGroupAnnouncement(tree: GALParser.GroupannFormContext): Formula {
-        val agents = tree.agents().PROP().map { agentController.getAgent(it.text) }
+        val agents = tree.agents().AGENT().map { agentController.getAgent(it.text) }
 
         return GroupAnn(agents, recursiveTransform(tree.inner))
     }
