@@ -8,13 +8,13 @@ form : prop=PROP                        #atomicForm
     | left=form op=CONJ right=form      #conjForm
     | left=form op=DISJ right=form      #disjForm
     | left=form op=IMPL right=form      #implForm
-    | 'K' agent=AGENT '('inner=form')'   #knowsForm
+    | 'K' agent=AGENT '('inner=form')'  #knowsForm
     | '(' inner=form ')'                #parensForm
     | '['announced=form']' inner=form   #announceForm
-    | agents inner=form                 #groupannForm
+    | '['agents']' inner=form           #groupannForm
     ;
 
-agents : '['AGENT(COMMA AGENT)*']';
+agents : AGENT(COMMA AGENT)*;
 
 // Lexer rules
 WHITESPACE : ' ' -> skip;

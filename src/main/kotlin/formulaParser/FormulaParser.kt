@@ -65,6 +65,6 @@ object FormulaParser : Controller() {
     }
 }
 
-class FormulaParsingException(input: String): RuntimeException("Failed to parse formula: $input")
-class AgentNotFoundException(agentName: String): RuntimeException("Agent: $agentName not found in model")
-class PropertyNotFoundException(propString: String): RuntimeException("Property: $propString not found in model")
+open class FormulaParsingException(input: String): RuntimeException("Failed to parse formula: $input")
+class AgentNotFoundException(agentName: String): FormulaParsingException("Agent: $agentName not found in model")
+class PropertyNotFoundException(propString: String): FormulaParsingException("Property: $propString not found in model")

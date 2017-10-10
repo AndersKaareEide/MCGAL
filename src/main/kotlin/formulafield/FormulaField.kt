@@ -1,7 +1,10 @@
 package formulafield
 
 import canvas.controllers.CanvasController
+import canvas.styles.ModelStyles
+import javafx.collections.FXCollections
 import javafx.scene.input.KeyCombination
+import javafx.scene.text.Font
 import tornadofx.*
 
 class FormulaField : View("My View") {
@@ -17,20 +20,15 @@ class FormulaField : View("My View") {
             }
         }
 
-        val debugArea = hbox {
-            
-        }
+        val debugArea = hbox()
 
         textfield {
             //TODO Clear error field when user resumes editing formula
             promptText = "Write formulas here"
-            setOnAction { controller.validateFormString(text, canvasController.model) }
+            setOnAction { controller.validateFormString(text, canvasController.model, debugArea) }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
                 controller.clearValidation(canvasController.model)
             }
-            //TODO Do I want to clear the validation when the user edits the formula? Live validation perhaps?
-            //Might be really slow for more complex formulas / models
-//            textProperty().onChange { controller.clearValidation(edgeController.model) }
         }
     }
 }

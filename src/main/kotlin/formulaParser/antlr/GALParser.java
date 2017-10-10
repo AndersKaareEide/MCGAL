@@ -1,14 +1,9 @@
 // Generated from C:/Users/AndersLaptop/Workspace/HaskellProjects/Masterprosjekt/src/main/kotlin/formulaParser/antlr\GAL.g4 by ANTLR 4.7
 package formulaParser.antlr;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
@@ -235,7 +230,7 @@ public class GALParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(31);
+			setState(33);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
 			case 1:
@@ -310,22 +305,26 @@ public class GALParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(28);
-				agents();
+				match(T__3);
 				setState(29);
+				agents();
+				setState(30);
+				match(T__4);
+				setState(31);
 				((GroupannFormContext)_localctx).inner = form(1);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(44);
+			setState(46);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(42);
+					setState(44);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 					case 1:
@@ -333,11 +332,11 @@ public class GALParser extends Parser {
 						_localctx = new ConjFormContext(new FormContext(_parentctx, _parentState));
 						((ConjFormContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_form);
-						setState(33);
-						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
-						setState(34);
-						((ConjFormContext)_localctx).op = match(CONJ);
 						setState(35);
+						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+						setState(36);
+						((ConjFormContext)_localctx).op = match(CONJ);
+						setState(37);
 						((ConjFormContext)_localctx).right = form(8);
 						}
 						break;
@@ -346,11 +345,11 @@ public class GALParser extends Parser {
 						_localctx = new DisjFormContext(new FormContext(_parentctx, _parentState));
 						((DisjFormContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_form);
-						setState(36);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
-						setState(37);
-						((DisjFormContext)_localctx).op = match(DISJ);
 						setState(38);
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						setState(39);
+						((DisjFormContext)_localctx).op = match(DISJ);
+						setState(40);
 						((DisjFormContext)_localctx).right = form(7);
 						}
 						break;
@@ -359,18 +358,18 @@ public class GALParser extends Parser {
 						_localctx = new ImplFormContext(new FormContext(_parentctx, _parentState));
 						((ImplFormContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_form);
-						setState(39);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-						setState(40);
-						((ImplFormContext)_localctx).op = match(IMPL);
 						setState(41);
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						setState(42);
+						((ImplFormContext)_localctx).op = match(IMPL);
+						setState(43);
 						((ImplFormContext)_localctx).right = form(6);
 						}
 						break;
 					}
 					} 
 				}
-				setState(46);
+				setState(48);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
@@ -409,28 +408,24 @@ public class GALParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(47);
-			match(T__3);
-			setState(48);
+			setState(49);
 			match(AGENT);
-			setState(53);
+			setState(54);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(49);
-				match(COMMA);
 				setState(50);
+				match(COMMA);
+				setState(51);
 				match(AGENT);
 				}
 				}
-				setState(55);
+				setState(56);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(56);
-			match(T__4);
 			}
 		}
 		catch (RecognitionException re) {
@@ -464,22 +459,22 @@ public class GALParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\17=\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\17<\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\3\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3\"\n\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\7\3-\n\3\f\3\16\3\60\13\3\3\4\3\4\3\4\3\4\7\4\66\n\4"+
-		"\f\4\16\49\13\4\3\4\3\4\3\4\2\3\4\5\2\4\6\2\2\2B\2\b\3\2\2\2\4!\3\2\2"+
-		"\2\6\61\3\2\2\2\b\t\5\4\3\2\t\n\7\2\2\3\n\3\3\2\2\2\13\f\b\3\1\2\f\"\7"+
-		"\n\2\2\r\16\7\f\2\2\16\"\5\4\3\n\17\20\7\3\2\2\20\21\7\t\2\2\21\22\7\4"+
-		"\2\2\22\23\5\4\3\2\23\24\7\5\2\2\24\"\3\2\2\2\25\26\7\4\2\2\26\27\5\4"+
-		"\3\2\27\30\7\5\2\2\30\"\3\2\2\2\31\32\7\6\2\2\32\33\5\4\3\2\33\34\7\7"+
-		"\2\2\34\35\5\4\3\4\35\"\3\2\2\2\36\37\5\6\4\2\37 \5\4\3\3 \"\3\2\2\2!"+
-		"\13\3\2\2\2!\r\3\2\2\2!\17\3\2\2\2!\25\3\2\2\2!\31\3\2\2\2!\36\3\2\2\2"+
-		"\".\3\2\2\2#$\f\t\2\2$%\7\r\2\2%-\5\4\3\n&\'\f\b\2\2\'(\7\16\2\2(-\5\4"+
-		"\3\t)*\f\7\2\2*+\7\17\2\2+-\5\4\3\b,#\3\2\2\2,&\3\2\2\2,)\3\2\2\2-\60"+
-		"\3\2\2\2.,\3\2\2\2./\3\2\2\2/\5\3\2\2\2\60.\3\2\2\2\61\62\7\6\2\2\62\67"+
-		"\7\t\2\2\63\64\7\13\2\2\64\66\7\t\2\2\65\63\3\2\2\2\669\3\2\2\2\67\65"+
-		"\3\2\2\2\678\3\2\2\28:\3\2\2\29\67\3\2\2\2:;\7\7\2\2;\7\3\2\2\2\6!,.\67";
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3$\n\3\3\3\3\3\3\3"+
+		"\3\3\3\3\3\3\3\3\3\3\3\3\7\3/\n\3\f\3\16\3\62\13\3\3\4\3\4\3\4\7\4\67"+
+		"\n\4\f\4\16\4:\13\4\3\4\2\3\4\5\2\4\6\2\2\2A\2\b\3\2\2\2\4#\3\2\2\2\6"+
+		"\63\3\2\2\2\b\t\5\4\3\2\t\n\7\2\2\3\n\3\3\2\2\2\13\f\b\3\1\2\f$\7\n\2"+
+		"\2\r\16\7\f\2\2\16$\5\4\3\n\17\20\7\3\2\2\20\21\7\t\2\2\21\22\7\4\2\2"+
+		"\22\23\5\4\3\2\23\24\7\5\2\2\24$\3\2\2\2\25\26\7\4\2\2\26\27\5\4\3\2\27"+
+		"\30\7\5\2\2\30$\3\2\2\2\31\32\7\6\2\2\32\33\5\4\3\2\33\34\7\7\2\2\34\35"+
+		"\5\4\3\4\35$\3\2\2\2\36\37\7\6\2\2\37 \5\6\4\2 !\7\7\2\2!\"\5\4\3\3\""+
+		"$\3\2\2\2#\13\3\2\2\2#\r\3\2\2\2#\17\3\2\2\2#\25\3\2\2\2#\31\3\2\2\2#"+
+		"\36\3\2\2\2$\60\3\2\2\2%&\f\t\2\2&\'\7\r\2\2\'/\5\4\3\n()\f\b\2\2)*\7"+
+		"\16\2\2*/\5\4\3\t+,\f\7\2\2,-\7\17\2\2-/\5\4\3\b.%\3\2\2\2.(\3\2\2\2."+
+		"+\3\2\2\2/\62\3\2\2\2\60.\3\2\2\2\60\61\3\2\2\2\61\5\3\2\2\2\62\60\3\2"+
+		"\2\2\638\7\t\2\2\64\65\7\13\2\2\65\67\7\t\2\2\66\64\3\2\2\2\67:\3\2\2"+
+		"\28\66\3\2\2\289\3\2\2\29\7\3\2\2\2:8\3\2\2\2\6#.\608";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

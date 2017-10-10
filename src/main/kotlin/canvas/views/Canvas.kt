@@ -75,6 +75,8 @@ class Canvas : View("My View") {
                 sidepanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidepanel
             } else if (it.code == KeyCode.DELETE) {
                 controller.removeSelected()
+            } else if (it.code == KeyCode.ESCAPE) {
+                formulaController.clearValidation(controller.model)
             }
         }
 

@@ -3,6 +3,7 @@ package formulaParser
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
+import formulafield.FormulaLabel
 import sidepanels.propertypanel.PropositionItem
 
 /**
@@ -66,4 +67,24 @@ fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
     }
 
     return Model(model.states, filteredEdges, model.agents, model.props)
+}
+
+fun makeRange(needsParens: Boolean, start: Int, end: Int): Pair<Int, Int> {
+    return if (needsParens) {
+        Pair(start -1, end + 1)
+    } else {
+        Pair(start, end)
+    }
+}
+
+fun insertParentheses(list: MutableList<FormulaLabel>, formula: Formula){
+    val size = list.size + 1
+    list.add(0, FormulaLabel(formula, "(", Pair(0, size)))
+    list.add(FormulaLabel(formula, ")", Pair(-size, 0)))
+}
+
+fun insertParentheses(left: MutableList<FormulaLabel>, right: MutableList<FormulaLabel>, formula: Formula){
+    val size = left.size + right.size + 2
+    left.add(0, FormulaLabel(formula, "(", Pair(0, size)))
+    right.add(FormulaLabel(formula, ")", Pair(-size, 0)))
 }
