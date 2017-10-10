@@ -43,6 +43,8 @@ class FormulaFieldController : Controller() {
             errorMsgProperty.value = e.message
         } catch (e: FormulaParsingException){
             errorMsgProperty.value = e.message
+        } catch (e: IllegalStateException){
+            errorMsgProperty.value = "Error parsing agents in group announcement"
         }
     }
 
