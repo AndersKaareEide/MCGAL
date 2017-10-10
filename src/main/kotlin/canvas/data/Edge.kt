@@ -21,9 +21,6 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Se
     init {
         parent1.inEdges.add(this)
         parent2.outEdges.add(this)
-        hiddenProperty.bind(booleanBinding(parent1.hiddenProperty, parent2.hiddenProperty){
-            parent1.hiddenProperty.value or parent2.hiddenProperty.value
-        })
     }
 
     override fun equals(other: Any?): Boolean {

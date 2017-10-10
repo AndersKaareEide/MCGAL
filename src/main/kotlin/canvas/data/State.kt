@@ -1,9 +1,6 @@
 package canvas.data
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.collections.FXCollections
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
@@ -29,8 +26,8 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
     val propsProperty = SimpleListProperty<PropositionItem>(this, "props", props.observable())
     var props by propsProperty
 
-    val hiddenProperty = SimpleBooleanProperty(this, "isHidden", false)
-    var isHidden by hiddenProperty
+    val cssClassProperty = SimpleObjectProperty<CssRule>(this, "cssClass", null)
+    var cssClass by cssClassProperty
 
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
     override var isSelected by selectedProperty

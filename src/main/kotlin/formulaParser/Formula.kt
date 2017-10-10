@@ -55,7 +55,6 @@ class Proposition(val proposition: PropositionItem): Formula() {
         return mutableListOf (FormulaLabel(this, proposition.propString, Pair(0,0)))
     }
 }
-//TODO Remember to use logical symbols
 class Negation(val inner: Formula): Formula() {
     override val needsParentheses = false
 

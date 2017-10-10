@@ -7,7 +7,6 @@ import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
 import formulaParser.GALErrorListener
-import formulafield.styling.LabelStyling
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.layout.HBox
 import org.antlr.v4.runtime.RecognitionException
@@ -50,19 +49,23 @@ class FormulaFieldController : Controller() {
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
             //TODO Replace with green / red glow instead
-            state.hiddenProperty.set(!formula.check(state, model))
+            state.cssClass = if (formula.check(state,model)){
+                ModelStyles.accepted
+            } else {
+                ModelStyles.rejected
+            }
         }
         validating = true
         canvasController.clearSelectedComponents()
     }
 
     /**
-     * Makes all states hidden again
+     * Makes all states visible again
      */
     fun clearValidation(model: Model) {
         if (validating) {
             for (state in model.states) {
-                state.hiddenProperty.set(false)
+                state.cssClass = null
             }
             validating = false
         }
