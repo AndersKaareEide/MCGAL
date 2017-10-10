@@ -54,7 +54,6 @@ class Canvas : View("My View") {
 
             top = CanvasMenuBar.root
 
-            //TODO Make into its own component
             bottom = FormulaField().root
         }
 

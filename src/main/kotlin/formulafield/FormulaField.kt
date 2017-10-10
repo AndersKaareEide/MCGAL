@@ -1,10 +1,8 @@
 package formulafield
 
 import canvas.controllers.CanvasController
-import canvas.styles.ModelStyles
-import javafx.collections.FXCollections
+import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
-import javafx.scene.text.Font
 import tornadofx.*
 
 class FormulaField : View("My View") {
@@ -22,12 +20,32 @@ class FormulaField : View("My View") {
 
         val debugArea = hbox()
 
-        textfield {
+        val inputField = textfield {
             //TODO Clear error field when user resumes editing formula
             promptText = "Write formulas here"
             setOnAction { controller.validateFormString(text, canvasController.model, debugArea) }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
                 controller.clearValidation(canvasController.model)
+            }
+
+            setOnKeyPressed {
+                if (it.code == KeyCode.UP) {
+                    controller.getPreviousFormula(this)
+                    it.consume()
+                } else if (it.code == KeyCode.DOWN) {
+                    controller.getNextFormula(this)
+                    it.consume()
+                }
+            }
+        }
+
+        setOnKeyPressed {
+            if (it.code == KeyCode.UP) {
+                controller.getPreviousFormula(inputField)
+                it.consume()
+            } else if (it.code == KeyCode.DOWN) {
+                controller.getNextFormula(inputField)
+                it.consume()
             }
         }
     }
