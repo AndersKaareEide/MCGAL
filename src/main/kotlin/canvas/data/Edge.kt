@@ -7,7 +7,7 @@ import java.io.Serializable
 
 class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Serializable, ModelComponent {
 
-    val id: String = parent1.name + parent2.name
+    var id: String = parent1.name + parent2.name
 
     val agentsProperty = SimpleListProperty<AgentItem>(this, "agents", agents.observable())
     var agents by agentsProperty

@@ -2,8 +2,6 @@ package menus
 
 import canvas.controllers.CanvasController
 import canvas.controllers.ClickMode
-import canvas.controllers.StateController
-import io.ModelSerializer
 import javafx.geometry.Orientation
 import javafx.scene.control.ButtonType
 import javafx.stage.FileChooser
@@ -13,10 +11,11 @@ import java.io.File
 
 object CanvasMenuBar : View() {
 
-    val controller: CanvasController by inject()
-    val stateController: StateController by inject()
+    val canvasController: CanvasController by inject()
+    val controller: MenuBarController by inject()
 
-    private val fileChooser = FileChooser()
+
+    val fileChooser = FileChooser()
 
     init {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("Model files", "*.mdl"))
@@ -28,15 +27,16 @@ object CanvasMenuBar : View() {
         menubar {
             //TODO Fix File menu being retarded and requesting focus every time Alt is pressed
             menu("_File") {
-                item("_Save").action { openSaveDialog() }
-                item("_Load").action { openLoadDialog() }
+                item("_Save").action { controller.openSaveDialog(fileChooser, currentWindow) }
+                item("_Load").action { controller.openLoadDialog(fileChooser, currentWindow) }
+                item("_Import").action { controller.openImportDialog(fileChooser, currentWindow) }
             }
 
             menu("_Edit") {
                 item("_Clear Model").action {
                     confirm("Clear model", "Do you really wish to clear the model?\nThis action is irreversible",
                             ButtonType.YES, ButtonType.CANCEL) {
-                        controller.clearModel()
+                        canvasController.clearModel()
                     }
                 }
             }
@@ -52,22 +52,9 @@ object CanvasMenuBar : View() {
                     runLater { this.scene.accelerators.put(it.accelerator, Runnable { isSelected = true }) }
                 }
             }
-            bind(controller.clickModeProperty)
+            bind(canvasController.clickModeProperty)
         }
     }
 
-    private fun openSaveDialog(){
-        val fileToSave = fileChooser.showSaveDialog(this.currentWindow)
-        if (fileToSave != null) {
-            ModelSerializer.serializeModel(controller.model, fileToSave)
-        }
-    }
 
-    private fun openLoadDialog() {
-        val fileToLoad = fileChooser.showOpenDialog(this.currentWindow)
-        if (fileToLoad != null) {
-            val model = ModelSerializer.deserializeModel(fileToLoad)
-            controller.loadModel(model)
-        }
-    }
 }

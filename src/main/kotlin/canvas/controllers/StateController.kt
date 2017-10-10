@@ -108,7 +108,7 @@ class StateController : Controller() {
         selectedStates.addAll(selected)
     }
 
-    private fun getNextStateID(): String {
+    fun getNextStateID(): String {
         //TODO Find better solution this shit is retardedly slow
         outer@ for (stateNum in 1 until states.lastIndex + 3) {
             for (state in states){

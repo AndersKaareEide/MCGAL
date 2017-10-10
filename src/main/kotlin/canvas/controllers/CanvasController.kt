@@ -60,6 +60,23 @@ class CanvasController : Controller() {
         propController.propositions.addAll(model.props)
     }
 
+    fun importModel(model: Model) {
+        clearSelectedComponents()
+        agentController.agents.addAll(model.agents.filter { !agentController.agents.contains(it) })
+        propController.propositions.addAll(model.props.filter { !propController.propositions.contains(it) })
+
+        model.states.forEach {
+            it.name = stateController.getNextStateID()
+            it.isSelected = true
+            stateController.states.add(it)
+            stateController.selectState(it)
+        }
+        model.edges.forEach {
+            it.id = it.parent1.name + it.parent2.name
+            edgeController.edges.add(it)
+        }
+    }
+
     fun clearModel() {
         stateController.states.clear()
         edgeController.edges.clear()
