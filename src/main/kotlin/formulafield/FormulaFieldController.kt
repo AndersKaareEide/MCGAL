@@ -35,7 +35,7 @@ class FormulaFieldController : Controller() {
                 it.setOnMouseExited {}
                 it.setOnMouseEntered {}
             }
-
+            //TODO Clear labels when the model is edited
             labels = formula.toFormulaItem().labels
             debugArea.children.setAll(labels)
 
@@ -48,8 +48,7 @@ class FormulaFieldController : Controller() {
 
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
-            //TODO Replace with green / red glow instead
-            state.cssClass = if (formula.check(state,model)){
+            state.validationStyle = if (formula.check(state,model)){
                 ModelStyles.accepted
             } else {
                 ModelStyles.rejected
@@ -60,12 +59,12 @@ class FormulaFieldController : Controller() {
     }
 
     /**
-     * Makes all states visible again
+     * Removes all validation-related styling from states
      */
     fun clearValidation(model: Model) {
         if (validating) {
             for (state in model.states) {
-                state.cssClass = null
+                state.validationStyle = null
             }
             validating = false
         }

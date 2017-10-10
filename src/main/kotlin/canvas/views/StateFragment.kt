@@ -20,7 +20,7 @@ class StateFragment(val item: State) : Fragment() {
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 
-                bindClass(item.cssClassProperty)
+                bindClass(item.validationStyleProp)
                 toggleClass(ModelStyles.selected, item.selectedProperty)
 
                 center = stackpane {

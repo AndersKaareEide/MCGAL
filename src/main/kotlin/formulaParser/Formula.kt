@@ -117,6 +117,7 @@ class Knows(val agent: AgentItem, val inner: Formula): Formula() {
 }
 
 //TODO Look into optimizing by reusing the same updated model when checking multiple states
+//TODO Fix incorrect highlighting, subformula does not get highlighted correctly
 class Announcement(val announcement: Formula, val inner: Formula): Formula() {
     override val needsParentheses = true
 

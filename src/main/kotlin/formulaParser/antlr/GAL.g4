@@ -13,7 +13,7 @@ form : prop=PROP                        #atomicForm
     | '['announced=form']' inner=form   #announceForm
     | '['agents']' inner=form           #groupannForm
     ;
-
+//TODO Gjøre []p til et gyldig group announcement?
 agents : AGENT(COMMA AGENT)*;
 
 // Lexer rules
