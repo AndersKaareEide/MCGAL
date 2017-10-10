@@ -102,7 +102,7 @@ class StateController : Controller() {
 
     fun selectFromBounds(bounds: Bounds){
         val selected = states.filter {
-            bounds.contains(Point2D(it.xPos, it.yPos))
+            bounds.contains(Point2D(it.xPos + STATE_CIRCLE_RADIUS, it.yPos + STATE_CIRCLE_RADIUS))
         }
         selected.forEach { it.isSelected = true }
         selectedStates.addAll(selected)

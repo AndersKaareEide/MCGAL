@@ -84,8 +84,10 @@ class CanvasController : Controller() {
         propController.propositions.clear()
     }
 
-    fun selectStates(bounds: Bounds) {
-        clearSelectedComponents()
+    fun selectStates(bounds: Bounds, it: MouseDragEvent) {
+        if (!it.isShiftDown) {
+            clearSelectedComponents()
+        }
         stateController.selectFromBounds(bounds)
 
         /*TODO Select edges from bounds as well via position of label? Hard to find coordinates of label without
