@@ -75,9 +75,9 @@ class FormulaFieldController : Controller() {
     /**
      * Removes all validation-related styling from states
      */
-    fun clearValidation() {
+    fun clearValidation(model: Model) {
         if (validating) {
-            for (state in canvasController.model.states) {
+            for (state in model.states) {
                 state.validationStyle = null
             }
             validating = false

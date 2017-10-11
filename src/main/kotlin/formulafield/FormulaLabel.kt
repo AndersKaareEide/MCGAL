@@ -22,7 +22,7 @@ class FormulaLabel(val formula: Formula, labelText: String, val indexRange: Pair
         }
         setOnMouseExited {
             controller.deselectLabels(this, indexRange)
-            controller.clearValidation()
+            controller.clearValidation(model)
         }
     }
 }

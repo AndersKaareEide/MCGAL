@@ -26,7 +26,7 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
     override val root = anchorpane {
 
         toggleClass(ModelStyles.hidden, item.hiddenProperty)
-        toggleClass(ModelStyles.selected, item.selectedProperty)
+        toggleClass(ModelStyles.selected, item.selectedProperty) //TODO Add selection support for Edges as well
 
         isPickOnBounds = false
 
