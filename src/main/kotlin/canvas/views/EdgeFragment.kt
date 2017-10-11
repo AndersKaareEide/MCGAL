@@ -5,6 +5,7 @@ import canvas.controllers.CanvasController
 import canvas.controllers.EdgeController
 import canvas.data.Edge
 import canvas.styles.ModelStyles
+import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.input.KeyCode
@@ -12,6 +13,7 @@ import tornadofx.*
 
 class EdgeFragment(val item: Edge) : Fragment("My View") {
 
+    val formulaController: FormulaFieldController by inject()
     val edgeController: EdgeController by inject()
     val canvasController: CanvasController by inject()
 
@@ -59,7 +61,11 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
 
     private fun addEdgeListeners(node: Node) {
         with(node){
-            setOnMousePressed { canvasController.handleSelectionClick(it, item); it.consume() }
+            setOnMousePressed {
+                canvasController.handleSelectionClick(it, item)
+                formulaController.clearValidation()
+                it.consume()
+            }
             setOnMouseClicked { edgeController.setAgents(item, it); it.consume() }
         }
     }

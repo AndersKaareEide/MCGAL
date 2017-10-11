@@ -5,6 +5,7 @@ import canvas.controllers.CanvasController
 import canvas.controllers.StateController
 import canvas.data.State
 import canvas.styles.ModelStyles
+import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import tornadofx.*
@@ -13,6 +14,7 @@ import tornadofx.*
 class StateFragment(val item: State) : Fragment() {
     val controller: StateController by inject()
     val canvasController: CanvasController by inject()
+    val formulaController: FormulaFieldController by inject()
 
     //TODO Use double-click to set properties or something?
     override val root =
@@ -31,6 +33,7 @@ class StateFragment(val item: State) : Fragment() {
                         setOnMousePressed {
                             controller.handleStateMPress(item, it)
                             canvasController.handleSelectionClick(it, item)
+                            formulaController.clearValidation()
                             it.consume()
                         }
                         //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states

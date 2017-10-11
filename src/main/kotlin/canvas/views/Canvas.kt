@@ -75,12 +75,12 @@ class Canvas : View("My View") {
             } else if (it.code == KeyCode.DELETE) {
                 controller.removeSelected()
             } else if (it.code == KeyCode.ESCAPE) {
-                formulaController.clearValidation(controller.model)
+                formulaController.clearValidation()
             }
         }
 
         //Drag selection
-        setOnMouseClicked { controller.handleCanvasClick(it) }
+        setOnMouseClicked { controller.handleCanvasClick(it); formulaController.clearValidation() }
         setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
         setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
         setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }

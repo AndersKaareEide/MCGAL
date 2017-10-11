@@ -25,7 +25,7 @@ class FormulaField : View("My View") {
             promptText = "Write formulas here"
             setOnAction { controller.validateFormString(text, canvasController.model, debugArea) }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
-                controller.clearValidation(canvasController.model)
+                controller.clearValidation()
             }
 
             setOnKeyPressed {
