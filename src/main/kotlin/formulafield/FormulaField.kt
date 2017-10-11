@@ -1,6 +1,7 @@
 package formulafield
 
 import canvas.controllers.CanvasController
+import javafx.beans.value.ChangeListener
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
 import tornadofx.*
@@ -25,8 +26,9 @@ class FormulaField : View("My View") {
             promptText = "Write formulas here"
             setOnAction { controller.validateFormString(text, canvasController.model, debugArea) }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
-                controller.clearValidation(canvasController.model)
+                controller.clearValidation()
             }
+            focusedProperty().addListener({ _, _, it -> if(!it) { controller.clearValidation() } })
 
             setOnKeyPressed {
                 if (it.code == KeyCode.UP) {

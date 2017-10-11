@@ -57,7 +57,6 @@ class Canvas : View("My View") {
             bottom = FormulaField().root
         }
 
-        //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
         val sidepanel = tabpane {
             prefWidth = 200.0
 
@@ -75,12 +74,12 @@ class Canvas : View("My View") {
             } else if (it.code == KeyCode.DELETE) {
                 controller.removeSelected()
             } else if (it.code == KeyCode.ESCAPE) {
-                formulaController.clearValidation(controller.model)
+                formulaController.clearValidation()
             }
         }
 
         //Drag selection
-        setOnMouseClicked { controller.handleCanvasClick(it) }
+        setOnMouseClicked { controller.handleCanvasClick(it); requestFocus() }
         setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
         setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
         setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }

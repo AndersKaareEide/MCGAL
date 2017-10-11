@@ -14,7 +14,6 @@ class StateFragment(val item: State) : Fragment() {
     val controller: StateController by inject()
     val canvasController: CanvasController by inject()
 
-    //TODO Use double-click to set properties or something?
     override val root =
             borderpane {
                 translateXProperty().bind(item.xProperty)
@@ -31,6 +30,7 @@ class StateFragment(val item: State) : Fragment() {
                         setOnMousePressed {
                             controller.handleStateMPress(item, it)
                             canvasController.handleSelectionClick(it, item)
+                            requestFocus()
                             it.consume()
                         }
                         //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states
