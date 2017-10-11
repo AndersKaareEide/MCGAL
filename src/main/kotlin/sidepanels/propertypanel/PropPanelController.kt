@@ -20,6 +20,10 @@ class PropPanelController : Controller() {
         return propositions.filtered { it.isSelected }!!
     }
 
+    fun deselectAll() {
+        propositions.forEach { it.isSelected = false }
+    }
+
     fun getProposition(propString: String) : PropositionItem {
         for (proposition in propositions){
             if (proposition.propString == propString){

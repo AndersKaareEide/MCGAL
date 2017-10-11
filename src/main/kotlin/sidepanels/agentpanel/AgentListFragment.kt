@@ -7,6 +7,7 @@ import javafx.scene.layout.Priority
 import tornadofx.*
 
 class AgentListFragment: ListCellFragment<AgentItem>() {
+
     val agent = AgentItemModel(itemProperty)
     val controller: AgentPanelController by inject()
 
@@ -15,6 +16,12 @@ class AgentListFragment: ListCellFragment<AgentItem>() {
         alignment = Pos.CENTER
 
         val checkbox = checkbox(property = agent.isSelected) {
+            setOnMouseClicked {
+                if (it.isControlDown){
+                    controller.deselectAll()
+                }
+                this.fire()
+            }
             action {
                 startEdit()
                 commitEdit(item)
@@ -31,6 +38,11 @@ class AgentListFragment: ListCellFragment<AgentItem>() {
             action { controller.removeAgent(agent) }
         }
 
-        setOnMouseClicked { checkbox.fire() }
+        setOnMouseClicked {
+            if (it.isControlDown){
+                controller.deselectAll()
+            }
+            checkbox.fire()
+        }
     }
 }

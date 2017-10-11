@@ -21,6 +21,10 @@ class AgentPanelController: Controller() {
         return agents.filtered { it.isSelected }!!
     }
 
+    fun deselectAll(){
+        agents.forEach { it.isSelected = false }
+    }
+
     fun removeAgent(agent: AgentItemModel){
         edgeController.removeAgent(agent.item)
         agents.remove(agent.item)

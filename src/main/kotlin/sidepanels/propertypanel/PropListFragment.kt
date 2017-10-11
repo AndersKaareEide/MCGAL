@@ -14,6 +14,12 @@ class PropListFragment() : ListCellFragment<PropositionItem>() {
         alignment = Pos.CENTER
 
         val checkbox = checkbox(property = proposition.isSelected) {
+            setOnMouseClicked {
+                if (it.isControlDown){
+                    controller.deselectAll()
+                }
+                this.fire()
+            }
             action {
                 startEdit()
                 commitEdit(item)
@@ -30,6 +36,11 @@ class PropListFragment() : ListCellFragment<PropositionItem>() {
             action { controller.removeProposition(proposition.item) }
         }
 
-        setOnMouseClicked { checkbox.fire() }
+        setOnMouseClicked {
+            if (it.isControlDown){
+                controller.deselectAll()
+            }
+            checkbox.fire()
+        }
     }
 }
