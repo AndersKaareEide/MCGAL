@@ -57,6 +57,7 @@ class StateController : Controller() {
         }
     }
 
+    //TODO Change it so that relative distance between states is maintained
     fun recenterSelectedStates(){
         val wHeight = canvas.currentWindow!!.height - 100
         val wWidth  = canvas.currentWindow!!.width - (240 + STATE_CIRCLE_RADIUS)
@@ -126,6 +127,14 @@ class StateController : Controller() {
         }
         selected.forEach { it.isSelected = true }
         selectedStates.addAll(selected)
+    }
+
+    fun selectAll(){
+        selectedStates.clear()
+        states.forEach {
+            it.isSelected = true
+            selectedStates.add(it)
+        }
     }
 
     fun getNextStateID(): String {

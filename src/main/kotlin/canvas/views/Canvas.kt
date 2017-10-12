@@ -76,6 +76,8 @@ class Canvas : View("My View") {
                 controller.removeSelected()
             } else if (it.code == KeyCode.ESCAPE) {
                 formulaController.clearValidation()
+            } else if (it.isAltDown && it.code == KeyCode.A){
+                stateController.selectAll()
             }
         }
         //Drag selection
