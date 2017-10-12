@@ -11,8 +11,8 @@ private val propP = PropositionItem("regn", true)
 private val agentA = AgentItem("Arne", true)
 private val agentB = AgentItem("Bjarne", false)
 
-private val state1 = State("s1", 150.0, 200.0, FXCollections.observableArrayList(propP))
-private val state2 = State("s2", 50.0, 70.0, FXCollections.observableArrayList())
+private val state1 = State("s1", 250.0, 300.0, FXCollections.observableArrayList(propP))
+private val state2 = State("s2", 150.0, 170.0, FXCollections.observableArrayList())
 
 private val edgeS1S2 = Edge(state1, state2, mutableListOf(agentA))
 
