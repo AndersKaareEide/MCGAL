@@ -53,11 +53,11 @@ class DragBoxController : Controller() {
 
     //TODO Find way to trigger this even if the drag gesture ends off-screen
     fun handleCanvasDragEnd(it: MouseDragEvent) {
-        val bounds = DragRectangle.boundsInLocal
+        if (DragRectangle.isVisible) {
+            val bounds = DragRectangle.boundsInLocal
 
-        controller.selectStates(bounds, it)
-        DragRectangle.isVisible = false
+            controller.selectStates(bounds, it)
+            DragRectangle.isVisible = false
+        }
     }
-
-
 }

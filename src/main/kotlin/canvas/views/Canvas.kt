@@ -78,14 +78,16 @@ class Canvas : View("My View") {
                 formulaController.clearValidation()
             }
         }
-
         //Drag selection
-        setOnMouseClicked { controller.handleCanvasClick(it); formulaController.clearValidation() }
+        setOnMousePressed { controller.handleCanvasClick(it); formulaController.clearValidation() }
         setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
         setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
-        setOnMouseDragReleased { dBoxController.handleCanvasDragEnd(it) }
+
         //TODO Fix OS 'banner' calling onExited somehow
-        setOnMouseDragExited { dBoxController.handleCanvasDragEnd(it) }
+        setOnMouseDragExited {
+            stateController.recenterSelectedStates()
+            dBoxController.handleCanvasDragEnd(it)
+        }
     }
 }
 

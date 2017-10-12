@@ -39,7 +39,10 @@ class StateFragment(val item: State) : Fragment() {
                         //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states
                         setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
-                        setOnMouseDragReleased { controller.handleDragEnd(item, it) }
+                        setOnMouseDragReleased {
+                            controller.handleDragEnd(item, it)
+                            it.consume()
+                        }
                         setOnMouseClicked { it.consume() } //Prevent from bubbling up to Canvas and triggering addState()
 
                     }

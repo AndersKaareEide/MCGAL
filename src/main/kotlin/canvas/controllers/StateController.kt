@@ -52,6 +52,27 @@ class StateController : Controller() {
         if (canvasController.clickMode == ClickMode.LINES && lastClickedState != null) {
             edgeController.addEdge(lastClickedState!!, item)
             event.consume()
+        } else if (canvasController.clickMode == ClickMode.MOVING){
+            recenterSelectedStates()
+        }
+    }
+
+    fun recenterSelectedStates(){
+        val wHeight = canvas.currentWindow!!.height - 100
+        val wWidth  = canvas.currentWindow!!.width - (240 + STATE_CIRCLE_RADIUS)
+
+        selectedStates.forEach {
+            if (it.xPos < 0) {
+                it.xPos = 0.0
+            } else if (it.xPos > wWidth){
+                it.xPos = wWidth
+            }
+
+            if (it.yPos < 0) {
+                it.yPos = 0.0
+            } else if (it.yPos > wHeight - 55.0) {
+                it.yPos = wHeight - 55.0
+            }
         }
     }
 
@@ -71,9 +92,9 @@ class StateController : Controller() {
     }
 
     fun startLineDrawing(item: State, node: Node) {
+        node.startFullDrag()
         if (canvasController.clickMode == ClickMode.LINES) {
             lastClickedState = item
-            node.startFullDrag()
         }
     }
 
@@ -83,7 +104,6 @@ class StateController : Controller() {
         states.add(State(getNextStateID(), posX, posY, ArrayList(propController.getSelected())))
     }
 
-    //TODO Find out if this potentially leaks memory due to loose references
     fun removeSelected() {
         selectedStates.iterator().forEach {
             states.remove(it)
@@ -109,7 +129,6 @@ class StateController : Controller() {
     }
 
     fun getNextStateID(): String {
-        //TODO Find better solution this shit is retardedly slow
         outer@ for (stateNum in 1 until states.lastIndex + 3) {
             for (state in states){
                 if (state.name == "s" + stateNum){
