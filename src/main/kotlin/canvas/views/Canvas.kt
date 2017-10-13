@@ -78,6 +78,10 @@ class Canvas : View("My View") {
                 formulaController.clearValidation()
             } else if (it.isAltDown && it.code == KeyCode.A){
                 stateController.selectAll()
+            } else if (it.isAltDown && it.code == KeyCode.C){
+                controller.copySelection()
+            } else if (it.isAltDown && it.code == KeyCode.V){
+                controller.pasteComponents()
             }
         }
         //Drag selection

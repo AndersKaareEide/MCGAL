@@ -138,7 +138,7 @@ class StateController : Controller() {
     }
 
     fun getNextStateID(): String {
-        outer@ for (stateNum in 1 until states.lastIndex + 3) {
+        outer@ for (stateNum in 1 until states.lastIndex + 4) {
             for (state in states){
                 if (state.name == "s" + stateNum){
                     continue@outer

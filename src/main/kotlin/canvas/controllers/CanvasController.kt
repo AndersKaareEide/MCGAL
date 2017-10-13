@@ -4,6 +4,7 @@ import canvas.data.Edge
 import canvas.data.State
 import canvas.data.Model
 import canvas.data.ModelComponent
+import io.ModelSerializer
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Bounds
 import javafx.scene.input.MouseDragEvent
@@ -22,6 +23,8 @@ class CanvasController : Controller() {
 
     val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
     var clickMode by clickModeProperty
+
+    var clipBoardModel: Model? = null
 
     val model = Model(stateController.states, edgeController.edges,
             agentController.agents.items, propController.propositions)
@@ -101,5 +104,23 @@ class CanvasController : Controller() {
         }
         stateController.clearSelected()
         edgeController.clearSelected()
+    }
+
+    fun copySelection() {
+        val selectedStates = stateController.selectedStates.toList()
+        clipBoardModel = Model(
+                selectedStates,
+                edgeController.edges.filter { selectedStates.contains(it.parent1) && selectedStates.contains(it.parent2) },
+                agentController.agents,
+                propController.propositions
+        )
+    }
+
+    //TODO Center pasted components on mouse cursor by modifying the model first?
+    fun pasteComponents() {
+        if (clipBoardModel != null){
+            clipBoardModel = ModelSerializer.createCopy(clipBoardModel!!) //Clone anew each time paste is called
+            importModel(clipBoardModel!!)
+        }
     }
 }

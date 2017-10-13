@@ -27,6 +27,10 @@ object ModelSerializer {
         return convertSerializableModel(deserializedModel)
     }
 
+    fun createCopy(input: Model): Model {
+        return convertSerializableModel(makeSerializable(input))
+    }
+
     private fun makeSerializable(model: Model): SerializableModel {
         val serializableProps = model.props.map {
             SerializableProp(it.propString, it.isSelected)
