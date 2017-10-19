@@ -8,7 +8,6 @@ import canvas.controllers.StateController
 import formulafield.FormulaField
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCombination
 import javafx.scene.layout.Priority
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel

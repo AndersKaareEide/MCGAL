@@ -32,18 +32,25 @@ class StateFragment(val item: State) : Fragment() {
 
                         setOnMousePressed {
                             controller.handleStateMPress(item, it)
-                            canvasController.handleSelectionClick(it, item)
+                            canvasController.handleSelectionMPress(it, item)
                             formulaController.clearValidation()
                             it.consume()
                         }
                         //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states
-                        setOnDragDetected { controller.startLineDrawing(item, this); it.consume() }
+                        setOnDragDetected {
+                            controller.startLineDrawing(item, this)
+                            canvasController.isDragging = true
+                            it.consume()
+                        }
                         setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
                         setOnMouseDragReleased {
                             controller.handleDragEnd(item, it)
                             it.consume()
                         }
-                        setOnMouseClicked { it.consume() } //Prevent from bubbling up to Canvas and triggering addState()
+                        setOnMouseClicked {
+                            canvasController.handleSelectionClick(it, item)
+                            it.consume()
+                        } //Prevent from bubbling up to Canvas and triggering addState()
 
                     }
                     label {

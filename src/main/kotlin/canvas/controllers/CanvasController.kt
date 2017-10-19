@@ -24,6 +24,9 @@ class CanvasController : Controller() {
     val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
     var clickMode by clickModeProperty
 
+    var isDragging = false
+
+
     var clipBoardModel: Model? = null
 
     val model = Model(stateController.states, edgeController.edges,
@@ -37,15 +40,33 @@ class CanvasController : Controller() {
         }
     }
 
-    fun handleSelectionClick(it: MouseEvent, item: ModelComponent){
-        if (!it.isShiftDown) {
+    fun handleSelectionMPress(event: MouseEvent, item: ModelComponent){
+        if (item.isSelected){
+            return //Wait until the click listener fires so that the user can drag multiple items without holding shift
+        } else {
+            handleSelectionClick(event, item)
+        }
+
+    }
+
+    fun handleSelectionClick(event: MouseEvent, item: ModelComponent){
+        if (isDragging){
+            isDragging = false
+            return //The user dragged something, maintain selection
+        }
+
+        if (!event.isShiftDown) {
             clearSelectedComponents()
         }
+        selectItem(item)
+    }
+
+    fun selectItem(item: ModelComponent) {
         item.isSelected = true
 
-        when(item){
+        when (item) {
             is State -> stateController.selectState(item)
-            is Edge ->  edgeController.selectEdge(item)
+            is Edge -> edgeController.selectEdge(item)
         }
     }
 
@@ -123,4 +144,5 @@ class CanvasController : Controller() {
             importModel(clipBoardModel!!)
         }
     }
+
 }
