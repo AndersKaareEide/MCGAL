@@ -26,3 +26,8 @@ class FormulaLabel(val formula: Formula, labelText: String, val indexRange: Pair
         }
     }
 }
+
+/**
+ * Used to represent a
+ */
+class FormulaChunk

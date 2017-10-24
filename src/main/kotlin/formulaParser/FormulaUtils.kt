@@ -43,6 +43,18 @@ fun extractProps(formula: Formula): Set<PropositionItem> {
 }
 
 /**
+ * Builds an immutable list of all the subformulas in the input formula, including the formula itself
+ */
+fun buildSubformulaList(formula: Formula): List<Formula> {
+    return when (formula){
+        is Proposition -> listOf(formula)
+        is Negation -> listOf(formula) + buildSubformulaList(formula.inner)
+        is BinaryOperator -> listOf(formula) + buildSubformulaList(formula.left) + buildSubformulaList(formula.right)
+        is
+    }
+}
+
+/**
  * Checks if the input formula contains a K-operator or not
  */
 fun containsKnowsOp(formula: Formula): Boolean {

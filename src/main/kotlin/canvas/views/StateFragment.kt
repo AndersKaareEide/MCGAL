@@ -36,7 +36,6 @@ class StateFragment(val item: State) : Fragment() {
                             formulaController.clearValidation()
                             it.consume()
                         }
-                        //TODO Make it so that you don't have to hold shift while initiating drag to drag multiple states
                         setOnDragDetected {
                             controller.startLineDrawing(item, this)
                             canvasController.isDragging = true
