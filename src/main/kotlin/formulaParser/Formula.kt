@@ -8,17 +8,16 @@ import formulafield.FormulaLabel
 import sidepanels.propertypanel.PropositionItem
 
 //TODO Implement dualities such as <Phi>Psi
-abstract class Formula(val debugger: Debugger?, val depth: Int) {
+abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
-    abstract fun check(state: State, model: Model): Boolean
+    abstract fun check(state: State, model: Model, debugger: Debugger? = null): Boolean
     abstract fun toLabels(needsParens: Boolean = false): MutableList<FormulaLabel>
-    abstract fun toExecutionSteps(state: State, model: Model): List<ExecutionStep>
     fun toFormulaItem(): FormulaItem {
         return FormulaItem(this)
     }
 
-    fun notifyDebugger(value: FormulaValue){
-        debugger?.makeEntry(this, value)
+    fun createDebugEntry(state: State, value: FormulaValue, debugger: Debugger?){
+        debugger?.makeNextEntry(this, state, value)
     }
 }
 
@@ -30,8 +29,7 @@ class FormulaItem(val formula: Formula) {
     }
 }
 
-abstract class BinaryOperator(val left: Formula, val right: Formula, debugger: Debugger?, depth: Int)
-    : Formula(debugger, depth) {
+abstract class BinaryOperator(val left: Formula, val right: Formula, debugger: Debugger?, depth: Int) : Formula(depth) {
 
     override val needsParentheses = true
     abstract val opSymbol: String
@@ -52,36 +50,34 @@ abstract class BinaryOperator(val left: Formula, val right: Formula, debugger: D
     }
 }
 
-class Proposition(val proposition: PropositionItem, debugger: Debugger?, depth: Int): Formula(debugger, depth) {
+class Proposition(val proposition: PropositionItem, debugger: Debugger?, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model): Boolean {
-        return state.props.contains(proposition)
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        val result = state.props.contains(proposition)
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 
     override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
         return mutableListOf (FormulaLabel(this, proposition.propString, Pair(0,0)))
     }
 
-    override fun toExecutionSteps(state: State, model: Model): List<ExecutionStep> {
-        return listOf(AtomicValidationStep(proposition, state, model))
-    }
 }
-class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Formula() {
+class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Formula(debugger, depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model): Boolean {
-        return inner.check(state, model).not()
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val result = inner.check(state, model).not()
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 
     override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
         val innerList = inner.toLabels(inner.needsParentheses)
         innerList.add(0, FormulaLabel(this, "¬", Pair(0, innerList.size)))
         return innerList
-    }
-
-    override fun toExecutionSteps(state: State, model: Model): List<ExecutionStep> {
-        return listOf(Executable(this, 1, state, model){ it -> !it }) + inner.toExecutionSteps(state, model)
     }
 }
 
@@ -90,10 +86,6 @@ class Disjunction(left: Formula, right: Formula): BinaryOperator(left, right) {
 
     override fun check(state: State, model: Model): Boolean {
         return left.check(state, model) or right.check(state, model)
-    }
-
-    override fun toExecutionSteps(state: State, model: Model): List<ExecutionStep> {
-        return listOf()
     }
 }
 

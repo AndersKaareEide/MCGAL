@@ -15,8 +15,7 @@ val valuationMap = mutableMapOf<Pair<State, Formula>,FormulaValue>()
 //TODO Find out if this belongs in the DebugPanelController
 class Debugger {
     fun startDebug(formula: Formula, state: State, model: Model){
-        val operatorStack = Stack<ExecutionStep>()
-        val stepList = formula.toExecutionSteps(state, model)
+        formula.check(state, model, this)
 
         //TODO Kanskje skrote hele ExecutionStep? Druse gjennom hele driten rekursivt som vanlig, men lage logg som brukeren kan steppe gjennom
     }
@@ -36,6 +35,9 @@ class Debugger {
     }
 
 }
+
+//TODO Add edge traversal as a validation step for visual purposes?
+
 //TODO Use formula depth to step over subformulas during debugging
 
 //TODO Lage neste tilstand basert på forrige tilstand og den nye oppdateringen
