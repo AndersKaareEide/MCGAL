@@ -21,7 +21,7 @@ class FormulaFieldController : Controller() {
     var forwards: Boolean? = null
     var validating: Boolean = false
     val formulaList: LinkedList<String> = LinkedList()
-    lateinit var labels: MutableList<FormulaLabel>
+    lateinit var labels: List<FormulaLabel>
 
     val errorMsgProperty = SimpleStringProperty("")
     val errorListener = GALErrorListener(errorMsgProperty)
@@ -83,7 +83,7 @@ class FormulaFieldController : Controller() {
             validating = false
         }
     }
-
+    //TODO Move out into LabelController
     fun selectLabels(label: FormulaLabel, range: Pair<Int, Int>){
         val opIndex = labels.indexOf(label)
         for (index in opIndex + range.first .. opIndex + range.second){

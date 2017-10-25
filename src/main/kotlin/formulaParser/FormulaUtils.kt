@@ -4,6 +4,7 @@ import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
 import formulafield.FormulaLabel
+import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
 /**
@@ -89,14 +90,8 @@ fun makeRange(needsParens: Boolean, start: Int, end: Int): Pair<Int, Int> {
     }
 }
 
-fun insertParentheses(list: MutableList<FormulaLabel>, formula: Formula){
+fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     val size = list.size + 1
-    list.add(0, FormulaLabel(formula, "(", Pair(0, size)))
-    list.add(FormulaLabel(formula, ")", Pair(-size, 0)))
-}
-
-fun insertParentheses(left: MutableList<FormulaLabel>, right: MutableList<FormulaLabel>, formula: Formula){
-    val size = left.size + right.size + 2
-    left.add(0, FormulaLabel(formula, "(", Pair(0, size)))
-    right.add(FormulaLabel(formula, ")", Pair(-size, 0)))
+    list.add(0, FormulaLabelItem(formula, "(", Pair(0, size)))
+    list.add(FormulaLabelItem(formula, ")", Pair(-size, 0)))
 }

@@ -5,13 +5,14 @@ import canvas.data.Model
 import canvas.data.State
 import formulaParser.formulaDebugger.*
 import formulafield.FormulaLabel
+import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
 //TODO Implement dualities such as <Phi>Psi
 abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
-    abstract fun check(state: State, model: Model, debugger: Debugger? = null): Boolean
-    abstract fun toLabels(needsParens: Boolean = false): MutableList<FormulaLabel>
+    abstract fun check(state: State, model: Model, debugger: Debugger?): Boolean
+    abstract fun toLabels(needsParens: Boolean = false): MutableList<FormulaLabelItem>
     fun toFormulaItem(): FormulaItem {
         return FormulaItem(this)
     }
@@ -22,24 +23,24 @@ abstract class Formula(val depth: Int) {
 }
 
 class FormulaItem(val formula: Formula) {
-    val labels: MutableList<FormulaLabel> = formula.toLabels()
+    val labels: MutableList<FormulaLabel> = formula.toLabels().map { FormulaLabel(it) }.toMutableList()
 
-    fun check(state: State, model: Model): Boolean {
-        return formula.check(state, model)
+    fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        return formula.check(state, model, debugger)
     }
 }
 
-abstract class BinaryOperator(val left: Formula, val right: Formula, debugger: Debugger?, depth: Int) : Formula(depth) {
+abstract class BinaryOperator(val left: Formula, val right: Formula, depth: Int) : Formula(depth) {
 
     override val needsParentheses = true
     abstract val opSymbol: String
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val left = left.toLabels(left.needsParentheses)
         val right = right.toLabels(right.needsParentheses)
         val indexRange = makeRange(needsParens, -left.size, right.size)
 
-        left.add(FormulaLabel(this, opSymbol, indexRange))
+        left.add(FormulaLabelItem(this, opSymbol, indexRange))
         val result = (left + right).toMutableList()
 
         if (needsParens){
@@ -50,7 +51,7 @@ abstract class BinaryOperator(val left: Formula, val right: Formula, debugger: D
     }
 }
 
-class Proposition(val proposition: PropositionItem, debugger: Debugger?, depth: Int): Formula(depth) {
+class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
@@ -59,68 +60,78 @@ class Proposition(val proposition: PropositionItem, debugger: Debugger?, depth: 
         return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
-        return mutableListOf (FormulaLabel(this, proposition.propString, Pair(0,0)))
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        return mutableListOf (FormulaLabelItem(this, proposition.propString, Pair(0,0)))
     }
 
 }
-class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Formula(debugger, depth) {
+class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = inner.check(state, model).not()
+        val result = inner.check(state, model, debugger).not()
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val innerList = inner.toLabels(inner.needsParentheses)
-        innerList.add(0, FormulaLabel(this, "¬", Pair(0, innerList.size)))
+        innerList.add(0, FormulaLabelItem(this, "¬", Pair(0, innerList.size)))
         return innerList
     }
 }
 
-class Disjunction(left: Formula, right: Formula): BinaryOperator(left, right) {
+class Disjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth) {
     override val opSymbol = "∨"
 
-    override fun check(state: State, model: Model): Boolean {
-        return left.check(state, model) or right.check(state, model)
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val result = left.check(state, model, debugger) or right.check(state, model, debugger)
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 }
 
-class Conjunction(left: Formula, right: Formula): BinaryOperator(left, right) {
+class Conjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth) {
     override val opSymbol = "Λ"
 
-    override fun check(state: State, model: Model): Boolean {
-        return left.check(state, model) and right.check(state, model)
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val result = left.check(state, model, debugger) and right.check(state, model, debugger)
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 }
 
-class Implication(left: Formula, right: Formula): BinaryOperator(left, right){
+class Implication(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth){
     override val opSymbol = "→"
 
-    override fun check(state: State, model: Model): Boolean {
-        return !left.check(state, model) or right.check(state, model)
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val result = !left.check(state, model, debugger) or right.check(state, model, debugger)
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 
 }
 
-class Knows(val agent: AgentItem, val inner: Formula): Formula() {
+class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = true
 
-    override fun check(state: State, model: Model): Boolean {
-        val indishStates = getIndishStates(agent, state, model) //TODO Fix not using updated model
-        if (indishStates.all { inner.check(it, model) }){
-            return true
-        }
-        return false
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val indishStates = getIndishStates(agent, state, model)
+        val result = indishStates.all { inner.check(it, model, debugger) }
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
+
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val result = inner.toLabels(false) //K-ops always require parentheses
         insertParentheses(result, inner)
-        result.add(0, FormulaLabel(this, "K${agent.name}", makeRange(needsParens,0, result.size)))
+        result.add(0, FormulaLabelItem(this, "K${agent.name}", makeRange(needsParens,0, result.size)))
         if (needsParens){
             insertParentheses(result, this)
         }
@@ -130,27 +141,30 @@ class Knows(val agent: AgentItem, val inner: Formula): Formula() {
 
 //TODO Look into optimizing by reusing the same updated model when checking multiple states
 //TODO Fix incorrect highlighting, subformula does not get highlighted correctly
-class Announcement(val announcement: Formula, val inner: Formula): Formula() {
+class Announcement(val announcement: Formula, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = true
 
-    override fun check(state: State, model: Model): Boolean {
-        if (!announcement.check(state, model)) {
-            return true
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+        val result = if (!announcement.check(state, model, debugger)) {
+            true
         }
         else {
             val updModel = updateModel(announcement, model)
-            return inner.check(state, updModel)
+            inner.check(state, updModel, debugger)
         }
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val announceLabels = announcement.toLabels(false)
         val innerLabels = inner.toLabels(false)
         val sRange = makeRange(needsParens, 0,announceLabels.size + 1)
         val eRange = makeRange(needsParens, -(announceLabels.size + 1), 0)
 
-        announceLabels.add(0, FormulaLabel(this, "[", sRange))
-        announceLabels.add(FormulaLabel(this, "]", eRange))
+        announceLabels.add(0, FormulaLabelItem(this, "[", sRange))
+        announceLabels.add(FormulaLabelItem(this, "]", eRange))
 
         val result = (announceLabels + innerLabels).toMutableList()
         if (needsParens){
@@ -161,36 +175,39 @@ class Announcement(val announcement: Formula, val inner: Formula): Formula() {
 }
 
 //TODO Look into optimizing by caching as well
-class GroupAnn(val agents: List<AgentItem>, val inner: Formula): Formula() {
+class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model): Boolean {
+    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         //Formula is already true, agents simply announce Top
-        if (inner.check(state, model)) {
+        if (inner.check(state, model, debugger)) {
             return true
         }
 
         //Atomic permanence and empty group is powerless
         if (agents.isEmpty() || !containsKnowsOp(inner)) {
-            return inner.check(state, model)
+            return inner.check(state, model, debugger)
         }
 
         val pooledModel = poolGroupKnowledge(agents, model)
         val extractProps = extractProps(inner)
         val knownProps = extractProps.filter {
-            Knows(agents.first(),Proposition(it)).check(state, pooledModel)
+            //TODO Find out if depth + 1 is correct for these
+            //TODO Find out how to display this perhaps, should debugger always be null so this doesn't clutter the logs?
+            Knows(agents.first(),Proposition(it, depth + 2),depth + 1).check(state, pooledModel, null)
         }
 
         //Update model by simulating successive announcements
-        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop), acc) }
-        return inner.check(state, updatedModel)
+        //TODO Find out if these need a correct depth as well
+        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop, 0), acc) }
+        return inner.check(state, updatedModel, debugger)
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabel> {
+    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val result = inner.toLabels(inner.needsParentheses)
 
         val agents = agents.joinToString { it.name }
-        val label = FormulaLabel(this, "[$agents]", makeRange(needsParens,0, result.size))
+        val label = FormulaLabelItem(this, "[$agents]", makeRange(needsParens,0, result.size))
         result.add(0, label)
 
         if (needsParens){
