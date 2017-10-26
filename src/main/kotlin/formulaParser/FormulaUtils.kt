@@ -21,8 +21,9 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     return inStates + outStates + state
 }
 
+//TODO Decide how to handle model updates graphically
 fun updateModel(announcement: Formula, model: Model): Model {
-    val updStates = model.states.filter { announcement.check(it, model) }
+    val updStates = model.states.filter { announcement.check(it, model, null) }
     val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
 
     return Model(updStates, updEdges, model.agents, model.props)
@@ -46,12 +47,13 @@ fun extractProps(formula: Formula): Set<PropositionItem> {
 /**
  * Builds an immutable list of all the subformulas in the input formula, including the formula itself
  */
+//TODO Rewrite and connect states to formulas in order to handle K-ops
 fun buildSubformulaList(formula: Formula): List<Formula> {
     return when (formula){
         is Proposition -> listOf(formula)
         is Negation -> listOf(formula) + buildSubformulaList(formula.inner)
         is BinaryOperator -> listOf(formula) + buildSubformulaList(formula.left) + buildSubformulaList(formula.right)
-        is
+        else -> listOf()
     }
 }
 

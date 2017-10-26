@@ -12,7 +12,7 @@ import sidepanels.propertypanel.PropositionItem
 abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
     abstract fun check(state: State, model: Model, debugger: Debugger?): Boolean
-    abstract fun toLabels(needsParens: Boolean = false): MutableList<FormulaLabelItem>
+    abstract fun toLabelItems(needsParens: Boolean = false): MutableList<FormulaLabelItem>
     fun toFormulaItem(): FormulaItem {
         return FormulaItem(this)
     }
@@ -23,7 +23,7 @@ abstract class Formula(val depth: Int) {
 }
 
 class FormulaItem(val formula: Formula) {
-    val labels: MutableList<FormulaLabel> = formula.toLabels().map { FormulaLabel(it) }.toMutableList()
+    val labels: MutableList<FormulaLabel> = formula.toLabelItems().map { FormulaLabel(it) }.toMutableList()
 
     fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         return formula.check(state, model, debugger)
@@ -35,9 +35,9 @@ abstract class BinaryOperator(val left: Formula, val right: Formula, depth: Int)
     override val needsParentheses = true
     abstract val opSymbol: String
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        val left = left.toLabels(left.needsParentheses)
-        val right = right.toLabels(right.needsParentheses)
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        val left = left.toLabelItems(left.needsParentheses)
+        val right = right.toLabelItems(right.needsParentheses)
         val indexRange = makeRange(needsParens, -left.size, right.size)
 
         left.add(FormulaLabelItem(this, opSymbol, indexRange))
@@ -60,7 +60,7 @@ class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) 
         return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
         return mutableListOf (FormulaLabelItem(this, proposition.propString, Pair(0,0)))
     }
 
@@ -75,8 +75,8 @@ class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Form
         return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        val innerList = inner.toLabels(inner.needsParentheses)
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        val innerList = inner.toLabelItems(inner.needsParentheses)
         innerList.add(0, FormulaLabelItem(this, "¬", Pair(0, innerList.size)))
         return innerList
     }
@@ -128,8 +128,8 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
 
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        val result = inner.toLabels(false) //K-ops always require parentheses
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        val result = inner.toLabelItems(false) //K-ops always require parentheses
         insertParentheses(result, inner)
         result.add(0, FormulaLabelItem(this, "K${agent.name}", makeRange(needsParens,0, result.size)))
         if (needsParens){
@@ -157,9 +157,9 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
         return result
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        val announceLabels = announcement.toLabels(false)
-        val innerLabels = inner.toLabels(false)
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        val announceLabels = announcement.toLabelItems(false)
+        val innerLabels = inner.toLabelItems(false)
         val sRange = makeRange(needsParens, 0,announceLabels.size + 1)
         val eRange = makeRange(needsParens, -(announceLabels.size + 1), 0)
 
@@ -203,8 +203,8 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
         return inner.check(state, updatedModel, debugger)
     }
 
-    override fun toLabels(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        val result = inner.toLabels(inner.needsParentheses)
+    override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
+        val result = inner.toLabelItems(inner.needsParentheses)
 
         val agents = agents.joinToString { it.name }
         val label = FormulaLabelItem(this, "[$agents]", makeRange(needsParens,0, result.size))
