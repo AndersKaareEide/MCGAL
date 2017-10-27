@@ -11,6 +11,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
+import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 
@@ -65,6 +66,7 @@ class Canvas : View("My View") {
 
             tab("Agents", AgentPanel().root)
             tab("Propositions", PropositionPanel().root)
+            tab("Debugger", DebugPanel().root)
         }
 
         //KeyEvent re-routing, here be dragons

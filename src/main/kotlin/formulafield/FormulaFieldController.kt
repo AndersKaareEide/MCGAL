@@ -21,7 +21,7 @@ class FormulaFieldController : Controller() {
     var forwards: Boolean? = null
     var validating: Boolean = false
     val formulaList: LinkedList<String> = LinkedList()
-    lateinit var labels: List<FormulaLabel>
+    lateinit var labels: List<FormulaFieldLabel>
 
     val errorMsgProperty = SimpleStringProperty("")
     val errorListener = GALErrorListener(errorMsgProperty)
@@ -41,7 +41,7 @@ class FormulaFieldController : Controller() {
 
             clearLabelListeners(debugArea)
             //TODO Clear labels when the model is edited
-            labels = formula.toFormulaItem().labels
+            labels = formula.toFormulaItem().labels.map { FormulaFieldLabel(it) }
             debugArea.children.setAll(labels)
 
         } catch (e: RecognitionException){
@@ -62,7 +62,7 @@ class FormulaFieldController : Controller() {
 
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
-            state.validationStyle = if (formula.check(state,model)){
+            state.validationStyle = if (formula.check(state,model, null)){
                 ModelStyles.accepted
             } else {
                 ModelStyles.rejected
@@ -84,11 +84,17 @@ class FormulaFieldController : Controller() {
         }
     }
     //TODO Move out into LabelController
-    fun selectLabels(label: FormulaLabel, range: Pair<Int, Int>){
-        val opIndex = labels.indexOf(label)
-        for (index in opIndex + range.first .. opIndex + range.second){
-            labels[index].addClass(ModelStyles.selected)
+    fun selectLabels(label: FormulaLabel, range: Pair<Int, Int>, labels: List<FormulaLabel>){
+        getLabels(label, range, labels).forEach {
+            it.addClass(ModelStyles.selected)
         }
+    }
+
+    fun getLabels(label: FormulaLabel, relativeRange: Pair<Int, Int>, labels: List<FormulaLabel>): List<FormulaLabel> {
+        val opIndex = labels.indexOf(label)
+        val absRange = IntRange(relativeRange.first + opIndex, relativeRange.second + opIndex)
+
+        return labels.slice(absRange)
     }
 
     fun deselectLabels(label: FormulaLabel, range: Pair<Int, Int>) {

@@ -9,5 +9,11 @@ fun toFormulaValue(input: Boolean?): FormulaValue{
 }
 
 enum class FormulaValue {
-    TRUE, FALSE, UNKNOWN
+    TRUE{
+        override fun toString(): String { return "Y"}
+    }, FALSE{
+        override fun toString(): String { return "N"}
+    }, UNKNOWN{
+        override fun toString(): String { return "?"}
+    };
 }

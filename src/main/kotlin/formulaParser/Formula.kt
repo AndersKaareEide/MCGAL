@@ -3,8 +3,10 @@ package formulaParser
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
-import formulaParser.formulaDebugger.*
-import formulafield.FormulaLabel
+import formulaParser.formulaDebugger.Debugger
+import formulaParser.formulaDebugger.FormulaValue
+import formulaParser.formulaDebugger.toFormulaValue
+import formulafield.FormulaFieldLabel
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -23,7 +25,7 @@ abstract class Formula(val depth: Int) {
 }
 
 class FormulaItem(val formula: Formula) {
-    val labels: MutableList<FormulaLabel> = formula.toLabelItems().map { FormulaLabel(it) }.toMutableList()
+    val labels: MutableList<FormulaLabelItem> = formula.toLabelItems()
 
     fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         return formula.check(state, model, debugger)
@@ -65,7 +67,7 @@ class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) 
     }
 
 }
-class Negation(val inner: Formula, debugger: Debugger? = null, depth: Int): Formula(depth) {
+class Negation(val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {

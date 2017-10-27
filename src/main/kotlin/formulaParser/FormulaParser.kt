@@ -24,44 +24,45 @@ object FormulaParser : Controller() {
         parser.addErrorListener(errorListener)
 
         val tree = parser.formula().form()
-        return recursiveTransform(tree)
+        return recursiveTransform(tree, 0)
     }
 
     //TODO Implement handling of TokenRecognitionExceptions
-    private fun recursiveTransform(tree: ParseTree): Formula {
+    private fun recursiveTransform(tree: ParseTree, depth: Int): Formula {
         when (tree) {
             is GALParser.ParensFormContext ->
-                return recursiveTransform(tree.inner)
+                return recursiveTransform(tree.inner, depth)
             is GALParser.AtomicFormContext ->
-                return Proposition(propController.getProposition(tree.prop.text))
+                return Proposition(propController.getProposition(tree.prop.text), depth)
             is GALParser.NegFormContext ->
-                return Negation(recursiveTransform(tree.inner))
+                return Negation(recursiveTransform(tree.inner, depth +1), depth)
             is GALParser.ConjFormContext ->
-                return Conjunction(recursiveTransform(tree.left), recursiveTransform(tree.right))
+                return Conjunction(recursiveTransform(tree.left, depth + 1), recursiveTransform(tree.right, depth +1 ), depth)
             is GALParser.DisjFormContext ->
-                return Disjunction(recursiveTransform(tree.left), recursiveTransform(tree.right))
+                return Disjunction(recursiveTransform(tree.left, depth + 1), recursiveTransform(tree.right, depth + 1), depth)
             is GALParser.ImplFormContext ->
-                return Implication(recursiveTransform(tree.left), recursiveTransform(tree.right))
+                return Implication(recursiveTransform(tree.left, depth + 1), recursiveTransform(tree.right, depth + 1), depth)
             is GALParser.AnnounceFormContext ->
-                return Announcement(recursiveTransform(tree.announced), recursiveTransform(tree.inner))
+                //TODO Determine whether to give the announced and the inner formulas of announcements the same depth
+                return Announcement(recursiveTransform(tree.announced, depth + 1), recursiveTransform(tree.inner, depth + 1), depth)
             is GALParser.KnowsFormContext ->
-                return makeKnowsFormula(tree)
+                return makeKnowsFormula(tree, depth)
             is GALParser.GroupannFormContext ->
-                return makeGroupAnnouncement(tree)
+                return makeGroupAnnouncement(tree, depth)
         }
 
         throw FormulaParsingException(tree.text)
     }
 
-    private fun makeKnowsFormula(tree: GALParser.KnowsFormContext): Formula {
+    private fun makeKnowsFormula(tree: GALParser.KnowsFormContext, depth: Int): Formula {
         val agent = agentController.getAgent(tree.agent.text)
-        return Knows(agent, recursiveTransform(tree.inner))
+        return Knows(agent, recursiveTransform(tree.inner, depth + 1), depth)
     }
 
-    private fun makeGroupAnnouncement(tree: GALParser.GroupannFormContext): Formula {
+    private fun makeGroupAnnouncement(tree: GALParser.GroupannFormContext, depth: Int): Formula {
         val agents = tree.agents().AGENT().map { agentController.getAgent(it.text) }
 
-        return GroupAnn(agents, recursiveTransform(tree.inner))
+        return GroupAnn(agents, recursiveTransform(tree.inner, depth + 1), depth)
     }
 }
 
