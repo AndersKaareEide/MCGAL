@@ -89,7 +89,7 @@ class Disjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = left.check(state, model, debugger) or right.check(state, model, debugger)
+        val result = left.check(state, model, debugger) || right.check(state, model, debugger)
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result
     }
@@ -100,7 +100,7 @@ class Conjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = left.check(state, model, debugger) and right.check(state, model, debugger)
+        val result = left.check(state, model, debugger) && right.check(state, model, debugger)
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result
     }
