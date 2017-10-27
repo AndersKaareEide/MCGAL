@@ -1,10 +1,9 @@
 package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
+import canvas.data.AgentItem
 import canvas.data.State
-import formulaParser.Conjunction
-import formulaParser.Formula
-import formulaParser.Proposition
+import formulaParser.*
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
@@ -18,11 +17,8 @@ class DebugPanel : View("My View") {
     val controller = find(CanvasController::class)
     var entries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
 
-    val form = Conjunction(
-            Conjunction(
-                    Proposition(PropositionItem("p", false), 2),
-                    Proposition(PropositionItem("q", false), 2), 1),
-            Proposition(PropositionItem("r", false), 1), 1)
+    val form = Knows(AgentItem("Arne", false),
+            Proposition(PropositionItem("regn", false), 1), 0)
 
     val model = controller.model
 
@@ -33,9 +29,11 @@ class DebugPanel : View("My View") {
 
         tableview(entries) {
             setSortPolicy { false }
-            column("", DebugEntry::stateNameProp)
-            column("Formula", DebugEntry::labelbox)
-            column("Val", DebugEntry::value)
+            column("", DebugEntry::stateNameProp).contentWidth()
+            column("Formula", DebugEntry::labelbox).pctWidth(80)
+            column("Val", DebugEntry::value).contentWidth()
+
+            smartResize()
         }
 
     }

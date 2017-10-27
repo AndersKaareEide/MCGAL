@@ -60,6 +60,7 @@ class Canvas : View("My View") {
         //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
         val sidepanel = tabpane {
             prefWidth = 200.0
+            minWidth = 200.0
 
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
