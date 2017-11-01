@@ -6,7 +6,6 @@ import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
 import formulaParser.formulaDebugger.toFormulaValue
-import formulafield.FormulaFieldLabel
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -148,11 +147,12 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = if (!announcement.check(state, model, debugger)) {
+        val result = if (!announcement.check(state, model, null)) {
+            announcement.check(state, model, debugger) //Dirty way of preventing duplicate entries
             true
         }
         else {
-            val updModel = updateModel(announcement, model)
+            val updModel = updateModel(announcement, model, debugger)
             inner.check(state, updModel, debugger)
         }
         createDebugEntry(state, toFormulaValue(result), debugger)
@@ -200,8 +200,8 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
         }
 
         //Update model by simulating successive announcements
-        //TODO Find out if these need a correct depth as well
-        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop, 0), acc) }
+        //TODO Find out if these need a correct depth as well, and if it should use the debugger
+        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop, 0), acc, debugger) }
         return inner.check(state, updatedModel, debugger)
     }
 

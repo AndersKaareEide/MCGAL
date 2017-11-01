@@ -23,6 +23,7 @@ class Canvas : View("My View") {
     private val edgeController: EdgeController by inject()
     private val formulaController: FormulaFieldController by inject()
 
+    val sidePanel = TabPane()
     //TODO Move out into own 'view'
 
     override val root = hbox {
@@ -32,6 +33,7 @@ class Canvas : View("My View") {
             prefHeight = 600.0
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
+
 
             center = stackpane {
                 anchorpane {
@@ -58,12 +60,13 @@ class Canvas : View("My View") {
         }
 
         //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
-        val sidepanel = tabpane {
-            prefWidth = 200.0
-            minWidth = 200.0
+        add(sidePanel)
+        with(sidePanel) {
+
+            prefWidth = 215.0
+            minWidth = 215.0
 
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
-
 
             tab("Agents", AgentPanel().root)
             tab("Propositions", PropositionPanel().root)
@@ -73,7 +76,7 @@ class Canvas : View("My View") {
         //KeyEvent re-routing, here be dragons
         this@hbox.setOnKeyPressed {
             if(it.isShortcutDown && it.code == KeyCode.TAB) {
-                sidepanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidepanel
+                sidePanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidePanel
             } else if (it.code == KeyCode.DELETE) {
                 controller.removeSelected()
             } else if (it.code == KeyCode.ESCAPE) {

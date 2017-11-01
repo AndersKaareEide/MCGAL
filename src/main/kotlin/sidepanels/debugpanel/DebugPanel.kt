@@ -2,20 +2,17 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.data.AgentItem
-import canvas.data.State
 import formulaParser.*
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
-import formulaParser.formulaDebugger.FormulaValue
-import formulafield.FormulaFieldController
-import javafx.beans.property.SimpleListProperty
+import javafx.scene.layout.Priority
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 
 class DebugPanel : View("My View") {
 
     val controller = find(CanvasController::class)
-    var entries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
+    val debugController = find(DebugController::class)
 
     val form = Knows(AgentItem("Arne", false),
             Proposition(PropositionItem("regn", false), 1), 0)
@@ -24,15 +21,17 @@ class DebugPanel : View("My View") {
 
     override val root = vbox {
         button("start") {
-            action { entries.setAll(Debugger().startDebug(form, model.states.first(), model).observable()) }
+            action { debugController.debugEntries.setAll(Debugger.startDebug(form, model.states.first(), model).observable()) }
         }
 
-        tableview(entries) {
+        tableview(debugController.debugEntries) {
+            //TODO Make it look nicer before table is filled
             setSortPolicy { false }
             column("", DebugEntry::stateNameProp).contentWidth()
             column("Formula", DebugEntry::labelbox).pctWidth(80)
             column("Val", DebugEntry::value).contentWidth()
 
+            vgrow = Priority.ALWAYS
             smartResize()
         }
 

@@ -3,6 +3,7 @@ package formulaParser
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
+import formulaParser.formulaDebugger.Debugger
 import formulafield.FormulaLabel
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
@@ -22,8 +23,8 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
 }
 
 //TODO Decide how to handle model updates graphically
-fun updateModel(announcement: Formula, model: Model): Model {
-    val updStates = model.states.filter { announcement.check(it, model, null) }
+fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model {
+    val updStates = model.states.filter { announcement.check(it, model, debugger) }
     val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
 
     return Model(updStates, updEdges, model.agents, model.props)

@@ -1,9 +1,10 @@
 package canvas.controllers
 
 import canvas.data.Edge
-import canvas.data.State
 import canvas.data.Model
 import canvas.data.ModelComponent
+import canvas.data.State
+import canvas.views.Canvas
 import io.ModelSerializer
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Bounds
@@ -20,6 +21,8 @@ class CanvasController : Controller() {
     val edgeController: EdgeController by inject()
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
+
+    private val canvas: Canvas by inject()
 
     val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
     var clickMode by clickModeProperty
@@ -145,4 +148,7 @@ class CanvasController : Controller() {
         }
     }
 
+    fun selectSidePanelTab(index: Int){
+        canvas.sidePanel.selectionModel.select(index)
+    }
 }

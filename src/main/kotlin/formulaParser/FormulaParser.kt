@@ -2,8 +2,8 @@ package formulaParser
 
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
+import javafx.beans.property.SimpleStringProperty
 import sidepanels.agentpanel.AgentPanelController
-import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
@@ -15,7 +15,9 @@ object FormulaParser : Controller() {
     val propController: PropPanelController by inject()
 
     //TODO Properly validate agent and propositions by reusing parser rules
-    fun parse(input: String, errorListener: ANTLRErrorListener): Formula {
+    fun parse(input: String, errorMessageCallBack: SimpleStringProperty): Formula {
+        val errorListener = GALErrorListener(errorMessageCallBack)
+
         val lexer = GALLexer(CharStreams.fromString(input))
         lexer.addErrorListener(errorListener)
         val tokens = CommonTokenStream(lexer)

@@ -12,16 +12,15 @@ import tornadofx.*
 
 
 //TODO Find out if this belongs in the DebugPanelController
-class Debugger {
+object Debugger {
 
-    val formulaController = find(FormulaFieldController::class)
-
-    val entryList = arrayListOf<DebugEntry>()
+    lateinit var entryList: MutableList<DebugEntry>
     //TODO Unfuck, use list instead of Map so that shit doesn't get overwritten and cause negative index searches and fun stuff
     lateinit var labelItems: List<FormulaLabelItem>
     lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
+        entryList = arrayListOf<DebugEntry>()
         valuationMap = initValuationMap(formula, state)
         labelItems = formula.toLabelItems()
 

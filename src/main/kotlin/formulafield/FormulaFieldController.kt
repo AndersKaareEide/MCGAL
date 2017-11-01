@@ -24,20 +24,19 @@ class FormulaFieldController : Controller() {
     lateinit var labels: List<FormulaFieldLabel>
 
     val errorMsgProperty = SimpleStringProperty("")
-    val errorListener = GALErrorListener(errorMsgProperty)
 
-    fun validateFormString(input: String, model: Model, debugArea: HBox){
+    fun validateFormString(input: String, debugArea: HBox){
         //TODO Underline part of formula causing error or something of the like
         errorMsgProperty.value = "" //Clear error message
         try {
-            val formula = FormulaParser.parse(input, errorListener)
+            val formula = FormulaParser.parse(input, errorMsgProperty)
 
             //TODO Limit length of list or something
             if (!formulaList.contains(input)) {
                 formulaList.add(input)
             }
 
-            checkFormula(formula, model)
+            checkFormula(formula, canvasController.model)
 
             clearLabelListeners(debugArea)
             //TODO Clear labels when the model is edited
