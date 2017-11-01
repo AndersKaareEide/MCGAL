@@ -18,7 +18,7 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     val outStates = outEdges.map { it.parent1 }
     val inStates = inEdges.map { it.parent2 }
 
-    return inStates + outStates + state
+    return listOf(state) + inStates + outStates
 }
 
 //TODO Decide how to handle model updates graphically
