@@ -162,11 +162,13 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val announceLabels = announcement.toLabelItems(false)
         val innerLabels = inner.toLabelItems(false)
-        val sRange = makeRange(needsParens, 0,announceLabels.size + 1)
-        val eRange = makeRange(needsParens, -(announceLabels.size + 1), 0)
+        val sRange = makeRange(needsParens, 0,announceLabels.size + 1 + innerLabels.size)
+        val eRange = makeRange(needsParens, -(announceLabels.size + 1), innerLabels.size)
 
         announceLabels.add(0, FormulaLabelItem(this, "[", sRange))
         announceLabels.add(FormulaLabelItem(this, "]", eRange))
+
+        println("$sRange, $eRange, ${announceLabels.size}")
 
         val result = (announceLabels + innerLabels).toMutableList()
         if (needsParens){
