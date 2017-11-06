@@ -16,23 +16,27 @@ class DebugController: Controller(){
     val formulaController = find(FormulaFieldController::class)
 
     var debugEntries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
-
+    var formulaText: String? = null
 
     /**
      * Starts sequence of choosing state to debug in and sets up debugger to generate list
      * of DebugEntries
      */
-    fun startDebug(text: String) {
-        //TODO Make user pick state to debug in
+    fun startDebug(formulaText: String){
+        this.formulaText = formulaText
+        canvasController.stateSelectionCallback = this::runDebugger
+        formulaController.errorMsgProperty.value = "Please select a state to step through the formula in"
+    }
+
+    private fun runDebugger() {
+        canvasController.stateSelectionCallback = null
         formulaController.errorMsgProperty.value = ""
 
-        if (stateController.selectedStates.isNotEmpty()) {
-            val selectedState = stateController.selectedStates.first()
-            val formula = FormulaParser.parse(text, formulaController.errorMsgProperty)
-            val model = canvasController.model
+        val selectedState = stateController.selectedStates.first()
+        val formula = FormulaParser.parse(formulaText!!, formulaController.errorMsgProperty)
+        val model = canvasController.model
 
-            debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
-            canvasController.selectSidePanelTab(2)
-        }
+        debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
+        canvasController.selectSidePanelTab(2)
     }
 }

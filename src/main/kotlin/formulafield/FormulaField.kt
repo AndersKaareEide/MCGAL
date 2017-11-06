@@ -1,6 +1,5 @@
 package formulafield
 
-import canvas.controllers.CanvasController
 import javafx.scene.control.TextField
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination

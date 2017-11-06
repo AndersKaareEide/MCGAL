@@ -29,8 +29,9 @@ class CanvasController : Controller() {
 
     var isDragging = false
 
-
     var clipBoardModel: Model? = null
+    var stateSelectionCallback: (() -> Unit)? = null
+
 
     val model = Model(stateController.states, edgeController.edges,
             agentController.agents.items, propController.propositions)
@@ -68,7 +69,10 @@ class CanvasController : Controller() {
         item.isSelected = true
 
         when (item) {
-            is State -> stateController.selectState(item)
+            is State -> {
+                stateController.selectState(item)
+                stateSelectionCallback?.invoke()
+            }
             is Edge -> edgeController.selectEdge(item)
         }
     }
