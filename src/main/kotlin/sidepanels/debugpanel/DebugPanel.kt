@@ -2,9 +2,11 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.data.AgentItem
-import formulaParser.*
+import formulaParser.Knows
+import formulaParser.Proposition
 import formulaParser.formulaDebugger.DebugEntry
-import formulaParser.formulaDebugger.Debugger
+import javafx.scene.control.SelectionMode
+import javafx.scene.control.TableSelectionModel
 import javafx.scene.layout.Priority
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
@@ -20,16 +22,24 @@ class DebugPanel : View("My View") {
     val model = controller.model
 
     override val root = vbox {
-        button("start") {
-            action { debugController.debugEntries.setAll(Debugger.startDebug(form, model.states.first(), model).observable()) }
+        hbox {
+            button("Over") {
+                action { debugController.stepOver() }
+            }
+            button("Into") {
+                action { debugController.stepInto() }
+            }
         }
 
-        tableview(debugController.debugEntries) {
+        debugController.tableSelection = tableview(debugController.debugEntries) {
             //TODO Make it look nicer before table is filled
+            selectionModel.selectionMode = SelectionMode.SINGLE
+
             setSortPolicy { false }
             column("", DebugEntry::stateNameProp).contentWidth()
             column("Formula", DebugEntry::labelbox).pctWidth(80)
             column("Val", DebugEntry::value).contentWidth()
+            column("Depth", DebugEntry::depth) //TODO Remove when no longer needed
 
             vgrow = Priority.ALWAYS
             smartResize()

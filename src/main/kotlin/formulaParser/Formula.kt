@@ -110,7 +110,7 @@ class Implication(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = !left.check(state, model, debugger) or right.check(state, model, debugger)
+        val result = !left.check(state, model, debugger) || right.check(state, model, debugger)
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result
     }
@@ -167,7 +167,7 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
 
         announceLabels.add(0, FormulaLabelItem(this, "[", sRange))
         announceLabels.add(FormulaLabelItem(this, "]", eRange))
-        
+
         val result = (announceLabels + innerLabels).toMutableList()
         if (needsParens){
             insertParentheses(result, this)

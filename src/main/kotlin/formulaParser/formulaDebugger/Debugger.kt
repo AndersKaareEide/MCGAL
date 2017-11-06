@@ -4,11 +4,9 @@ import canvas.data.Model
 import canvas.data.State
 import formulaParser.Formula
 import formulaParser.buildSubformulaList
-import formulafield.FormulaFieldController
 import formulafield.FormulaLabel
 import javafx.scene.layout.HBox
 import sidepanels.debugpanel.FormulaLabelItem
-import tornadofx.*
 
 
 //TODO Find out if this belongs in the DebugPanelController
@@ -38,15 +36,14 @@ object Debugger {
                 .associateBy({ it }, { FormulaValue.UNKNOWN })
     }
 
-    //TODO Somehow link the KA(p) subformulas to the correct states
     //Creates the next "log" entry based on the valuationMapping from the last entry
     fun makeNextEntry(formula: Formula, state: State, value: FormulaValue) {
         val labels = formula.toFormulaItem().labels.map { FormulaLabel(it) }
         val entry = if (entryList.isEmpty()){
-            DebugEntry(state, labels, value, valuationMap)
+            DebugEntry(state, labels, value, valuationMap, formula.depth)
         } else {
             val updatedFormValuation = entryList[entryList.lastIndex].formValues + Pair(Pair(state, formula), value)
-            DebugEntry(state, labels, value, updatedFormValuation)
+            DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
         }
         entryList.add(entry)
     }
@@ -59,7 +56,7 @@ object Debugger {
 
 //TODO Lage neste tilstand basert på forrige tilstand og den nye oppdateringen
 class DebugEntry(val state: State, val labels: List<FormulaLabel>, val value: FormulaValue,
-                 val formValues: Map<Pair<State,Formula>, FormulaValue>){
+                 val formValues: Map<Pair<State,Formula>, FormulaValue>, val depth: Int){
 
     val labelbox: HBox = HBox()
     val stateNameProp = state.nameProperty
