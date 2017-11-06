@@ -167,9 +167,7 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
 
         announceLabels.add(0, FormulaLabelItem(this, "[", sRange))
         announceLabels.add(FormulaLabelItem(this, "]", eRange))
-
-        println("$sRange, $eRange, ${announceLabels.size}")
-
+        
         val result = (announceLabels + innerLabels).toMutableList()
         if (needsParens){
             insertParentheses(result, this)
