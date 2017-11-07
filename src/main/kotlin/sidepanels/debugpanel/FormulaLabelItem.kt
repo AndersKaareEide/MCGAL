@@ -13,11 +13,12 @@ import tornadofx.*
  */
 open class FormulaLabelItem(val formula: Formula, val labelText: String, val indexRange: Pair<Int, Int>)
 
-//TODO Add list of LabelItems to State and bindChildren in StateFragment
 class DebugLabelItem(formula: Formula, labelText: String, indexRange: Pair<Int, Int>, val state: State,
-                     var value: FormulaValue = FormulaValue.UNKNOWN): FormulaLabelItem(formula, labelText, indexRange){
+                     value: FormulaValue = FormulaValue.UNKNOWN): FormulaLabelItem(formula, labelText, indexRange){
+
 
     val valueProperty = SimpleObjectProperty(this,"value", value)
+    var value by valueProperty
     val hoverProperty = SimpleBooleanProperty(this, "isHoveredOver", false)
     var isHoveredOver by hoverProperty
 

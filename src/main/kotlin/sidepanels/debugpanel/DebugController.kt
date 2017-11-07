@@ -2,13 +2,13 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.controllers.StateController
-import canvas.data.State
 import formulaParser.FormulaParser
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
-import formulaParser.formulaDebugger.DebuggingLabel
+import formulaParser.formulaDebugger.FormulaValue
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TableView
 import tornadofx.*
 
@@ -22,7 +22,8 @@ class DebugController: Controller(){
     var formulaText: String? = null
 
     lateinit var tableSelection: TableView<DebugEntry>
-    lateinit var debugLabelMap: MutableMap<State, DebuggingLabel>
+
+    var selectedEntryProperty = SimpleObjectProperty<DebugEntry>()
 
     /**
      * Starts sequence of choosing state to debug in and sets up debugger to generate list
@@ -45,6 +46,7 @@ class DebugController: Controller(){
         debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
         canvasController.selectSidePanelTab(2)
         tableSelection.selectionModel.select(0)
+        selectedEntryProperty.bind(tableSelection.selectionModel.selectedItemProperty())
     }
 
 
@@ -61,6 +63,15 @@ class DebugController: Controller(){
                 tableSelection.selectionModel.select(index)
                 break
             }
+        }
+    }
+
+    fun applyValuationMap(debugEntry: DebugEntry){
+        val labelItemList = Debugger.stateLabelMap[debugEntry.state]
+
+        for (item in labelItemList!!){
+            item.value = debugEntry.formValues[Pair(debugEntry.state, item.formula)]!!
+            println(item.value)
         }
     }
 

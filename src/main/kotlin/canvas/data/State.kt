@@ -2,6 +2,7 @@ package canvas.data
 
 import javafx.beans.property.*
 import javafx.collections.FXCollections
+import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 import java.io.Serializable
@@ -31,5 +32,8 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
 
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
     override var isSelected by selectedProperty
+
+    val debugLabelsProperty = SimpleListProperty<DebugLabelItem>(this, "debugLabels", FXCollections.observableArrayList())
+    var debugLabels by debugLabelsProperty
 }
 

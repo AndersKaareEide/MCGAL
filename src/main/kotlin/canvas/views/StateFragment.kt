@@ -8,6 +8,7 @@ import canvas.styles.ModelStyles
 import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
+import sidepanels.debugpanel.DebuggingLabel
 import tornadofx.*
 
 
@@ -24,6 +25,13 @@ class StateFragment(val item: State) : Fragment() {
 
                 bindClass(item.validationStyleProp)
                 toggleClass(ModelStyles.selected, item.selectedProperty)
+
+                //TODO Create binding for debugLabels
+                top = hbox {
+                    bindChildren(item.debugLabels){
+                        DebuggingLabel(it)
+                    }
+                }
 
                 center = stackpane {
                     circle {

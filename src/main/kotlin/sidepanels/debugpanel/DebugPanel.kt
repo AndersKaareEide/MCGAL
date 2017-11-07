@@ -6,7 +6,6 @@ import formulaParser.Knows
 import formulaParser.Proposition
 import formulaParser.formulaDebugger.DebugEntry
 import javafx.scene.control.SelectionMode
-import javafx.scene.control.TableSelectionModel
 import javafx.scene.layout.Priority
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
@@ -31,6 +30,7 @@ class DebugPanel : View("My View") {
             }
         }
 
+        //TODO Possibly expand side panel during debugging? It gets pretty crowded
         debugController.tableSelection = tableview(debugController.debugEntries) {
             //TODO Make it look nicer before table is filled
             selectionModel.selectionMode = SelectionMode.SINGLE
@@ -39,22 +39,23 @@ class DebugPanel : View("My View") {
             column("", DebugEntry::stateNameProp).contentWidth()
             column("Formula", DebugEntry::labelbox).pctWidth(80)
             column("Val", DebugEntry::value).contentWidth()
-            column("Depth", DebugEntry::depth) //TODO Remove when no longer needed
+            column("Depth", DebugEntry::depth).contentWidth() //TODO Remove when no longer needed
 
             vgrow = Priority.ALWAYS
             smartResize()
+
+            selectionModel.selectedIndexProperty().onChange {
+                if (it >= 0)
+                    debugController.applyValuationMap(items[it])
+            }
         }
 
     }
 }
 
-class DebugEntryListFragment(): ListCellFragment<DebugEntry>(){
-    override val root = hbox {
-        text(item.state.name)
-    }
-    //TODO onSelectionChanged -> Update all LabelItems based on the valuationMap from the DebugEntry
-    //TODO Make LabelItem -> Pair<DebugLabel, FormulaLabel> mapping
-}
+//TODO onSelectionChanged -> Update all LabelItems based on the valuationMap from the DebugEntry
+//TODO Make LabelItem -> Pair<DebugLabel, FormulaLabel> mapping
+
 
 
 //Add breakpoints as subclass of formula ]}

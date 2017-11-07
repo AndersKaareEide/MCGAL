@@ -4,7 +4,7 @@ import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
-import formulafield.FormulaLabel
+import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -12,9 +12,10 @@ import sidepanels.propertypanel.PropositionItem
  * Based on an agent and a state, returns all states the given agent considers
  * indistinguishable from the given state
  */
-fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
-    val outEdges = state.outEdges.filter { it.agents.contains(agent) && model.edges.contains(it) }
-    val inEdges = state.inEdges.filter { it.agents.contains(agent) && model.edges.contains(it) }
+//TODO Figure out if model is actually necessary
+fun getIndishStates(agent: AgentItem, state: State): List<State> {
+    val outEdges = state.outEdges.filter { it.agents.contains(agent) }
+    val inEdges = state.inEdges.filter { it.agents.contains(agent) }
 
     val outStates = outEdges.map { it.parent1 }
     val inStates = inEdges.map { it.parent2 }
@@ -48,13 +49,22 @@ fun extractProps(formula: Formula): Set<PropositionItem> {
 /**
  * Builds an immutable list of all the subformulas in the input formula, including the formula itself
  */
-//TODO Rewrite and connect states to formulas in order to handle K-ops
-fun buildSubformulaList(formula: Formula): List<Formula> {
+//TODO Rewrite and connect states to formulas in order to handle announcements
+fun buildSubformulaList(state: State, formula: Formula): List<Pair<State, Formula>> {
     return when (formula){
-        is Proposition -> listOf(formula)
-        is Negation -> listOf(formula) + buildSubformulaList(formula.inner)
-        is BinaryOperator -> listOf(formula) + buildSubformulaList(formula.left) + buildSubformulaList(formula.right)
-        else -> listOf()
+        is Proposition -> listOf(Pair(state, formula))
+        is Negation -> listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner)
+        is BinaryOperator -> listOf(Pair(state, formula)) +
+                buildSubformulaList(state, formula.left) +
+                buildSubformulaList(state, formula.right)
+        is Knows -> {
+            val indishStates = getIndishStates(formula.agent, state)
+            val initial: List<Pair<State, Formula>> = listOf(Pair(state, formula))
+
+            indishStates.map { buildSubformulaList(it, formula.inner) }
+                    .fold(initial) { list, elements -> list.plus(elements) }
+        }
+        else -> TODO("Not implemented yet")
     }
 }
 
@@ -97,4 +107,28 @@ fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     val size = list.size + 1
     list.add(0, FormulaLabelItem(formula, "(", Pair(0, size)))
     list.add(FormulaLabelItem(formula, ")", Pair(-size, 0)))
+}
+
+fun insertParentheses(map: MutableMap<State, MutableList<DebugLabelItem>>, formula: Formula, state: State){
+    val size = map.size + 1
+    map[state]!!.add(0, DebugLabelItem(formula, "(", Pair(0, size), state))
+    map[state]!!.add(DebugLabelItem(formula, ")", Pair(-size, 0), state))
+}
+
+/**
+ * Function that combines two stateToLabel maps by combining the label lists where keys overlap
+ * Candidate for ugliest function ever written in Kotlin
+ */
+fun combineMapLists(leftMap: MutableMap<State, MutableList<DebugLabelItem>>,
+                    rightMap: MutableMap<State, MutableList<DebugLabelItem>>):
+        MutableMap<State, MutableList<DebugLabelItem>> {
+
+    val overlappingKeys = leftMap.keys.filter { rightMap.containsKey(it) }
+    val result = (leftMap + rightMap).toMutableMap()
+
+    overlappingKeys.forEach {
+        result.put(it, ((leftMap[it]!! + rightMap[it]!!).toMutableList()))
+    }
+
+    return result
 }

@@ -1,5 +1,7 @@
 package formulaParser.formulaDebugger
 
+import javafx.scene.paint.Color
+
 fun toFormulaValue(input: Boolean?): FormulaValue{
     return when(input){
         null  -> FormulaValue.UNKNOWN
@@ -8,12 +10,12 @@ fun toFormulaValue(input: Boolean?): FormulaValue{
     }
 }
 
-enum class FormulaValue {
-    TRUE{
+enum class FormulaValue(val color: Color) {
+    TRUE(Color.GREEN){
         override fun toString(): String { return "Y"}
-    }, FALSE{
+    }, FALSE(Color.RED){
         override fun toString(): String { return "N"}
-    }, UNKNOWN{
+    }, UNKNOWN(Color.BLUE){
         override fun toString(): String { return "?"}
     };
 }

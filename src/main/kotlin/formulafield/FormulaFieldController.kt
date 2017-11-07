@@ -6,7 +6,6 @@ import canvas.styles.ModelStyles
 import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
-import formulaParser.GALErrorListener
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
@@ -40,7 +39,7 @@ class FormulaFieldController : Controller() {
 
             clearLabelListeners(debugArea)
             //TODO Clear labels when the model is edited
-            labels = formula.toFormulaItem().labels.map { FormulaFieldLabel(it) }
+            labels = formula.toFormulaItem().labelItems.map { FormulaFieldLabel(it) }
             debugArea.children.setAll(labels)
 
         } catch (e: RecognitionException){
