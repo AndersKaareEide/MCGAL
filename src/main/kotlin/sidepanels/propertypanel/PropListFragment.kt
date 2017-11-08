@@ -17,8 +17,8 @@ class PropListFragment() : ListCellFragment<PropositionItem>() {
             setOnMouseClicked {
                 if (it.isControlDown){
                     controller.deselectAll()
+                    this.fire()
                 }
-                this.fire()
             }
             action {
                 startEdit()

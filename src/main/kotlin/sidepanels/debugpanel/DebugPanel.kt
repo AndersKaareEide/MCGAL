@@ -39,7 +39,6 @@ class DebugPanel : View("My View") {
             column("", DebugEntry::stateNameProp).contentWidth()
             column("Formula", DebugEntry::labelbox).pctWidth(80)
             column("Val", DebugEntry::value).contentWidth()
-            column("Depth", DebugEntry::depth).contentWidth() //TODO Remove when no longer needed
 
             vgrow = Priority.ALWAYS
             smartResize()
@@ -59,4 +58,3 @@ class DebugPanel : View("My View") {
 
 
 //Add breakpoints as subclass of formula ]}
-class FormViewItem()

@@ -52,7 +52,6 @@ class StateFragment(val item: State) : Fragment() {
                 }
 
                 right = hbox {
-                    translateZ
                     bindChildren(item.debugLabelsProperty){
                         DebugLabel(it)
                     }

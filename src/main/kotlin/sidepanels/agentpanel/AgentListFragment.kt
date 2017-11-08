@@ -19,8 +19,8 @@ class AgentListFragment: ListCellFragment<AgentItem>() {
             setOnMouseClicked {
                 if (it.isControlDown){
                     controller.deselectAll()
+                    this.fire()
                 }
-                this.fire()
             }
             action {
                 startEdit()
