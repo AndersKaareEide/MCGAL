@@ -67,11 +67,11 @@ class DebugController: Controller(){
     }
 
     fun applyValuationMap(debugEntry: DebugEntry){
-        val labelItemList = Debugger.stateLabelMap[debugEntry.state]
-
-        for (item in labelItemList!!){
-            item.value = debugEntry.formValues[Pair(debugEntry.state, item.formula)]!!
-            println(item.value)
+        for (state in Debugger.stateLabelMap.keys){
+            for (item in Debugger.stateLabelMap[state]!!){
+                //TODO Replace with index range
+                item.value = debugEntry.formValues[Pair(state, item.formula)]!!
+            }
         }
     }
 

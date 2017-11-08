@@ -8,7 +8,7 @@ import canvas.styles.ModelStyles
 import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
-import sidepanels.debugpanel.DebuggingLabel
+import sidepanels.debugpanel.DebugLabel
 import tornadofx.*
 
 
@@ -28,8 +28,10 @@ class StateFragment(val item: State) : Fragment() {
 
                 //TODO Create binding for debugLabels
                 top = hbox {
+                    isManaged = false
+                    translateY = -25.0
                     bindChildren(item.debugLabels){
-                        DebuggingLabel(it)
+                        DebugLabel(it)
                     }
                 }
 

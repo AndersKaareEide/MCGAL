@@ -7,7 +7,7 @@ import javafx.scene.control.Label
 import sidepanels.debugpanel.DebugLabelItem
 import tornadofx.*
 
-class DebuggingLabel(val item: DebugLabelItem): FormulaLabel(item.formula, item.labelText, item.indexRange) {
+class DebugLabel(val item: DebugLabelItem): FormulaLabel(item.formula, item.labelText, item.indexRange) {
 
     val controller = find(DebugController::class)
     val model = find(CanvasController::class).model

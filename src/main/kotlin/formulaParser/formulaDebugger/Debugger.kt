@@ -19,9 +19,8 @@ object Debugger {
     lateinit var labelItems: List<FormulaLabelItem>
     lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
-    lateinit var debugLabelMap: MutableMap<Pair<Formula, State>, IndexRange> //TODO (Formula, State) -> List?
-
-    var stateLabelMap = mutableMapOf<State, List<DebugLabelItem>>()
+    lateinit var formulaRangeMap: MutableMap<Pair<Formula, State>, IndexRange> //TODO (Formula, State) -> List?
+    lateinit var stateLabelMap: MutableMap<State, MutableList<DebugLabelItem>>
 
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
@@ -29,7 +28,7 @@ object Debugger {
         valuationMap = initValuationMap(formula, state)
         labelItems = formula.toLabelItems()
 
-        initStateLabels(formula, state, model)
+        initStateLabels(formula, state)
 
         //Run checking to populate through calls to makeNextEntry()
         formula.check(state, model, this)
@@ -38,18 +37,16 @@ object Debugger {
     }
 
     //Creates a mapping of all the subformulas contained in the input formula and state to
-    fun initValuationMap(formula: Formula, state: State): Map<Pair<State, Formula>,FormulaValue>{
+    private fun initValuationMap(formula: Formula, state: State): Map<Pair<State, Formula>,FormulaValue>{
         return buildSubformulaList(state, formula)
                 .associateBy({ it }, { FormulaValue.UNKNOWN })
     }
 
-    private fun initStateLabels(formula: Formula, state: State, model: Model) {
-        val debugLabels = formula.toLabelItems().map {
-            DebugLabelItem(it.formula, it.labelText, it.indexRange, state)
+    private fun initStateLabels(formula: Formula, state: State) {
+        stateLabelMap = formula.toDebugLabelItems(state)
+        stateLabelMap.keys.forEach {
+            it.debugLabels.setAll(stateLabelMap[it]!!)
         }
-
-        stateLabelMap.put(state, debugLabels)
-        state.debugLabels.addAll(debugLabels)
     }
 
     //Creates the next "log" entry based on the valuationMapping from the last entry

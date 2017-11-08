@@ -169,13 +169,15 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
     }
 
     override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
-        val result = inner.toDebugLabelItems(state,false)
+        var result = mutableMapOf<State, MutableList<DebugLabelItem>>()
         val indishStates = getIndishStates(this.agent, state)
 
-        indishStates.forEach {
-            combineMapLists(result, inner.toDebugLabelItems(it, inner.needsParentheses))
+        indishStates.forEach{
+            result = combineMapLists(result, inner.toDebugLabelItems(it, inner.needsParentheses))
         }
-        insertParentheses(result, inner, state)
+
+        insertParentheses(result, this, state)
+        result[state]!!.add(0, DebugLabelItem(this, "K${agent.name}", makeRange(needsParens, 0 , result[state]!!.size), state))
 
         return result
     }
