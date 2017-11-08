@@ -17,12 +17,9 @@ class DebugLabel(val item: DebugLabelItem): FormulaLabel(item.formula, item.labe
             item.valueProperty.value.color
         })
 
-
         setOnMouseEntered {
-            println(item.labelText)
-            println(item.value)
+            //TODO Add mouse listeners that make the formula light up
         }
     }
-
 }
 

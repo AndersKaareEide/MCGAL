@@ -8,6 +8,7 @@ import canvas.styles.ModelStyles
 import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
+import javafx.scene.shape.Circle
 import sidepanels.debugpanel.DebugLabel
 import tornadofx.*
 
@@ -26,56 +27,59 @@ class StateFragment(val item: State) : Fragment() {
                 bindClass(item.validationStyleProp)
                 toggleClass(ModelStyles.selected, item.selectedProperty)
 
-                //TODO Create binding for debugLabels
-                top = hbox {
-                    isManaged = false
-                    translateY = -25.0
-                    bindChildren(item.debugLabels){
-                        DebugLabel(it)
-                    }
-                }
-
                 center = stackpane {
                     circle {
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
-                        setOnMousePressed {
-                            controller.handleStateMPress(item, it)
-                            canvasController.handleSelectionMPress(it, item)
-                            formulaController.clearValidation()
-                            it.consume()
-                        }
-                        setOnDragDetected {
-                            controller.startLineDrawing(item, this)
-                            canvasController.isDragging = true
-                            it.consume()
-                        }
-                        setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
-                        setOnMouseDragReleased {
-                            controller.handleDragEnd(item, it)
-                            it.consume()
-                        }
-                        setOnMouseClicked {
-                            canvasController.handleSelectionClick(it, item)
-                            it.consume()
-                        } //Prevent from bubbling up to Canvas and triggering addState()
-
+                        addMouseListeners()
                     }
                     label {
                         textProperty().bind(item.nameProperty)
                         isMouseTransparent = true
                     }
+
+                    label {
+                        textProperty().bind(stringBinding(item.propsProperty) {
+                            item.propsProperty.value.joinToString(","){ it.propString }
+                        })
+                        useMaxWidth = true
+                        alignment = Pos.CENTER
+                        isMouseTransparent = true
+
+                        translateY += 32
+                    }
                 }
 
-                bottom = label {
-                    textProperty().bind(stringBinding(item.propsProperty) {
-                        item.propsProperty.value.joinToString(","){ it.propString }
-                    })
-                    useMaxWidth = true
-                    alignment = Pos.CENTER
-                    isMouseTransparent = true
+                right = hbox {
+                    translateZ
+                    bindChildren(item.debugLabelsProperty){
+                        DebugLabel(it)
+                    }
                 }
             }
+
+    private fun Circle.addMouseListeners() {
+        setOnMousePressed {
+            controller.handleStateMPress(item, it)
+            canvasController.handleSelectionMPress(it, item)
+            formulaController.clearValidation()
+            it.consume()
+        }
+        setOnDragDetected {
+            controller.startLineDrawing(item, this)
+            canvasController.isDragging = true
+            it.consume()
+        }
+        setOnMouseDragged { controller.handleMDrag(item, it); it.consume() }
+        setOnMouseDragReleased {
+            controller.handleDragEnd(item, it)
+            it.consume()
+        }
+        setOnMouseClicked {
+            canvasController.handleSelectionClick(it, item)
+            it.consume() //Prevent from bubbling up to Canvas and triggering addState()
+        }
+    }
 }
 
