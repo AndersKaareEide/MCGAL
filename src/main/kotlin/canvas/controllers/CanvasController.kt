@@ -8,9 +8,11 @@ import canvas.views.Canvas
 import io.ModelSerializer
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Bounds
+import javafx.scene.control.Tab
 import javafx.scene.input.MouseDragEvent
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
+import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
 
@@ -22,7 +24,10 @@ class CanvasController : Controller() {
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
 
+    private val debugPanel: DebugPanel by inject()
     private val canvas: Canvas by inject()
+
+    private var debugTab: Tab? = null
 
     val clickModeProperty = SimpleObjectProperty<ClickMode>(this, "clickMode", ClickMode.MOVING)
     var clickMode by clickModeProperty
@@ -152,7 +157,18 @@ class CanvasController : Controller() {
         }
     }
 
-    fun selectSidePanelTab(index: Int){
-        canvas.sidePanel.selectionModel.select(index)
+    fun showDebugPanelTab(){
+        if (debugTab == null) {
+            debugTab = Tab("Debugger", debugPanel.root)
+        }
+        if (!canvas.sidePanel.tabs.contains(debugTab)) {
+            canvas.sidePanel.tabs.add(debugTab)
+        }
+        canvas.sidePanel.selectionModel.select(2)
     }
+
+    fun hideDebugPanelTab(){
+        canvas.sidePanel.tabs.remove(debugTab)
+    }
+
 }

@@ -70,7 +70,6 @@ class Canvas : View("My View") {
 
             tab("Agents", AgentPanel().root)
             tab("Propositions", PropositionPanel().root)
-            tab("Debugger", DebugPanel().root)
         }
 
         //KeyEvent re-routing, here be dragons

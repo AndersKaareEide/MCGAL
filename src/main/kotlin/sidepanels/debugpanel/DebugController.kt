@@ -5,7 +5,6 @@ import canvas.controllers.StateController
 import formulaParser.FormulaParser
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
-import formulaParser.formulaDebugger.FormulaValue
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -30,6 +29,8 @@ class DebugController: Controller(){
      * of DebugEntries
      */
     fun startDebug(formulaText: String){
+        clearDebugger() //Clear any previous debugLabels
+
         this.formulaText = formulaText
         canvasController.stateSelectionCallback = this::runDebugger
         formulaController.errorMsgProperty.value = "Please select a state to step through the formula in"
@@ -44,9 +45,23 @@ class DebugController: Controller(){
         val model = canvasController.model
 
         debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
-        canvasController.selectSidePanelTab(2)
+        canvasController.showDebugPanelTab()
+
         tableSelection.selectionModel.select(0)
         selectedEntryProperty.bind(tableSelection.selectionModel.selectedItemProperty())
+    }
+
+    fun clearDebugger(){
+        canvasController.hideDebugPanelTab()
+        debugEntries.clear()
+        clearDebugLabels()
+    }
+
+    //TODO Call when then user hits Esc or something
+    fun clearDebugLabels(){
+        stateController.states.forEach {
+            it.debugLabels.clear()
+        }
     }
 
 

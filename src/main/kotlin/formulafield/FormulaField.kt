@@ -61,6 +61,9 @@ class FormulaField : View("My View") {
                 } else if (it.code == KeyCode.DOWN) {
                     controller.getNextFormula(this)
                     it.consume()
+                } else if ((it.isAltDown || it.isControlDown) && it.code == KeyCode.ENTER){
+                    debugController.startDebug(text)
+                    it.consume()
                 }
             }
         }
