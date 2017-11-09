@@ -24,11 +24,11 @@ class StateFragment(val item: State) : Fragment() {
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 
-                bindClass(item.validationStyleProp)
-                toggleClass(ModelStyles.selected, item.selectedProperty)
-
                 center = stackpane {
                     circle {
+                        toggleClass(ModelStyles.selected, item.selectedProperty)
+                        bindClass(item.validationStyleProp)
+
                         radius = STATE_CIRCLE_RADIUS
                         fill = Color.WHITE
 
