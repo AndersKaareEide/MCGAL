@@ -6,6 +6,7 @@ import canvas.controllers.DragBoxController
 import canvas.controllers.EdgeController
 import canvas.controllers.StateController
 import formulafield.FormulaField
+import javafx.geometry.Orientation
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
@@ -26,7 +27,8 @@ class Canvas : View("My View") {
     val sidePanel = TabPane()
     //TODO Move out into own 'view'
 
-    override val root = hbox {
+    override val root = splitpane(Orientation.HORIZONTAL) {
+        setDividerPositions(100.0) //Hack just to get the divider to give maximum space to the canvas
 
         borderpane {
             prefWidth = 800.0
@@ -73,7 +75,7 @@ class Canvas : View("My View") {
         }
 
         //KeyEvent re-routing, here be dragons
-        this@hbox.setOnKeyPressed {
+        this@splitpane.setOnKeyPressed {
             if(it.isShortcutDown && it.code == KeyCode.TAB) {
                 sidePanel.fireEvent(it) //Dirty solution to re-route Ctrl-Tab presses to the sidePanel
             } else if (it.code == KeyCode.DELETE) {
