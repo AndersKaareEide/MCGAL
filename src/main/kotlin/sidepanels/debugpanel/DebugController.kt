@@ -83,9 +83,11 @@ class DebugController: Controller(){
 
     fun applyValuationMap(debugEntry: DebugEntry){
         for (state in Debugger.stateLabelMap.keys){
-            for (item in Debugger.stateLabelMap[state]!!){
+            for (list in Debugger.stateLabelMap[state]!!){
                 //TODO Replace with index range
-                item.value = debugEntry.formValues[Pair(state, item.formula)]!!
+                for (item in list) {
+                    item.value = debugEntry.formValues[Pair(state, item.formula)]!!
+                }
             }
         }
     }

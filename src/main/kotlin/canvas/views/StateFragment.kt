@@ -10,6 +10,7 @@ import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import sidepanels.debugpanel.DebugLabel
+import sidepanels.debugpanel.DebugLabelItem
 import tornadofx.*
 
 
@@ -51,9 +52,13 @@ class StateFragment(val item: State) : Fragment() {
                     }
                 }
 
-                right = hbox {
+                right = vbox {
                     bindChildren(item.debugLabelsProperty){
-                        DebugLabel(it)
+                        hbox {
+                            bindChildren(it){
+                                label -> DebugLabel(label)
+                            }
+                        }
                     }
                 }
             }

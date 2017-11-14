@@ -5,6 +5,7 @@ import canvas.data.State
 import formulaParser.Formula
 import formulaParser.buildSubformulaList
 import formulafield.FormulaLabel
+import javafx.collections.ObservableList
 import javafx.scene.control.IndexRange
 import javafx.scene.layout.HBox
 import sidepanels.debugpanel.DebugLabelItem
@@ -20,7 +21,7 @@ object Debugger {
     lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
     lateinit var formulaRangeMap: MutableMap<Pair<Formula, State>, IndexRange> //TODO (Formula, State) -> List?
-    lateinit var stateLabelMap: MutableMap<State, MutableList<DebugLabelItem>>
+    lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
 
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
@@ -28,12 +29,27 @@ object Debugger {
         valuationMap = initValuationMap(formula, state)
         labelItems = formula.toLabelItems()
 
-        initStateLabels(formula, state)
+        stateLabelMap = formula.toDebugLabelItems(state)
+        sortLabelMap(stateLabelMap)
+        filterLabelMap(stateLabelMap)
 
         //Run checking to populate through calls to makeNextEntry()
         formula.check(state, model, this)
 
+//        stateLabelMap = filterStateLabelMap(stateLabelMap, entryList.last())
+        assignStateLabels()
+
         return entryList
+    }
+
+    private fun sortLabelMap(stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>){
+        stateLabelMap.keys.forEach {
+            stateLabelMap[it]!!.sortByDescending { it.size }
+        }
+    }
+
+    private fun filterLabelMap(stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
+
     }
 
     //Creates a mapping of all the subformulas contained in the input formula and state to
@@ -42,8 +58,18 @@ object Debugger {
                 .associateBy({ it }, { FormulaValue.UNKNOWN })
     }
 
-    private fun initStateLabels(formula: Formula, state: State) {
-        stateLabelMap = formula.toDebugLabelItems(state)
+    //TODO Divide into <State, List<List<???>>>
+    //TODO Somehow filter out top-level formulas that never get checked (never change formValue)
+//    private fun filterStateLabelMap(stateLabelMap: MutableMap<State, MutableList<MutableList<DebugLabelItem>>>, lastEntry: DebugEntry): MutableMap<State, MutableList<MutableList<DebugLabelItem>>> {
+//        return stateLabelMap.filter {
+//            val debugLabelItem = stateLabelMap[it.key]!!.first()
+//            val valuationMap = lastEntry.formValues
+//            valuationMap[Pair(debugLabelItem.state, debugLabelItem.formula)] != FormulaValue.UNKNOWN
+//        }.toMutableMap()
+//    }
+
+    //TODO Do this *after* the filtering?
+    private fun assignStateLabels() {
         stateLabelMap.keys.forEach {
             it.debugLabels.setAll(stateLabelMap[it]!!)
         }

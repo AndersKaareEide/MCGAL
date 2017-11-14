@@ -6,6 +6,8 @@ import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
 import formulaParser.formulaDebugger.toFormulaValue
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
@@ -15,7 +17,7 @@ abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
     abstract fun check(state: State, model: Model, debugger: Debugger?): Boolean
     abstract fun toLabelItems(needsParens: Boolean = false): MutableList<FormulaLabelItem>
-    abstract fun toDebugLabelItems(state: State, needsParens: Boolean = false): MutableMap<State, MutableList<DebugLabelItem>>
+    abstract fun toDebugLabelItems(state: State, needsParens: Boolean = false, currentIndex: Int = 0): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
     fun toFormulaItem(): FormulaItem {
         return FormulaItem(this)
     }
@@ -53,16 +55,16 @@ abstract class BinaryOperator(val left: Formula, val right: Formula, depth: Int)
         return result
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
         val leftMap = left.toDebugLabelItems(state, left.needsParentheses)
         val rightMap = right.toDebugLabelItems(state, right.needsParentheses)
         val indexRange = makeRange(needsParens, -leftMap.size, rightMap.size)
 
-        leftMap[state]!!.add(DebugLabelItem(this, opSymbol, indexRange, state))
+        leftMap[state]!![0].add(DebugLabelItem(this, opSymbol, indexRange, state))
         val result = combineMapLists(leftMap, rightMap)
 
         if (needsParens){
-            insertParentheses(result, this, state)
+            insertParentheses(result, this, state, currentIndex)
         }
         return result
     }
@@ -82,11 +84,19 @@ class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) 
         return mutableListOf (FormulaLabelItem(this, proposition.propString, Pair(0,0)))
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
-        val result = mutableMapOf<State, MutableList<DebugLabelItem>>()
-        result.put(state, mutableListOf(DebugLabelItem(this, proposition.propString, Pair(0,0), state)))
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
+        val result = mutableMapOf<State, MutableList<ObservableList<DebugLabelItem>>>()
+        val list = initializePropositionList(currentIndex)
+
+        val newLabel = DebugLabelItem(this, proposition.propString, Pair(0, 0), state)
+        val newEntry = FXCollections.observableArrayList(newLabel)
+
+        list.add(currentIndex, newEntry)
+
+        result.put(state, list)
         return result
     }
+
 
 }
 class Negation(val inner: Formula, depth: Int): Formula(depth) {
@@ -105,9 +115,9 @@ class Negation(val inner: Formula, depth: Int): Formula(depth) {
         return innerList
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
         val innerList = inner.toDebugLabelItems(state, inner.needsParentheses)
-        innerList[state]!!.add(0, DebugLabelItem(this, "¬", Pair(0, innerList.size), state))
+        innerList[state]!![currentIndex].add(0, DebugLabelItem(this, "¬", Pair(0, innerList.size), state))
         return innerList
     }
 }
@@ -168,16 +178,21 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
         return (result).toMutableList()
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
-        var result = mutableMapOf<State, MutableList<DebugLabelItem>>()
-        val indishStates = getIndishStates(this.agent, state)
+    //TODO Fix parentheses bug
+    //TODO Somehow magically prevent duplicates
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
+        var result = inner.toDebugLabelItems(state, inner.needsParentheses, currentIndex)
 
-        indishStates.forEach{
-            result = combineMapLists(result, inner.toDebugLabelItems(it, inner.needsParentheses))
+        insertParentheses(result, this, state, currentIndex)
+        result[state]!![currentIndex].add(0, DebugLabelItem(this, "K${agent.name}", makeRange(needsParens, 0 , result[state]!!.size), state))
+
+        val indishStates = getIndishStates(this.agent, state)
+        for(indishState in indishStates) {
+            val size = result[indishState]?.size ?: 0
+            //TODO Figure out if setting needsParens to false fixes extra parens
+            result = combineMapLists(result, inner.toDebugLabelItems(indishState, false, size))
         }
 
-        insertParentheses(result, this, state)
-        result[state]!!.add(0, DebugLabelItem(this, "K${agent.name}", makeRange(needsParens, 0 , result[state]!!.size), state))
 
         return result
     }
@@ -218,7 +233,7 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
         return result
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
@@ -265,7 +280,7 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
         return result
     }
 
-    override fun toDebugLabelItems(state: State, needsParens: Boolean): MutableMap<State, MutableList<DebugLabelItem>> {
+    override fun toDebugLabelItems(state: State, needsParens: Boolean, currentIndex: Int): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
