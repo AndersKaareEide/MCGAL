@@ -14,8 +14,7 @@ import tornadofx.*
 open class FormulaLabelItem(val formula: Formula, val labelText: String, val indexRange: Pair<Int, Int>)
 
 class DebugLabelItem(formula: Formula, labelText: String, indexRange: Pair<Int, Int>, val state: State,
-                     value: FormulaValue = FormulaValue.UNKNOWN): FormulaLabelItem(formula, labelText, indexRange){
-
+                     value: FormulaValue = FormulaValue.UNKNOWN): FormulaLabelItem(formula, labelText, indexRange) {
 
     val valueProperty = SimpleObjectProperty(this,"value", value)
     var value by valueProperty

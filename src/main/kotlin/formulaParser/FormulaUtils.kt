@@ -4,7 +4,6 @@ import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
-import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
@@ -111,68 +110,3 @@ fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     list.add(FormulaLabelItem(formula, ")", Pair(-size, 0)))
 }
 
-fun insertParentheses(map: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>, formula: Formula, state: State, index: Int){
-    val size = map.size + 1
-    map[state]!![index].add(0, DebugLabelItem(formula, "(", Pair(0, size), state))
-    map[state]!![index].add(DebugLabelItem(formula, ")", Pair(-size, 0), state))
-}
-
-/**
- * Function that combines two stateToLabel maps by combining the label lists where keys overlap
- * Candidate for ugliest function ever written in Kotlin
- */
-fun combineMapLists(leftMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>,
-                    rightMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>):
-        MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
-
-    val overlappingKeys = leftMap.keys.filter { rightMap.containsKey(it) }
-    val result = (leftMap + rightMap).toMutableMap()
-
-    for (key in overlappingKeys){
-        val combinedEntries = mutableListOf<ObservableList<DebugLabelItem>>()
-        var index = 0
-        if (leftMap[key]!!.size >= rightMap[key]!!.size){
-            while (index <= rightMap[key]!!.lastIndex){ //List level
-                combinedEntries.add(FXCollections.observableArrayList(leftMap[key]!![index] + rightMap[key]!![index]))
-                index++
-            }
-            while (index <= leftMap[key]!!.lastIndex){
-                combinedEntries.add(leftMap[key]!![index])
-                index++
-            }
-        } else {
-            while (index <= leftMap[key]!!.lastIndex){
-                combinedEntries.add(FXCollections.observableArrayList(leftMap[key]!![index] + rightMap[key]!![index]))
-                index++
-            }
-            while (index <= rightMap[key]!!.lastIndex){
-                combinedEntries.add(rightMap[key]!![index])
-                index++
-            }
-        }
-        result.put(key, combinedEntries)
-    }
-    return result
-}
-
-/**
- * Father, I have sinned
- */
-fun initializePropositionList(currentIndex: Int): ArrayList<ObservableList<DebugLabelItem>> {
-    val list = ArrayList<ObservableList<DebugLabelItem>>(currentIndex + 1)
-    for (index in 0 .. currentIndex){
-        list.add(FXCollections.observableArrayList())
-    }
-    return list
-}
-
-/**
- * Massively dirty function for checking if a state's list of labelLists already contains this
- */
-fun equalityTest(list1: ObservableList<DebugLabelItem>, prop: Proposition): Boolean {
-    if (list1.size != 1)
-        return false
-
-    val otherProp = list1[0].formula
-    return otherProp is Proposition && otherProp.proposition.propString == prop.proposition.propString
-}
