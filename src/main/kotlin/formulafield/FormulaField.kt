@@ -3,7 +3,6 @@ package formulafield
 import javafx.scene.control.TextField
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
-import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import sidepanels.debugpanel.DebugController
 import tornadofx.*
@@ -21,9 +20,11 @@ class FormulaField : View("My View") {
             }
         }
 
-        val debugArea = hbox()
+        hbox {
+            bindChildren(controller.labels){ it }
+        }
         val inputField = TextField()
-        initInputField(inputField, debugArea)
+        initInputField(inputField)
 
 
         hbox {
@@ -44,12 +45,12 @@ class FormulaField : View("My View") {
         }
     }
 
-    private fun FormulaField.initInputField(inputField: TextField, debugArea: HBox) {
+    private fun FormulaField.initInputField(inputField: TextField) {
         with(inputField) {
             //TODO Clear error field when user resumes editing formula
             hgrow = Priority.ALWAYS
             promptText = "Write formulas here"
-            setOnAction { controller.validateFormString(text, debugArea) }
+            setOnAction { controller.validateFormString(text) }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
                 controller.clearValidation()
             }

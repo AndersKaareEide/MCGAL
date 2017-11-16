@@ -19,7 +19,7 @@ class FormulaFieldLabel(formula: Formula, labelText: String, indexRange: IntRang
 
         setOnMouseEntered {
             controller.checkFormula(formula, model)
-            controller.selectLabels(this, indexRange, controller.labels)
+            controller.selectLabels(this, indexRange)
         }
         setOnMouseExited {
             controller.deselectLabels(this, indexRange)

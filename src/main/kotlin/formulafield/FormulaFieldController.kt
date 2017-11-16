@@ -7,8 +7,8 @@ import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
 import javafx.beans.property.SimpleStringProperty
+import javafx.collections.FXCollections
 import javafx.scene.control.TextField
-import javafx.scene.layout.HBox
 import org.antlr.v4.runtime.RecognitionException
 import tornadofx.*
 import java.util.*
@@ -20,11 +20,11 @@ class FormulaFieldController : Controller() {
     var forwards: Boolean? = null
     var validating: Boolean = false
     val formulaList: LinkedList<String> = LinkedList()
-    lateinit var labels: List<FormulaFieldLabel>
+    val labels = FXCollections.observableArrayList<FormulaFieldLabel>()
 
     val errorMsgProperty = SimpleStringProperty("")
 
-    fun validateFormString(input: String, debugArea: HBox){
+    fun validateFormString(input: String){
         //TODO Underline part of formula causing error or something of the like
         errorMsgProperty.value = "" //Clear error message
         try {
@@ -37,10 +37,9 @@ class FormulaFieldController : Controller() {
 
             checkFormula(formula, canvasController.model)
 
-            clearLabelListeners(debugArea)
+            clearLabelListeners()
             //TODO Clear labels when the model is edited
-            labels = formula.toFormulaItem().labelItems.map { FormulaFieldLabel(it) }
-            debugArea.children.setAll(labels)
+            labels.setAll(formula.toFormulaItem().labelItems.map { FormulaFieldLabel(it) })
 
         } catch (e: RecognitionException){
             errorMsgProperty.value = e.message
@@ -51,8 +50,8 @@ class FormulaFieldController : Controller() {
         }
     }
 
-    private fun clearLabelListeners(debugArea: HBox) {
-        debugArea.children.forEach {
+    private fun clearLabelListeners() {
+        labels.forEach {
             it.setOnMouseExited  {}
             it.setOnMouseEntered {}
         }
@@ -82,7 +81,7 @@ class FormulaFieldController : Controller() {
         }
     }
     //TODO Move out into LabelController
-    fun selectLabels(label: FormulaLabel, range: IntRange, labels: List<FormulaLabel>){
+    fun selectLabels(label: FormulaLabel, range: IntRange){
         getLabels(label, range, labels).forEach {
             it.addClass(ModelStyles.selected)
         }
