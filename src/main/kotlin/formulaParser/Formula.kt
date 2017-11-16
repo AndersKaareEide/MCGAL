@@ -6,9 +6,6 @@ import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
 import formulaParser.formulaDebugger.toFormulaValue
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -65,7 +62,7 @@ class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) 
     }
 
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
-        return mutableListOf (FormulaLabelItem(this, proposition.propString, Pair(0,0)))
+        return mutableListOf (FormulaLabelItem(this, proposition.propString, IntRange(0,0)))
     }
 }
 class Negation(val inner: Formula, depth: Int): Formula(depth) {
@@ -80,7 +77,7 @@ class Negation(val inner: Formula, depth: Int): Formula(depth) {
 
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val innerList = inner.toLabelItems(inner.needsParentheses)
-        innerList.add(0, FormulaLabelItem(this, "¬", Pair(0, innerList.size)))
+        innerList.add(0, FormulaLabelItem(this, "¬", IntRange(0, innerList.size)))
         return innerList
     }
 }

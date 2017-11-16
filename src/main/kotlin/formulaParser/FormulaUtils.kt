@@ -96,17 +96,17 @@ fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
     return Model(model.states, filteredEdges, model.agents, model.props)
 }
 
-fun makeRange(needsParens: Boolean, start: Int, end: Int): Pair<Int, Int> {
+fun makeRange(needsParens: Boolean, start: Int, end: Int): IntRange {
     return if (needsParens) {
-        Pair(start -1, end + 1)
+        IntRange(start -1, end + 1)
     } else {
-        Pair(start, end)
+        IntRange(start, end)
     }
 }
 
 fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     val size = list.size + 1
-    list.add(0, FormulaLabelItem(formula, "(", Pair(0, size)))
-    list.add(FormulaLabelItem(formula, ")", Pair(-size, 0)))
+    list.add(0, FormulaLabelItem(formula, "(", IntRange(0, size)))
+    list.add(FormulaLabelItem(formula, ")", IntRange(-size, 0)))
 }
 

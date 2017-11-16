@@ -13,7 +13,6 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.IndexRange
 import javafx.scene.layout.HBox
-import sidepanels.debugpanel.DebugLabel
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import tornadofx.*
@@ -153,7 +152,7 @@ object Debugger {
 
     fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
         val opIndex = debugLabelList.indexOf(innerLabel)
-        val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.second + opIndex)
+        val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
         return absRange
     }
 }

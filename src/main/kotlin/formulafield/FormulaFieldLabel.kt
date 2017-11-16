@@ -6,7 +6,7 @@ import formulafield.styling.LabelStyling
 import sidepanels.debugpanel.FormulaLabelItem
 import tornadofx.*
 
-class FormulaFieldLabel(formula: Formula, labelText: String, indexRange: Pair<Int, Int>)
+class FormulaFieldLabel(formula: Formula, labelText: String, indexRange: IntRange)
     : FormulaLabel(formula, labelText, indexRange) {
 
     constructor(item: FormulaLabelItem) : this(item.formula, item.labelText, item.indexRange)

@@ -8,7 +8,7 @@ import javafx.scene.control.Label
 import sidepanels.debugpanel.FormulaLabelItem
 import tornadofx.*
 
-open class FormulaLabel(val formula: Formula, labelText: String, val indexRange: Pair<Int, Int>): Label(labelText) {
+open class FormulaLabel(val formula: Formula, labelText: String, val indexRange: IntRange): Label(labelText) {
 
     constructor(item: FormulaLabelItem) : this(item.formula, item.labelText, item.indexRange)
 }

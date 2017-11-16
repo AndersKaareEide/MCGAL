@@ -11,9 +11,9 @@ import tornadofx.*
 /**
  * Data class used store all the information needed to create FormulaLabels
  */
-open class FormulaLabelItem(val formula: Formula, val labelText: String, val indexRange: Pair<Int, Int>)
+open class FormulaLabelItem(val formula: Formula, val labelText: String, val indexRange: IntRange)
 
-class DebugLabelItem(formula: Formula, labelText: String, indexRange: Pair<Int, Int>, val state: State,
+class DebugLabelItem(formula: Formula, labelText: String, indexRange: IntRange, val state: State,
                      value: FormulaValue = FormulaValue.UNKNOWN): FormulaLabelItem(formula, labelText, indexRange) {
 
     val valueProperty = SimpleObjectProperty(this,"value", value)

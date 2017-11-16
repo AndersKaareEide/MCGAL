@@ -82,22 +82,22 @@ class FormulaFieldController : Controller() {
         }
     }
     //TODO Move out into LabelController
-    fun selectLabels(label: FormulaLabel, range: Pair<Int, Int>, labels: List<FormulaLabel>){
+    fun selectLabels(label: FormulaLabel, range: IntRange, labels: List<FormulaLabel>){
         getLabels(label, range, labels).forEach {
             it.addClass(ModelStyles.selected)
         }
     }
 
-    fun getLabels(label: FormulaLabel, relativeRange: Pair<Int, Int>, labels: List<FormulaLabel>): List<FormulaLabel> {
+    fun getLabels(label: FormulaLabel, relativeRange: IntRange, labels: List<FormulaLabel>): List<FormulaLabel> {
         val opIndex = labels.indexOf(label)
-        val absRange = IntRange(relativeRange.first + opIndex, relativeRange.second + opIndex)
+        val absRange = IntRange(relativeRange.first + opIndex, relativeRange.last + opIndex)
 
         return labels.slice(absRange)
     }
 
-    fun deselectLabels(label: FormulaLabel, range: Pair<Int, Int>) {
+    fun deselectLabels(label: FormulaLabel, range: IntRange) {
         val opIndex = labels.indexOf(label)
-        for (index in opIndex + range.first .. opIndex + range.second){
+        for (index in opIndex + range.first .. opIndex + range.last){
             labels[index].removeClass(ModelStyles.selected)
         }
     }
