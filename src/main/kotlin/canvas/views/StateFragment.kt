@@ -53,6 +53,8 @@ class StateFragment(val item: State) : Fragment() {
                 }
 
                 right = vbox {
+                    translateX += 5
+
                     bindChildren(item.debugLabelsProperty){
                         hbox {
                             bindChildren(it){

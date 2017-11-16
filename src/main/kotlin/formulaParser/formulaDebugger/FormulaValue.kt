@@ -15,7 +15,7 @@ enum class FormulaValue(val color: Color) {
         override fun toString(): String { return "Y"}
     }, FALSE(Color.RED){
         override fun toString(): String { return "N"}
-    }, UNKNOWN(Color.YELLOW){
+    }, UNKNOWN(Color.BLACK){
         override fun toString(): String { return "?"}
     };
 }
