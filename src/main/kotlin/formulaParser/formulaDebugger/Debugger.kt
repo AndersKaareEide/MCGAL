@@ -115,6 +115,7 @@ object Debugger {
         originState.debugLabels.add(FXCollections.observableArrayList(debugLabelList))
         for (knowsOp in distributionMap.keys){
             val labels = getInnerLabels(knowsOp, debugLabelList)
+            stripOuterParentheses(labels)
 
             //Actually add the labels to each state
             for (state in distributionMap[knowsOp]!!){
@@ -126,6 +127,13 @@ object Debugger {
         //TODO 3. Add all indishstates from inputState as well
         //TODO 4. Somehow map from knowsOp to the DLI that represents its inner formula
         //TODO 5. Actually add the relevant lists of labels to the states
+    }
+
+    private fun stripOuterParentheses(labels: ObservableList<DebugLabelItem>) {
+        if (labels[0].labelText == "("){
+            labels.removeAt(0)
+            labels.removeAt(labels.lastIndex)
+        }
     }
 
     private fun getInnerLabels(knowsOp: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>): ObservableList<DebugLabelItem>{
@@ -147,7 +155,6 @@ object Debugger {
 private fun DebugLabelItem.contains(debugLabelList: ObservableList<DebugLabelItem>, other: DebugLabelItem): Boolean {
     val indexRange = getAbsoluteIntRange(debugLabelList, this)
     val otherRange = getAbsoluteIntRange(debugLabelList, other)
-
 
     return (indexRange.first < otherRange.first && indexRange.last >= otherRange.last)
 }
