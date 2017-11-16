@@ -3,12 +3,14 @@ package sidepanels.debugpanel
 import canvas.controllers.CanvasController
 import canvas.controllers.StateController
 import formulaParser.FormulaParser
+import formulaParser.FormulaParsingException
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TableView
+import org.antlr.v4.runtime.RecognitionException
 import tornadofx.*
 
 class DebugController: Controller(){
@@ -41,14 +43,24 @@ class DebugController: Controller(){
         formulaController.errorMsgProperty.value = ""
 
         val selectedState = stateController.selectedStates.first()
-        val formula = FormulaParser.parse(formulaText!!, formulaController.errorMsgProperty)
-        val model = canvasController.model
 
-        debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
-        canvasController.showDebugPanelTab()
+        try {
+            val formula = FormulaParser.parse(formulaText!!, formulaController.errorMsgProperty)
+            val model = canvasController.model
 
-        tableSelection.selectionModel.select(0)
-        selectedEntryProperty.bind(tableSelection.selectionModel.selectedItemProperty())
+            debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
+            canvasController.showDebugPanelTab()
+
+            tableSelection.selectionModel.select(0)
+            selectedEntryProperty.bind(tableSelection.selectionModel.selectedItemProperty())
+
+        } catch (e: RecognitionException){
+            formulaController.errorMsgProperty.value = e.message
+        } catch (e: FormulaParsingException){
+            formulaController.errorMsgProperty.value = e.message
+        } catch (e: IllegalStateException){
+            formulaController.errorMsgProperty.value = "Error parsing agents in group announcement"
+        }
     }
 
     fun clearDebugger(){
