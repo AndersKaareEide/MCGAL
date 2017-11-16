@@ -82,6 +82,7 @@ class Canvas : View("My View") {
                 controller.removeSelected()
             } else if (it.code == KeyCode.ESCAPE) {
                 formulaController.clearValidation()
+                formulaController.clearLabels()
             } else if (it.isAltDown && it.code == KeyCode.A){
                 stateController.selectAll()
             } else if (it.isAltDown && it.code == KeyCode.C){

@@ -50,6 +50,11 @@ class FormulaFieldController : Controller() {
         }
     }
 
+    fun clearLabels(){
+        labels.clear()
+        clearLabelListeners()
+    }
+
     private fun clearLabelListeners() {
         labels.forEach {
             it.setOnMouseExited  {}
