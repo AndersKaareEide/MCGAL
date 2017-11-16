@@ -1,5 +1,6 @@
 package formulaParser.formulaDebugger
 
+import canvas.controllers.CanvasController
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.Formula
@@ -12,21 +13,24 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.control.IndexRange
 import javafx.scene.layout.HBox
+import sidepanels.debugpanel.DebugLabel
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
+import tornadofx.*
 
 
 //TODO Find out if this belongs in the DebugPanelController
 object Debugger {
 
+    val canvasController = find(CanvasController::class)
+
     lateinit var entryList: MutableList<DebugEntry>
-    //TODO Unfuck, use list instead of Map so that shit doesn't get overwritten and cause negative index searches and fun stuff
+
     lateinit var labelItems: List<FormulaLabelItem>
     lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
     lateinit var formulaRangeMap: MutableMap<Pair<Formula, State>, IndexRange> //TODO (Formula, State) -> List?
     lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
-
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
         entryList = arrayListOf<DebugEntry>()
@@ -38,8 +42,6 @@ object Debugger {
 
         //Run checking to populate through calls to makeNextEntry()
         formula.check(state, model, this)
-
-        assignStateLabels()
 
         return entryList
     }
@@ -56,40 +58,36 @@ object Debugger {
                 .associateBy({ it }, { FormulaValue.UNKNOWN })
     }
 
-    //TODO Do this *after* the filtering?
-    private fun assignStateLabels() {
-        stateLabelMap.keys.forEach {
-            it.debugLabels.setAll(stateLabelMap[it]!!)
-        }
-    }
-
     //Creates the next "log" entry based on the valuationMapping from the last entry
     fun makeNextEntry(formula: Formula, state: State, value: FormulaValue) {
         val labels = formula.toFormulaItem().labelItems.map { FormulaLabel(it) }
-        val entry = if (entryList.isEmpty()){
-            DebugEntry(state, labels, value, valuationMap, formula.depth)
+        val updatedFormValuation = if (entryList.isEmpty()){
+            valuationMap + Pair(Pair(state, formula), value)
         } else {
-            val updatedFormValuation = entryList[entryList.lastIndex].formValues + Pair(Pair(state, formula), value)
-            DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
+            entryList[entryList.lastIndex].formValues + Pair(Pair(state, formula), value)
         }
+
+        val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
         entryList.add(entry)
     }
 
-    //TODO 1. Avoid recursion
-    //TODO 2. Avoid fucking with indexes
     fun convertToDebugLabels(input: List<FormulaLabelItem>, state: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
-        val result = mutableMapOf<State, MutableList<ObservableList<DebugLabelItem>>>()
+
+        val result = canvasController.model.states
+                .associate { Pair(it, mutableListOf<ObservableList<DebugLabelItem>>()) }
+                .toMutableMap()
+
         val debugLabelList = FXCollections.observableArrayList<DebugLabelItem>()
-        //TODO Maybe make DebugLabelItems keep a reference to the FormulaLabelItem they are based on for linking purposes later on
         debugLabelList.addAll(input.map { DebugLabelItem(it.formula, it.labelText, it.indexRange, state) })
 
-        distributeKnowsFormulas(debugLabelList, state)
+        distributeKnowsFormulas(debugLabelList, state, result)
         return result
     }
 
-    //TODO Possibly deal with parentheses later
+    //TODO Clone Items instead of reusing reference to same Item
+    fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State,
+                                result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
 
-    fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State) {
         val knowsOpList = debugLabelList.filter { it.formula is Knows && !(it.labelText == "(" || it.labelText == ")") }
         val distributionMap = knowsOpList.associate { Pair(it, mutableSetOf<State>()) }
 
@@ -112,14 +110,22 @@ object Debugger {
             distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, originState))
         }
 
-        originState.debugLabels.add(FXCollections.observableArrayList(debugLabelList))
+        val originalLabels = FXCollections.observableArrayList(debugLabelList)
+        originState.debugLabels.add(originalLabels)
+        result[originState]!!.add(originalLabels)
+
         for (knowsOp in distributionMap.keys){
+            //TODO Copy labels
             val labels = getInnerLabels(knowsOp, debugLabelList)
             stripOuterParentheses(labels)
 
             //Actually add the labels to each state
             for (state in distributionMap[knowsOp]!!){
-                state.debugLabels.add(FXCollections.observableArrayList(labels))
+                val labelCopies = FXCollections.observableArrayList(labels.map {
+                    DebugLabelItem(it.formula, it.labelText, it.indexRange, it.state)
+                })
+                state.debugLabels.add(labelCopies)
+                result[state]!!.add(labelCopies)
             }
         }
         //TODO 1. Find indishstates from all parentOp states
