@@ -5,6 +5,7 @@ import canvas.data.State
 import formulaParser.Formula
 import formulaParser.Knows
 import formulaParser.buildSubformulaList
+import formulaParser.formulaDebugger.Debugger.getAbsoluteIntRange
 import formulaParser.getIndishStates
 import formulafield.FormulaLabel
 import javafx.collections.FXCollections
@@ -95,9 +96,9 @@ object Debugger {
         //TODO If contained within previous Knows operator by checking index, distribute further
         for ((index, knowsOp) in knowsOpList.withIndex()){
             //For every step right, check all forms to the left to try and find a 'parent'
-            for (innerIndex in index downTo 0) {
+            for (innerIndex in (index - 1) downTo 0) {
                 val parentOp = knowsOpList[innerIndex]
-                if (parentOp.contains(knowsOp)){
+                if (parentOp.contains(debugLabelList, knowsOp)){
                     val parentOpDistributionSet = distributionMap[parentOp]
                     for (innerState in parentOpDistributionSet!!){
                         val formula = knowsOp.formula as Knows
@@ -131,18 +132,24 @@ object Debugger {
         val innerFormula = (knowsOp.formula as Knows).inner
         val innerLabel = debugLabelList.find { it.formula == innerFormula }!!
 
-        val opIndex = debugLabelList.indexOf(innerLabel)
-        val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.second + opIndex)
+        val absRange = getAbsoluteIntRange(debugLabelList, innerLabel)
 
         return FXCollections.observableArrayList(debugLabelList.slice(absRange))
     }
+
+    fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
+        val opIndex = debugLabelList.indexOf(innerLabel)
+        val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.second + opIndex)
+        return absRange
+    }
 }
 
-private fun DebugLabelItem.contains(other: DebugLabelItem): Boolean {
-    val indexRange = this.indexRange
-    val otherRange = other.indexRange
+private fun DebugLabelItem.contains(debugLabelList: ObservableList<DebugLabelItem>, other: DebugLabelItem): Boolean {
+    val indexRange = getAbsoluteIntRange(debugLabelList, this)
+    val otherRange = getAbsoluteIntRange(debugLabelList, other)
 
-    return (indexRange.first < otherRange.first && indexRange.second >= otherRange.second)
+
+    return (indexRange.first < otherRange.first && indexRange.last >= otherRange.last)
 }
 
 
