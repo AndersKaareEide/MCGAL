@@ -2,6 +2,7 @@ package canvas.views
 
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.controllers.CanvasController
+import canvas.controllers.DraggableController
 import canvas.controllers.StateController
 import canvas.data.State
 import canvas.styles.ModelStyles
@@ -9,15 +10,13 @@ import formulafield.FormulaFieldController
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
-import sidepanels.debugpanel.DebugLabel
-import sidepanels.debugpanel.DebugLabelItem
 import tornadofx.*
 
 
 class StateFragment(val item: State) : Fragment() {
-    val controller: StateController by inject()
-    val canvasController: CanvasController by inject()
-    val formulaController: FormulaFieldController by inject()
+    private val controller: StateController by inject()
+    private val canvasController: CanvasController by inject()
+    private val formulaController: FormulaFieldController by inject()
 
     //TODO Use double-click to set properties or something?
     override val root =
@@ -59,7 +58,8 @@ class StateFragment(val item: State) : Fragment() {
             it.consume()
         }
         setOnDragDetected {
-            controller.startLineDrawing(item, this)
+            startFullDrag()
+            controller.startLineDrawing(item)
             canvasController.isDragging = true
             it.consume()
         }

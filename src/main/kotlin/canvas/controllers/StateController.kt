@@ -6,7 +6,6 @@ import canvas.views.Canvas
 import javafx.collections.FXCollections
 import javafx.geometry.Bounds
 import javafx.geometry.Point2D
-import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
@@ -17,34 +16,28 @@ class StateController : Controller() {
     val propController: PropPanelController by inject()
     val edgeController: EdgeController by inject()
     val canvasController: CanvasController by inject()
+    val dragController: DraggableController by inject()
 
     val states = FXCollections.observableArrayList(defaultStates)!!
-    val selectedStates = FXCollections.observableSet<State>()
+    val selectedStates = FXCollections.observableSet<State>()!!
 
     val canvas: Canvas by inject()
 
     var lastClickedState: State? = null
 
-    var deltaX = 0.0
-    var deltaY = 0.0
-
     fun handleStateMPress(item: State, event: MouseEvent){
         if (event.isControlDown){
             item.props.setAll(propController.getSelected())
         }
-        if (canvasController.clickMode == ClickMode.MOVING) {
-            setDragDelta(item, event)
-        }
-    }
 
-    private fun setDragDelta(item: State, event: MouseEvent){
-        deltaX = item.xPos - event.sceneX
-        deltaY = item.yPos - event.sceneY
+        if (canvasController.clickMode == ClickMode.MOVING) {
+            dragController.setDragOffset(item, event)
+        }
     }
 
     fun handleMDrag(state: State, event: MouseEvent) {
         if (canvasController.clickMode == ClickMode.MOVING){
-            dragItem(state, event)
+            dragController.dragGroup(state, selectedStates, event)
         }
     }
 
@@ -77,23 +70,7 @@ class StateController : Controller() {
         }
     }
 
-    private fun dragItem(state: State, event: MouseEvent){
-        val newX = deltaX + event.sceneX
-        val newY = deltaY + event.sceneY
-
-        selectedStates.forEach {
-            if (it != state) {
-                it.xPos = newX + (it.xPos - state.xPos)
-                it.yPos = newY + (it.yPos - state.yPos)
-            }
-        }
-
-        state.yPos = newY
-        state.xPos = newX
-    }
-
-    fun startLineDrawing(item: State, node: Node) {
-        node.startFullDrag()
+    fun startLineDrawing(item: State) {
         if (canvasController.clickMode == ClickMode.LINES) {
             lastClickedState = item
         }
