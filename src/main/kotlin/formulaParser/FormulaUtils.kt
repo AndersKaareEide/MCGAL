@@ -65,7 +65,7 @@ fun buildSubformulaList(state: State, formula: Formula): List<Pair<State, Formul
             indishStates.map { buildSubformulaList(it, formula.inner) }
                     .fold(initial) { list, elements -> list.plus(elements) }
         }
-        else -> TODO("Not implemented yet")
+        else -> TODO("Stepping through announcement and group announcement formulas is not implemented yet")
     }
 }
 

@@ -1,5 +1,6 @@
 package canvas.data
 
+import canvas.views.Draggable
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -8,16 +9,16 @@ import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 import java.io.Serializable
 
-class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent {
+class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent, Draggable {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty
 
-    val xProperty = SimpleDoubleProperty(this, "xPos", xPos)
-    var xPos by xProperty
+    override val xProperty = SimpleDoubleProperty(this, "xPos", xPos)
+    override var xPos by xProperty
 
-    val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
-    var yPos by yProperty
+    override val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
+    override var yPos by yProperty
 
     val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
     var inEdges by inEdgesProperty

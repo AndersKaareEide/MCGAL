@@ -39,29 +39,15 @@ class StateFragment(val item: State) : Fragment() {
                         textProperty().bind(item.nameProperty)
                         isMouseTransparent = true
                     }
-
-                    label {
-                        textProperty().bind(stringBinding(item.propsProperty) {
-                            item.propsProperty.value.joinToString(","){ it.propString }
-                        })
-                        useMaxWidth = true
-                        alignment = Pos.CENTER
-                        isMouseTransparent = true
-
-                        translateY += 32
-                    }
                 }
 
-                right = vbox {
-                    translateX += 5
-
-                    bindChildren(item.debugLabelsProperty){
-                        hbox {
-                            bindChildren(it){
-                                label -> DebugLabel(label)
-                            }
-                        }
-                    }
+                bottom = label {
+                    textProperty().bind(stringBinding(item.propsProperty) {
+                        item.propsProperty.value.joinToString(","){ it.propString }
+                    })
+                    useMaxWidth = true
+                    alignment = Pos.CENTER
+                    isMouseTransparent = true
                 }
             }
 

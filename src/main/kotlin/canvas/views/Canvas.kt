@@ -36,23 +36,28 @@ class Canvas : View("My View") {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
 
-
             center = stackpane {
                 anchorpane {
                     isManaged = false
+                    isPickOnBounds = false
                     bindChildren(edgeController.edges) {
                         EdgeFragment(it).root
                     }
-                    isPickOnBounds = false
                 }
                 anchorpane {
                     isManaged = false
+                    isPickOnBounds = false
                     bindChildren(stateController.states) {
                         StateFragment(it).root
                     }
-                    isPickOnBounds = false
                 }
-
+                anchorpane {
+                    isManaged = false
+                    isPickOnBounds = false
+                    bindChildren(stateController.states) {
+                        DebugLabelHolder(it).root
+                    }
+                }
                 dragrectangle()
             }
 
