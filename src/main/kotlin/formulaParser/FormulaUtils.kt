@@ -50,19 +50,31 @@ fun extractProps(formula: Formula): Set<PropositionItem> {
  * Builds an immutable list of all the subformulas in the input formula, including the formula itself
  */
 //TODO Rewrite and connect states to formulas in order to handle announcements
-fun buildSubformulaList(state: State, formula: Formula): List<Pair<State, Formula>> {
+fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair<State, Formula>> {
     return when (formula){
         is Proposition -> listOf(Pair(state, formula))
-        is Negation -> listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner)
+        is Negation -> listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner, model)
         is BinaryOperator -> listOf(Pair(state, formula)) +
-                buildSubformulaList(state, formula.left) +
-                buildSubformulaList(state, formula.right)
+                buildSubformulaList(state, formula.left, model) +
+                buildSubformulaList(state, formula.right, model)
         is Knows -> {
-            val indishStates = getIndishStates(formula.agent, state)
+            val indishStates = getIndishStates(formula.agent, state, model)
             val initial: List<Pair<State, Formula>> = listOf(Pair(state, formula))
 
-            indishStates.map { buildSubformulaList(it, formula.inner) }
+            //TODO Optimize by building once and then mapping over? No, we need deep copies
+            indishStates.map { buildSubformulaList(it, formula.inner, model) }
                     .fold(initial) { list, elements -> list.plus(elements) }
+        }
+        is Announcement -> {
+            val initial: List<Pair<State,Formula>> = listOf(Pair(state, formula))
+            val firstEntry = listOf(Pair(state, formula))
+
+            val announcements =
+                    model.states.map { buildSubformulaList(state, formula.announcement, model) }
+                    .fold(initial){ list, elements -> list.plus(elements) }
+
+            val innerEntries = buildSubformulaList(state, formula.inner, model)
+            return firstEntry + announcements + innerEntries
         }
         else -> TODO("Stepping through announcement and group announcement formulas is not implemented yet")
     }
