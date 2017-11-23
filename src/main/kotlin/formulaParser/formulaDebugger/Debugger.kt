@@ -53,7 +53,7 @@ object Debugger {
 
     //Creates a mapping of all the subformulas contained in the input formula and state to
     private fun initValuationMap(formula: Formula, state: State): Map<Pair<State, Formula>,FormulaValue>{
-        return buildSubformulaList(state, formula)
+        return buildSubformulaList(state, formula, canvasController.model )
                 .associateBy({ it }, { FormulaValue.UNKNOWN })
     }
 
@@ -89,6 +89,7 @@ object Debugger {
 
         val knowsOpList = debugLabelList.filter { it.formula is Knows && !(it.labelText == "(" || it.labelText == ")") }
         val distributionMap = knowsOpList.associate { Pair(it, mutableSetOf<State>()) }
+        val model = canvasController.model //We don't actually care about the model here, as we're not checking
 
         //TODO If contained within previous Knows operator by checking index, distribute further
         for ((index, knowsOp) in knowsOpList.withIndex()){
@@ -99,14 +100,14 @@ object Debugger {
                     val parentOpDistributionSet = distributionMap[parentOp]
                     for (innerState in parentOpDistributionSet!!){
                         val formula = knowsOp.formula as Knows
-                        distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, innerState))
+                        distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, innerState, model))
                     }
                     //We found a 'parent' for this one, continue to next formula
                     break
                 }
             }
             val formula = knowsOp.formula as Knows
-            distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, originState))
+            distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, originState, model))
         }
 
         val originalLabels = FXCollections.observableArrayList(debugLabelList)

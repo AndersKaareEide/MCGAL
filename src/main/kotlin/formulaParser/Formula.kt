@@ -121,7 +121,7 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val indishStates = getIndishStates(agent, state)
+        val indishStates = getIndishStates(agent, state, model)
         val result = indishStates.all { inner.check(it, model, debugger) }
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result

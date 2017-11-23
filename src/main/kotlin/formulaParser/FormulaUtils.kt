@@ -4,8 +4,6 @@ import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
-import javafx.collections.ObservableList
-import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -13,15 +11,16 @@ import sidepanels.propertypanel.PropositionItem
  * Based on an agent and a state, returns all states the given agent considers
  * indistinguishable from the given state
  */
-//TODO Figure out if model is actually necessary
-fun getIndishStates(agent: AgentItem, state: State): List<State> {
+//TODO Figure out if model is actually necessary, it is, fuck me
+fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     val outEdges = state.outEdges.filter { it.agents.contains(agent) }
     val inEdges = state.inEdges.filter { it.agents.contains(agent) }
 
     val outStates = outEdges.map { it.parent1 }
     val inStates = inEdges.map { it.parent2 }
 
-    return listOf(state) + inStates + outStates
+    val result = listOf(state) + inStates + outStates
+    return result.filter { model.states.contains(it) }
 }
 
 //TODO Decide how to handle model updates graphically
