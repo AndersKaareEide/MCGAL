@@ -3,6 +3,7 @@ package canvas.views
 import canvas.STATE_CIRCLE_RADIUS
 import canvas.controllers.DraggableController
 import canvas.data.State
+import canvas.styles.ModelStyles
 import javafx.beans.property.SimpleDoubleProperty
 import sidepanels.debugpanel.DebugLabel
 import tornadofx.*
@@ -18,6 +19,7 @@ class DebugLabelHolder(val state: State) : Fragment("My View"), Draggable {
     override var yPos by yProperty
 
     override val root = borderpane {
+        toggleClass(ModelStyles.hidden, state.hiddenProperty)
         translateXProperty().bind(xProperty + state.xProperty)
         translateYProperty().bind(yProperty + state.yProperty)
 

@@ -37,5 +37,8 @@ class State(name: String, xPos: Double, yPos: Double, props: List<PropositionIte
 
     val debugLabelsProperty = SimpleListProperty<ObservableList<DebugLabelItem>>(this, "debugLabels", FXCollections.observableArrayList())
     var debugLabels by debugLabelsProperty
+
+    val hiddenProperty = SimpleBooleanProperty(this, "isHidden", false)
+    var isHidden by hiddenProperty
 }
 

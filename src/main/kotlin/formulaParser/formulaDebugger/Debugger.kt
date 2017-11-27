@@ -3,15 +3,11 @@ package formulaParser.formulaDebugger
 import canvas.controllers.CanvasController
 import canvas.data.Model
 import canvas.data.State
-import formulaParser.Formula
-import formulaParser.Knows
-import formulaParser.buildSubformulaList
+import formulaParser.*
 import formulaParser.formulaDebugger.Debugger.getAbsoluteIntRange
-import formulaParser.getIndishStates
 import formulafield.FormulaLabel
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import javafx.scene.control.IndexRange
 import javafx.scene.layout.HBox
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
@@ -28,7 +24,6 @@ object Debugger {
     lateinit var labelItems: List<FormulaLabelItem>
     lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
-    lateinit var formulaRangeMap: MutableMap<Pair<Formula, State>, IndexRange> //TODO (Formula, State) -> List?
     lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
@@ -70,16 +65,21 @@ object Debugger {
         entryList.add(entry)
     }
 
-    fun convertToDebugLabels(input: List<FormulaLabelItem>, state: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
+    fun convertToDebugLabels(input: List<FormulaLabelItem>, originState: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
 
         val result = canvasController.model.states
                 .associate { Pair(it, mutableListOf<ObservableList<DebugLabelItem>>()) }
                 .toMutableMap()
 
         val debugLabelList = FXCollections.observableArrayList<DebugLabelItem>()
-        debugLabelList.addAll(input.map { DebugLabelItem(it.formula, it.labelText, it.indexRange, state) })
+        debugLabelList.addAll(input.map { DebugLabelItem(it.formula, it.labelText, it.indexRange, originState) })
 
-        distributeKnowsFormulas(debugLabelList, state, result)
+        val originalLabels = FXCollections.observableArrayList(debugLabelList)
+        originState.debugLabels.add(originalLabels)
+        result[originState]!!.add(originalLabels)
+
+        distributeKnowsFormulas(debugLabelList, originState, result)
+        distributeAnnouncements(debugLabelList, result)
         return result
     }
 
@@ -110,12 +110,7 @@ object Debugger {
             distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, originState, model))
         }
 
-        val originalLabels = FXCollections.observableArrayList(debugLabelList)
-        originState.debugLabels.add(originalLabels)
-        result[originState]!!.add(originalLabels)
-
         for (knowsOp in distributionMap.keys){
-            //TODO Copy labels
             val labels = getInnerLabels(knowsOp, debugLabelList)
             stripOuterParentheses(labels)
 
@@ -135,20 +130,34 @@ object Debugger {
         //TODO 5. Actually add the relevant lists of labels to the states
     }
 
+    /**
+     * Function responsible for creating DebugLabels for any announcement formulas and
+     * distributing them across the model
+     */
+    //TODO Fix bug with chained announcements fucking shit up royally
+    private fun distributeAnnouncements(debugLabelList: ObservableList<DebugLabelItem>, result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
+
+        val announcementLabelList = debugLabelList
+                .filter { it.formula is Announcement }
+                .filter { (it.labelText == "[") } //Announcements are weird since they are only represented as [ and ]
+
+        val dix = announcementLabelList.map { getAnnouncementLabels(it, debugLabelList) }
+
+        for (state in canvasController.model.states){
+            val labelCopies = dix.map {
+                FXCollections.observableArrayList(it.map {
+                    DebugLabelItem(it.formula, it.labelText, it.indexRange, it.state, isAnnouncementCheck = true)
+                })
+            }.toMutableList()
+            result[state]!!.addAll(labelCopies)
+        }
+    }
+
     private fun stripOuterParentheses(labels: ObservableList<DebugLabelItem>) {
         if (labels[0].labelText == "("){
             labels.removeAt(0)
             labels.removeAt(labels.lastIndex)
         }
-    }
-
-    private fun getInnerLabels(knowsOp: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>): ObservableList<DebugLabelItem>{
-        val innerFormula = (knowsOp.formula as Knows).inner
-        val innerLabel = debugLabelList.find { it.formula == innerFormula }!!
-
-        val absRange = getAbsoluteIntRange(debugLabelList, innerLabel)
-
-        return FXCollections.observableArrayList(debugLabelList.slice(absRange))
     }
 
     fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {

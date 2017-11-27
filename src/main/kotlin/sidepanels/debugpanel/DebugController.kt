@@ -2,10 +2,12 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.controllers.StateController
+import canvas.data.State
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
 import formulaParser.formulaDebugger.DebugEntry
 import formulaParser.formulaDebugger.Debugger
+import formulaParser.formulaDebugger.FormulaValue
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -94,14 +96,24 @@ class DebugController: Controller(){
     }
 
     fun applyValuationMap(debugEntry: DebugEntry){
+        val hiddenStates = mutableMapOf<State, Boolean>()
         for (state in Debugger.stateLabelMap.keys){
             for (list in Debugger.stateLabelMap[state]!!){
-                //TODO Replace with index range
-                for (item in list) {
-                    item.value = debugEntry.formValues[Pair(state, item.formula)]!!
+                for (labelItem in list) {
+                    val formulaValue = debugEntry.formValues[Pair(state, labelItem.formula)]!!
+                    labelItem.value = formulaValue
+                    if(labelItem.isAnnouncementCheck && formulaValue == FormulaValue.FALSE){
+                        hiddenStates.put(state, true)
+                    }
                 }
             }
         }
+        assignHiddenStates(Debugger.stateLabelMap.keys, hiddenStates)
     }
 
+    private fun assignHiddenStates(states: MutableSet<State>, statesToHide: MutableMap<State, Boolean>) {
+        for (state in states){
+            state.isHidden = statesToHide[state] ?: false
+        }
+    }
 }

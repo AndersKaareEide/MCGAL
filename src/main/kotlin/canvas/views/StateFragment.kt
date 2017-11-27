@@ -21,6 +21,7 @@ class StateFragment(val item: State) : Fragment() {
     //TODO Use double-click to set properties or something?
     override val root =
             borderpane {
+                toggleClass(ModelStyles.hidden, item.hiddenProperty)
                 translateXProperty().bind(item.xProperty)
                 translateYProperty().bind(item.yProperty)
 

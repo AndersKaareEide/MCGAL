@@ -4,6 +4,9 @@ import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.formulaDebugger.Debugger
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
@@ -70,7 +73,7 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
             val firstEntry = listOf(Pair(state, formula))
 
             val announcements =
-                    model.states.map { buildSubformulaList(state, formula.announcement, model) }
+                    model.states.map { buildSubformulaList(it, formula.announcement, model) }
                     .fold(initial){ list, elements -> list.plus(elements) }
 
             val innerEntries = buildSubformulaList(state, formula.inner, model)
@@ -119,5 +122,25 @@ fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     val size = list.size + 1
     list.add(0, FormulaLabelItem(formula, "(", IntRange(0, size)))
     list.add(FormulaLabelItem(formula, ")", IntRange(-size, 0)))
+}
+
+fun getInnerLabels(knowsOp: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>): ObservableList<DebugLabelItem> {
+    val innerFormula = (knowsOp.formula as Knows).inner
+    val innerLabel = debugLabelList.find { it.formula == innerFormula }!!
+
+    val absRange = Debugger.getAbsoluteIntRange(debugLabelList, innerLabel)
+
+    return FXCollections.observableArrayList(debugLabelList.slice(absRange))
+}
+
+fun getAnnouncementLabels(labelItem: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>)
+        : ObservableList<DebugLabelItem> {
+
+    val announcement = (labelItem.formula as Announcement).announcement
+    val announcementLabel = debugLabelList.find { it.formula == announcement }!!
+
+    val absRange = Debugger.getAbsoluteIntRange(debugLabelList, announcementLabel)
+
+    return FXCollections.observableArrayList(debugLabelList.slice(absRange))
 }
 
