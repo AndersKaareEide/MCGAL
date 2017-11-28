@@ -83,7 +83,6 @@ object Debugger {
         return result
     }
 
-    //TODO Clone Items instead of reusing reference to same Item
     fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State,
                                 result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
 
@@ -91,7 +90,6 @@ object Debugger {
         val distributionMap = knowsOpList.associate { Pair(it, mutableSetOf<State>()) }
         val model = canvasController.model //We don't actually care about the model here, as we're not checking
 
-        //TODO If contained within previous Knows operator by checking index, distribute further
         for ((index, knowsOp) in knowsOpList.withIndex()){
             //For every step right, check all forms to the left to try and find a 'parent'
             for (innerIndex in (index - 1) downTo 0) {
@@ -123,18 +121,17 @@ object Debugger {
                 result[state]!!.add(labelCopies)
             }
         }
-        //TODO 1. Find indishstates from all parentOp states
-        //TODO 2. Add these to distributionMap for knowsOp
-        //TODO 3. Add all indishstates from inputState as well
-        //TODO 4. Somehow map from knowsOp to the DLI that represents its inner formula
-        //TODO 5. Actually add the relevant lists of labels to the states
+        //1. Find indishstates from all parentOp states
+        //2. Add these to distributionMap for knowsOp
+        //3. Add all indishstates from inputState as well
+        //4. Somehow map from knowsOp to the DLI that represents its inner formula
+        //5. Actually add the relevant lists of labels to the states
     }
 
     /**
      * Function responsible for creating DebugLabels for any announcement formulas and
      * distributing them across the model
      */
-    //TODO Fix bug with chained announcements fucking shit up royally
     private fun distributeAnnouncements(debugLabelList: ObservableList<DebugLabelItem>, result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
 
         val announcementLabelList = debugLabelList

@@ -35,7 +35,6 @@ fun Label.getPositionBinding(x1: DoubleBinding, x2: DoubleBinding, y1: DoubleBin
 
 data class LabelPos (val xPos: Double, val yPos: Double, val rotDegrees: Double)
 
-//TODO Move out
 private operator fun Pair<Double, Double>.plus(other: Pair<Double, Double>): Pair<Double, Double> {
     return Pair(first + other.first, second + other.second)
 }

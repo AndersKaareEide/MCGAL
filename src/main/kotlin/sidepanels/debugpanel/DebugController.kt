@@ -95,7 +95,14 @@ class DebugController: Controller(){
         }
     }
 
+    /**
+     * Function responsible for coloring the DebugLabels next to each State by matching the formula
+     * they represent with their corresponding value from the given DebugEntry's valuationMap
+     */
     fun applyValuationMap(debugEntry: DebugEntry){
+        canvasController.clearSelectedComponents()
+        canvasController.selectItem(debugEntry.state)
+
         val hiddenStates = mutableMapOf<State, Boolean>()
         for (state in Debugger.stateLabelMap.keys){
             for (list in Debugger.stateLabelMap[state]!!){

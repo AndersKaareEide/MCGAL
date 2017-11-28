@@ -35,7 +35,7 @@ class CanvasController : Controller() {
     var isDragging = false
 
     var clipBoardModel: Model? = null
-    var stateSelectionCallback: (() -> Unit)? = null
+    var stateSelectionCallback: (() -> Unit)? = null //Ugly hack used to start the debugger
 
 
     val model = Model(stateController.states, edgeController.edges,
