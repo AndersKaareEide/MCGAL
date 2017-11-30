@@ -3,6 +3,7 @@ package canvas.controllers
 import canvas.data.AgentItem
 import canvas.data.Edge
 import canvas.data.State
+import formulafield.FormulaFieldController
 import javafx.collections.FXCollections
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
@@ -11,10 +12,11 @@ import utils.defaultEdges
 
 class EdgeController: Controller() {
 
-    val agentController: AgentPanelController by inject()
+    private val agentController: AgentPanelController by inject()
+    private val formulaController: FormulaFieldController by inject()
 
     val edges = FXCollections.observableArrayList(defaultEdges)!!
-    val selectedEdges = FXCollections.observableSet<Edge>()
+    val selectedEdges = FXCollections.observableSet<Edge>()!!
 
     fun addEdge(parent1: State, parent2: State) {
         val agents = agentController.getSelected()
@@ -30,8 +32,7 @@ class EdgeController: Controller() {
         } else if(!agents.isEmpty()) {
             edges.add(newEdge)
         } else {
-            //TODO Provide visual feedback and remove edge if already existing or something
-            println("Can't create edge without selecting agents first")
+            formulaController.setErrorMsg("Can't create edge without selecting agents first")
         }
     }
 
