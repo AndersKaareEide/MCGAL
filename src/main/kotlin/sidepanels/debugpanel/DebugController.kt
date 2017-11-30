@@ -37,17 +37,17 @@ class DebugController: Controller(){
 
         this.formulaText = formulaText
         canvasController.stateSelectionCallback = this::runDebugger
-        formulaController.errorMsgProperty.value = "Please select a state to step through the formula in"
+        formulaController.setErrorMsg("Please select a state to step through the formula in")
     }
 
     private fun runDebugger() {
         canvasController.stateSelectionCallback = null
-        formulaController.errorMsgProperty.value = ""
+        formulaController.clearErrorMsg()
 
         val selectedState = stateController.selectedStates.first()
 
         try {
-            val formula = FormulaParser.parse(formulaText!!, formulaController.errorMsgProperty)
+            val formula = FormulaParser.parse(formulaText!!, formulaController::setErrorMsg)
             val model = canvasController.model
 
             debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
@@ -57,11 +57,11 @@ class DebugController: Controller(){
             selectedEntryProperty.bind(tableSelection.selectionModel.selectedItemProperty())
 
         } catch (e: RecognitionException){
-            formulaController.errorMsgProperty.value = e.message
+            formulaController.setErrorMsg(e.message!!)
         } catch (e: FormulaParsingException){
-            formulaController.errorMsgProperty.value = e.message
+            formulaController.setErrorMsg(e.message!!)
         } catch (e: IllegalStateException){
-            formulaController.errorMsgProperty.value = "Error parsing agents in group announcement"
+            formulaController.setErrorMsg("Error parsing agents in group announcement")
         }
     }
 
@@ -80,10 +80,12 @@ class DebugController: Controller(){
 
 
     fun stepInto() {
+        tableSelection.requestFocus()
         tableSelection.selectionModel.selectNext()
     }
 
     fun stepOver() {
+        tableSelection.requestFocus()
         val selectedIndex = tableSelection.selectionModel.selectedIndex
         val currentDepth = tableSelection.items[selectedIndex].depth
 

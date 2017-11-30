@@ -17,7 +17,7 @@ import tornadofx.*
 //TODO Find out if this belongs in the DebugPanelController
 object Debugger {
 
-    val canvasController = find(CanvasController::class)
+    private val canvasController = find(CanvasController::class)
 
     lateinit var entryList: MutableList<DebugEntry>
 

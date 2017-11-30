@@ -15,12 +15,12 @@ import java.util.*
 
 class FormulaFieldController : Controller() {
 
-    val canvasController: CanvasController by inject()
+    private val canvasController: CanvasController by inject()
 
     var forwards: Boolean? = null
     var validating: Boolean = false
     val formulaList: LinkedList<String> = LinkedList()
-    val labels = FXCollections.observableArrayList<FormulaFieldLabel>()
+    val labels = FXCollections.observableArrayList<FormulaFieldLabel>()!!
 
     val errorMsgProperty = SimpleStringProperty("")
 
@@ -28,7 +28,7 @@ class FormulaFieldController : Controller() {
         //TODO Underline part of formula causing error or something of the like
         errorMsgProperty.value = "" //Clear error message
         try {
-            val formula = FormulaParser.parse(input, errorMsgProperty)
+            val formula = FormulaParser.parse(input, this::setErrorMsg)
 
             //TODO Limit length of list or something
             if (!formulaList.contains(input)) {
@@ -128,5 +128,13 @@ class FormulaFieldController : Controller() {
             inputField.text = next
             forwards = false
         }
+    }
+
+    fun setErrorMsg(errorMsg: String){
+        errorMsgProperty.set(errorMsg)
+    }
+
+    fun clearErrorMsg(){
+        errorMsgProperty.set("")
     }
 }

@@ -125,9 +125,6 @@ class CanvasController : Controller() {
             clearSelectedComponents()
         }
         stateController.selectFromBounds(bounds)
-
-        /*TODO Select edges from bounds as well via position of label? Hard to find coordinates of label without
-          TODO introducing extra overhead */
     }
 
     fun clearSelectedComponents() {
@@ -149,7 +146,6 @@ class CanvasController : Controller() {
         )
     }
 
-    //TODO Center pasted components on mouse cursor by modifying the model first?
     fun pasteComponents() {
         if (clipBoardModel != null){
             clipBoardModel = ModelSerializer.createCopy(clipBoardModel!!) //Clone anew each time paste is called
