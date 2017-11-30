@@ -18,7 +18,6 @@ class StateFragment(val item: State) : Fragment() {
     private val canvasController: CanvasController by inject()
     private val formulaController: FormulaFieldController by inject()
 
-    //TODO Use double-click to set properties or something?
     override val root =
             borderpane {
                 toggleClass(ModelStyles.hidden, item.hiddenProperty)

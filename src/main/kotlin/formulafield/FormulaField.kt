@@ -51,6 +51,10 @@ class FormulaField : View("My View") {
             hgrow = Priority.ALWAYS
             promptText = "Write formulas here"
             setOnAction { controller.validateFormString(text) }
+            setOnKeyPressed {
+                if (it.code != KeyCode.ENTER)
+                    controller.clearErrorMsg()
+            }
             accelerators.put(KeyCombination.keyCombination("Esc")) {
                 controller.clearValidation()
             }

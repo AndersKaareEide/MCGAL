@@ -42,11 +42,11 @@ class FormulaFieldController : Controller() {
             labels.setAll(formula.toFormulaItem().labelItems.map { FormulaFieldLabel(it) })
 
         } catch (e: RecognitionException){
-            errorMsgProperty.value = e.message
+            setErrorMsg(e.message!!)
         } catch (e: FormulaParsingException){
-            errorMsgProperty.value = e.message
+            setErrorMsg(e.message!!)
         } catch (e: IllegalStateException){
-            errorMsgProperty.value = "Error parsing agents in group announcement"
+            setErrorMsg("Error parsing agents in group announcement")
         }
     }
 

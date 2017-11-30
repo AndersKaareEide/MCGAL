@@ -25,7 +25,6 @@ class Canvas : View("My View") {
     private val formulaController: FormulaFieldController by inject()
 
     val sidePanel = TabPane()
-    //TODO Move out into own 'view'
 
     override val root = splitpane(Orientation.HORIZONTAL) {
         setDividerPositions(100.0) //Hack just to get the divider to give maximum space to the canvas
@@ -62,11 +61,9 @@ class Canvas : View("My View") {
             }
 
             top = CanvasMenuBar.root
-
             bottom = FormulaField().root
         }
 
-        //TODO Somehow re-route KeyEvents so that ctrl-tab still changes pane even when states are focused
         add(sidePanel)
         with(sidePanel) {
 
@@ -101,7 +98,6 @@ class Canvas : View("My View") {
         setOnDragDetected { dBoxController.handleCanvasDragStart(it) }
         setOnMouseDragged { dBoxController.handleCanvasDrag(it) }
 
-        //TODO Fix OS 'banner' calling onExited somehow
         setOnMouseDragExited {
             stateController.recenterSelectedStates()
             dBoxController.handleCanvasDragEnd(it)

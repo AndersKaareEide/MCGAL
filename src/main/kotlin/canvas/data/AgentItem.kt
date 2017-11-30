@@ -14,7 +14,6 @@ class AgentItem(name: String, isSelected: Boolean): Comparable<AgentItem>, Seria
     val isSelectedProperty = SimpleBooleanProperty(this, "isSelected", isSelected)
     var isSelected by isSelectedProperty
 
-    //TODO Flesh out to make a2 < a12
     override fun compareTo(other: AgentItem): Int {
         return name.compareTo(other.name)
     }

@@ -19,8 +19,11 @@ class EdgeController: Controller() {
     val selectedEdges = FXCollections.observableSet<Edge>()!!
 
     fun addEdge(parent1: State, parent2: State) {
+        formulaController.clearErrorMsg()
+
         val agents = agentController.getSelected()
         val newEdge = Edge(parent1, parent2, ArrayList(agents))
+
         if (edges.contains(newEdge)) {
             if (agents.isEmpty()){
                 edges.remove(newEdge)
