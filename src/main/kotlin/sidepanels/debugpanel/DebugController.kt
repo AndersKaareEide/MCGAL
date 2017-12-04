@@ -102,6 +102,7 @@ class DebugController: Controller(){
      * they represent with their corresponding value from the given DebugEntry's valuationMap
      */
     fun applyValuationMap(debugEntry: DebugEntry){
+        formulaController.clearLabels()
         canvasController.clearSelectedComponents()
         canvasController.selectItem(debugEntry.state)
 

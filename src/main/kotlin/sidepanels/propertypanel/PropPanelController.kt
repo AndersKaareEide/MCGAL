@@ -52,6 +52,4 @@ class PropPanelController : Controller() {
         propositions.remove(proposition)
         stateController.states.forEach { it.props.remove(proposition) }
     }
-
-    //TODO Add function for 'duplicating' the graph when adding new props
 }

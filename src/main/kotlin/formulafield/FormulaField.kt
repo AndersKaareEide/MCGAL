@@ -47,7 +47,6 @@ class FormulaField : View("My View") {
 
     private fun FormulaField.initInputField(inputField: TextField) {
         with(inputField) {
-            //TODO Clear error field when user resumes editing formula
             hgrow = Priority.ALWAYS
             promptText = "Write formulas here"
             setOnAction { controller.validateFormString(text) }

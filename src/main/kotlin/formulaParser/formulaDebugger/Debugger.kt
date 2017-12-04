@@ -174,7 +174,6 @@ private fun DebugLabelItem.contains(debugLabelList: ObservableList<DebugLabelIte
 
 //TODO Add edge traversal as a validation step for visual purposes?
 
-//TODO Lage neste tilstand basert på forrige tilstand og den nye oppdateringen
 class DebugEntry(val state: State, val labels: List<FormulaLabel>, val value: FormulaValue,
                   val formValues: Map<Pair<State,Formula>, FormulaValue>, val depth: Int){
 

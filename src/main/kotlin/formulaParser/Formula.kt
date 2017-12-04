@@ -9,7 +9,6 @@ import formulaParser.formulaDebugger.toFormulaValue
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
 
-//TODO Implement dualities such as <Phi>Psi
 abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
     abstract fun check(state: State, model: Model, debugger: Debugger?): Boolean
@@ -127,7 +126,6 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
         return result
 
     }
-    //TODO fix parenthesis highlighting bug, operator itself does not get highlighted correctly when mousing over parentheses
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
         val result = inner.toLabelItems(false) //K-ops parentheses are required by formula syntax
         insertParentheses(result, inner)
@@ -140,7 +138,6 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
 }
 
 //TODO Look into optimizing by reusing the same updated model when checking multiple states
-//TODO Fix incorrect highlighting, subformula does not get highlighted correctly
 class Announcement(val announcement: Formula, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = true
 

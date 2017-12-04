@@ -30,7 +30,6 @@ class FormulaFieldController : Controller() {
         try {
             val formula = FormulaParser.parse(input, this::setErrorMsg)
 
-            //TODO Limit length of list or something
             if (!formulaList.contains(input)) {
                 formulaList.add(input)
             }
@@ -38,7 +37,6 @@ class FormulaFieldController : Controller() {
             checkFormula(formula, canvasController.model)
 
             clearLabelListeners()
-            //TODO Clear labels when the model is edited
             labels.setAll(formula.toFormulaItem().labelItems.map { FormulaFieldLabel(it) })
 
         } catch (e: RecognitionException){

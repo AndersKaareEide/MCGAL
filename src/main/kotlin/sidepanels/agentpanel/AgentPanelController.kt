@@ -17,7 +17,6 @@ class AgentPanelController: Controller() {
     }
 
     fun getSelected(): ObservableList<AgentItem> {
-        //TODO Find out whether filteredList returns a new list or reuses the same
         return agents.filtered { it.isSelected }!!
     }
 
@@ -30,7 +29,6 @@ class AgentPanelController: Controller() {
         agents.remove(agent.item)
     }
 
-    //TODO Make it so that agents are sorted on edges as well
     fun addAgent(agentName: String){
         if (agentName != "") {
             val newAgent = AgentItem(agentName, true)

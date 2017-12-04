@@ -30,9 +30,7 @@ class DebugPanel : View("My View") {
             }
         }
 
-        //TODO Possibly expand side panel during debugging? It gets pretty crowded
         debugController.tableSelection = tableview(debugController.debugEntries) {
-            //TODO Make it look nicer before table is filled
             selectionModel.selectionMode = SelectionMode.SINGLE
 
             setSortPolicy { false }
@@ -51,10 +49,3 @@ class DebugPanel : View("My View") {
 
     }
 }
-
-//TODO onSelectionChanged -> Update all LabelItems based on the valuationMap from the DebugEntry
-//TODO Make LabelItem -> Pair<DebugLabel, FormulaLabel> mapping
-
-
-
-//Add breakpoints as subclass of formula ]}

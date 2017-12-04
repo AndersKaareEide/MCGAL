@@ -5,6 +5,7 @@ import canvas.data.Model
 import canvas.data.ModelComponent
 import canvas.data.State
 import canvas.views.Canvas
+import formulafield.FormulaFieldController
 import io.ModelSerializer
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Bounds
@@ -18,7 +19,7 @@ import tornadofx.*
 
 @Suppress("UNCHECKED_CAST")
 class CanvasController : Controller() {
-
+    val formulaController: FormulaFieldController by inject()
     val stateController: StateController by inject()
     val edgeController: EdgeController by inject()
     val agentController: AgentPanelController by inject()
@@ -88,6 +89,7 @@ class CanvasController : Controller() {
     }
 
     fun loadModel(model: Model) {
+        formulaController.clearLabels()
         stateController.states.setAll(model.states)
         edgeController.edges.setAll(model.edges)
         agentController.agents.clear()
@@ -98,6 +100,7 @@ class CanvasController : Controller() {
 
     fun importModel(model: Model) {
         clearSelectedComponents()
+        formulaController.clearLabels()
         agentController.agents.addAll(model.agents.filter { !agentController.agents.contains(it) })
         propController.propositions.addAll(model.props.filter { !propController.propositions.contains(it) })
 
@@ -114,6 +117,7 @@ class CanvasController : Controller() {
     }
 
     fun clearModel() {
+        formulaController.clearLabels()
         stateController.states.clear()
         edgeController.edges.clear()
         agentController.agents.clear()
