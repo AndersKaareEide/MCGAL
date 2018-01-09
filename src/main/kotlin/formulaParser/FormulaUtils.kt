@@ -79,7 +79,7 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
             val innerEntries = buildSubformulaList(state, formula.inner, model)
             return firstEntry + announcements + innerEntries
         }
-        else -> TODO("Stepping through announcement and group announcement formulas is not implemented yet")
+        else -> TODO("\nStepping through group announcement formulas is not implemented yet")
     }
 }
 

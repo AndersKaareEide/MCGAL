@@ -20,6 +20,9 @@ object CanvasMenuBar : View() {
     init {
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("Model files", "*.mdl"))
         fileChooser.initialDirectory = File(System.getProperty("user.dir") + "/models")
+        if (!fileChooser.initialDirectory.exists()){
+            fileChooser.initialDirectory.mkdir()
+        }
     }
 
     override val root = hbox {

@@ -47,7 +47,7 @@ jar {
         attributes 'Main-Class': 'Main'
     }
 
-    archiveName 'Model Checker ' + version.toString() + '.jar'
+    archiveName 'Model Checker.jar'
     destinationDir = new File('builds')
 
     from { configurations.compile.collect {
@@ -57,3 +57,7 @@ jar {
     println(sourceSets)
 }
 
+task copyModels(type: Copy, dependsOn: jar){
+    from 'models'
+    into 'builds/models'
+}
