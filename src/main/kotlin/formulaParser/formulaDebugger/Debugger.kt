@@ -4,11 +4,9 @@ import canvas.controllers.CanvasController
 import canvas.data.Model
 import canvas.data.State
 import formulaParser.*
-import formulaParser.formulaDebugger.Debugger.getAbsoluteIntRange
 import formulafield.FormulaLabel
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import javafx.scene.layout.HBox
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import tornadofx.*
@@ -164,23 +162,5 @@ object Debugger {
     }
 }
 
-private fun DebugLabelItem.contains(debugLabelList: ObservableList<DebugLabelItem>, other: DebugLabelItem): Boolean {
-    val indexRange = getAbsoluteIntRange(debugLabelList, this)
-    val otherRange = getAbsoluteIntRange(debugLabelList, other)
-
-    return (indexRange.first < otherRange.first && indexRange.last >= otherRange.last)
-}
 
 
-//TODO Add edge traversal as a validation step for visual purposes?
-
-class DebugEntry(val state: State, val labels: List<FormulaLabel>, val value: FormulaValue,
-                  val formValues: Map<Pair<State,Formula>, FormulaValue>, val depth: Int){
-
-    val labelbox: HBox = HBox()
-    val stateNameProp = state.nameProperty
-
-    init {
-        labelbox.children.addAll(labels)
-    }
-}

@@ -4,9 +4,11 @@ import canvas.data.State
 
 
 import formulaParser.Formula
+import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.ObservableList
 import tornadofx.*
 /**
  * Data class used store all the information needed to create FormulaLabels
@@ -21,5 +23,10 @@ class DebugLabelItem(formula: Formula, labelText: String, indexRange: IntRange, 
     val hoverProperty = SimpleBooleanProperty(this, "isHoveredOver", false)
     var isHoveredOver by hoverProperty
 
+    fun contains(debugLabelList: ObservableList<DebugLabelItem>, other: DebugLabelItem): Boolean {
+        val indexRange = Debugger.getAbsoluteIntRange(debugLabelList, this)
+        val otherRange = Debugger.getAbsoluteIntRange(debugLabelList, other)
 
+        return (indexRange.first < otherRange.first && indexRange.last >= otherRange.last)
+    }
 }

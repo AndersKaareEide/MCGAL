@@ -2,7 +2,6 @@ package formulaParser
 
 import formulaParser.antlr.GALLexer
 import formulaParser.antlr.GALParser
-import javafx.beans.property.SimpleStringProperty
 import sidepanels.agentpanel.AgentPanelController
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
