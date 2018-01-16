@@ -11,6 +11,7 @@ import formulaParser.formulaDebugger.FormulaValue
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.ObservableList
 import javafx.scene.control.TableView
 import org.antlr.v4.runtime.RecognitionException
 import tornadofx.*
@@ -24,6 +25,7 @@ class DebugController: Controller(){
     var debugEntries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
     var formulaText: String? = null
 
+    lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
     lateinit var tableSelection: TableView<DebugEntry>
 
     var selectedEntryProperty = SimpleObjectProperty<DebugEntry>()
@@ -51,6 +53,8 @@ class DebugController: Controller(){
             val model = canvasController.model
 
             debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
+            stateLabelMap = Debugger.stateLabelMap.toMutableMap()
+
             canvasController.showDebugPanelTab()
 
             tableSelection.selectionModel.select(0)
@@ -107,8 +111,8 @@ class DebugController: Controller(){
         canvasController.selectItem(debugEntry.state)
 
         val hiddenStates = mutableMapOf<State, Boolean>()
-        for (state in Debugger.stateLabelMap.keys){
-            for (list in Debugger.stateLabelMap[state]!!){
+        for (state in stateLabelMap.keys){
+            for (list in stateLabelMap[state]!!){
                 for (labelItem in list) {
                     val formulaValue = debugEntry.formValues[Pair(state, labelItem.formula)]!!
                     labelItem.value = formulaValue
@@ -118,7 +122,7 @@ class DebugController: Controller(){
                 }
             }
         }
-        assignHiddenStates(Debugger.stateLabelMap.keys, hiddenStates)
+        assignHiddenStates(stateLabelMap.keys, hiddenStates)
     }
 
     private fun assignHiddenStates(states: MutableSet<State>, statesToHide: MutableMap<State, Boolean>) {

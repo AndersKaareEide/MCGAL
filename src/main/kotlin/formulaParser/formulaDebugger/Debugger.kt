@@ -17,10 +17,10 @@ object Debugger {
 
     private val canvasController = find(CanvasController::class)
 
-    lateinit var entryList: MutableList<DebugEntry>
+    private lateinit var entryList: MutableList<DebugEntry>
 
-    lateinit var labelItems: List<FormulaLabelItem>
-    lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
+    private lateinit var labelItems: List<FormulaLabelItem>
+    private lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
 
     lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
 
@@ -63,7 +63,7 @@ object Debugger {
         entryList.add(entry)
     }
 
-    fun convertToDebugLabels(input: List<FormulaLabelItem>, originState: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
+    private fun convertToDebugLabels(input: List<FormulaLabelItem>, originState: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
 
         val result = canvasController.model.states
                 .associate { Pair(it, mutableListOf<ObservableList<DebugLabelItem>>()) }
@@ -81,8 +81,8 @@ object Debugger {
         return result
     }
 
-    fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State,
-                                result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
+    private fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State,
+                                        result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
 
         val knowsOpList = debugLabelList.filter { it.formula is Knows && !(it.labelText == "(" || it.labelText == ")") }
         val distributionMap = knowsOpList.associate { Pair(it, mutableSetOf<State>()) }
