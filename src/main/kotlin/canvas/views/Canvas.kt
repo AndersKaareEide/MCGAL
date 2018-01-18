@@ -16,7 +16,7 @@ import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 
-class Canvas : View("My View") {
+class Canvas : View("GALMC") {
 
     private val controller: CanvasController by inject()
     private val dBoxController: DragBoxController by inject()
