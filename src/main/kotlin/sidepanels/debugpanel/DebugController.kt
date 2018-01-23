@@ -2,7 +2,9 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.controllers.StateController
+import canvas.data.Model
 import canvas.data.State
+import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
 import formulaParser.formulaDebugger.DebugEntry
@@ -42,11 +44,9 @@ class DebugController: Controller(){
         formulaController.setErrorMsg("Please select a state to step through the formula in")
     }
 
-    private fun runDebugger() {
+    private fun runDebugger(selectedState: State) {
         canvasController.stateSelectionCallback = null
         formulaController.clearErrorMsg()
-
-        val selectedState = stateController.selectedStates.first()
 
         try {
             val formula = FormulaParser.parse(formulaText!!, formulaController::setErrorMsg)

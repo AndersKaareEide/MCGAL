@@ -5,6 +5,7 @@ import canvas.data.Model
 import canvas.data.ModelComponent
 import canvas.data.State
 import canvas.views.Canvas
+import formulaParser.formulaDebugger.Debugger
 import formulafield.FormulaFieldController
 import io.ModelSerializer
 import javafx.beans.property.SimpleObjectProperty
@@ -13,6 +14,7 @@ import javafx.scene.control.Tab
 import javafx.scene.input.MouseDragEvent
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
+import sidepanels.debugpanel.DebugController
 import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
@@ -24,6 +26,7 @@ class CanvasController : Controller() {
     val edgeController: EdgeController by inject()
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
+    val debugController: DebugController by inject()
 
     private val debugPanel: DebugPanel by inject()
     private val canvas: Canvas by inject()
@@ -36,7 +39,7 @@ class CanvasController : Controller() {
     var isDragging = false
 
     var clipBoardModel: Model? = null
-    var stateSelectionCallback: (() -> Unit)? = null //Ugly hack used to start the debugger
+    var stateSelectionCallback: ((State) -> Unit)? = null //Ugly hack used to start the debugger
 
 
     val model = Model(stateController.states, edgeController.edges,
@@ -77,7 +80,7 @@ class CanvasController : Controller() {
         when (item) {
             is State -> {
                 stateController.selectState(item)
-                stateSelectionCallback?.invoke()
+                stateSelectionCallback?.invoke(item)
             }
             is Edge -> edgeController.selectEdge(item)
         }
@@ -122,6 +125,8 @@ class CanvasController : Controller() {
         edgeController.edges.clear()
         agentController.agents.clear()
         propController.propositions.clear()
+        debugController.clearDebugger()
+        Debugger.clear()
     }
 
     fun selectStates(bounds: Bounds, it: MouseDragEvent) {

@@ -17,7 +17,7 @@ object Debugger {
 
     private val canvasController = find(CanvasController::class)
 
-    private lateinit var entryList: MutableList<DebugEntry>
+    private lateinit var debugEntries: MutableList<DebugEntry>
 
     private lateinit var labelItems: List<FormulaLabelItem>
     private lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
@@ -25,7 +25,7 @@ object Debugger {
     lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
-        entryList = arrayListOf<DebugEntry>()
+        debugEntries = arrayListOf<DebugEntry>()
         valuationMap = initValuationMap(formula, state)
         labelItems = formula.toLabelItems()
 
@@ -34,8 +34,7 @@ object Debugger {
 
         //Run checking to populate through calls to makeNextEntry()
         formula.check(state, model, this)
-
-        return entryList
+        return debugEntries
     }
 
     private fun sortLabelMap(stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>){
@@ -53,14 +52,14 @@ object Debugger {
     //Creates the next "log" entry based on the valuationMapping from the last entry
     fun makeNextEntry(formula: Formula, state: State, value: FormulaValue) {
         val labels = formula.toFormulaItem().labelItems.map { FormulaLabel(it) }
-        val updatedFormValuation = if (entryList.isEmpty()){
+        val updatedFormValuation = if (debugEntries.isEmpty()){
             valuationMap + Pair(Pair(state, formula), value)
         } else {
-            entryList[entryList.lastIndex].formValues + Pair(Pair(state, formula), value)
+            debugEntries[debugEntries.lastIndex].formValues + Pair(Pair(state, formula), value)
         }
 
         val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
-        entryList.add(entry)
+        debugEntries.add(entry)
     }
 
     private fun convertToDebugLabels(input: List<FormulaLabelItem>, originState: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
@@ -159,6 +158,13 @@ object Debugger {
         val opIndex = debugLabelList.indexOf(innerLabel)
         val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
         return absRange
+    }
+
+    fun clear(){
+        debugEntries.clear()
+        labelItems = emptyList()
+        valuationMap = emptyMap()
+        stateLabelMap = mutableMapOf()
     }
 }
 
