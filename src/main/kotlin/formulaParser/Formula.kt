@@ -116,7 +116,7 @@ class Implication(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 }
 
 class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth) {
-    override val needsParentheses = true
+    override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
         createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
