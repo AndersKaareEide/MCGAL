@@ -6,6 +6,7 @@ import canvas.data.State
 import formulaParser.Formula
 import formulaParser.formulaDebugger.Debugger
 import formulaParser.formulaDebugger.FormulaValue
+import formulaParser.getAbsoluteIntRange
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
@@ -24,8 +25,8 @@ class DebugLabelItem(formula: Formula, labelText: String, indexRange: IntRange, 
     var isHoveredOver by hoverProperty
 
     fun contains(debugLabelList: ObservableList<DebugLabelItem>, other: DebugLabelItem): Boolean {
-        val indexRange = Debugger.getAbsoluteIntRange(debugLabelList, this)
-        val otherRange = Debugger.getAbsoluteIntRange(debugLabelList, other)
+        val indexRange = getAbsoluteIntRange(debugLabelList, this)
+        val otherRange = getAbsoluteIntRange(debugLabelList, other)
 
         return (indexRange.first < otherRange.first && indexRange.last >= otherRange.last)
     }

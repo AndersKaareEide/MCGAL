@@ -128,7 +128,7 @@ fun getInnerLabels(knowsOp: DebugLabelItem, debugLabelList: ObservableList<Debug
     val innerFormula = (knowsOp.formula as Knows).inner
     val innerLabel = debugLabelList.find { it.formula == innerFormula }!!
 
-    val absRange = Debugger.getAbsoluteIntRange(debugLabelList, innerLabel)
+    val absRange = getAbsoluteIntRange(debugLabelList, innerLabel)
 
     return FXCollections.observableArrayList(debugLabelList.slice(absRange))
 }
@@ -139,8 +139,15 @@ fun getAnnouncementLabels(labelItem: DebugLabelItem, debugLabelList: ObservableL
     val announcement = (labelItem.formula as Announcement).announcement
     val announcementLabel = debugLabelList.find { it.formula == announcement }!!
 
-    val absRange = Debugger.getAbsoluteIntRange(debugLabelList, announcementLabel)
+    val absRange = getAbsoluteIntRange(debugLabelList, announcementLabel)
 
     return FXCollections.observableArrayList(debugLabelList.slice(absRange))
 }
+
+fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
+    val opIndex = debugLabelList.indexOf(innerLabel)
+    val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
+    return absRange
+}
+
 

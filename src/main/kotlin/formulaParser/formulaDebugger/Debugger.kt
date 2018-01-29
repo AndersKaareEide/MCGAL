@@ -135,10 +135,10 @@ object Debugger {
                 .filter { it.formula is Announcement }
                 .filter { (it.labelText == "[") } //Announcements are weird since they are only represented as [ and ]
 
-        val dix = announcementLabelList.map { getAnnouncementLabels(it, debugLabelList) }
+        val announcementLabels = announcementLabelList.map { getAnnouncementLabels(it, debugLabelList) }
 
         for (state in canvasController.model.states){
-            val labelCopies = dix.map {
+            val labelCopies = announcementLabels.map {
                 FXCollections.observableArrayList(it.map {
                     DebugLabelItem(it.formula, it.labelText, it.indexRange, it.state, isAnnouncementCheck = true)
                 })
@@ -152,12 +152,6 @@ object Debugger {
             labels.removeAt(0)
             labels.removeAt(labels.lastIndex)
         }
-    }
-
-    fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
-        val opIndex = debugLabelList.indexOf(innerLabel)
-        val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
-        return absRange
     }
 
     fun clear(){
