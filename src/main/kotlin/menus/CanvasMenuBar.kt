@@ -28,7 +28,6 @@ object CanvasMenuBar : View() {
     override val root = hbox {
         addClass(MenuBarStyles.menubar)
         menubar {
-            //TODO Fix File menu being retarded and requesting focus every time Alt is pressed
             menu("_File") {
                 item("_Save").action { controller.openSaveDialog(fileChooser, currentWindow) }
                 item("_Load").action { controller.openLoadDialog(fileChooser, currentWindow) }
@@ -47,7 +46,6 @@ object CanvasMenuBar : View() {
 
         separator(Orientation.VERTICAL) {  }
 
-        //TODO Assign icons and prettify
         togglegroup {
             ClickMode.values().forEach {
                 radiobutton(it.title, value = it) {

@@ -137,7 +137,6 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
     }
 }
 
-//TODO Look into optimizing by reusing the same updated model when checking multiple states
 class Announcement(val announcement: Formula, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = true
 
@@ -172,7 +171,6 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
     }
 }
 
-//TODO Look into optimizing by caching as well
 class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 

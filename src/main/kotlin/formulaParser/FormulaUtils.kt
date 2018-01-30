@@ -9,12 +9,12 @@ import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
 import sidepanels.propertypanel.PropositionItem
+import tornadofx.*
 
 /**
  * Based on an agent and a state, returns all states the given agent considers
  * indistinguishable from the given state
  */
-//TODO Figure out if model is actually necessary, it is, fuck me
 fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     val outEdges = state.outEdges.filter { it.agents.contains(agent) }
     val inEdges = state.inEdges.filter { it.agents.contains(agent) }
@@ -26,7 +26,6 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     return result.filter { model.states.contains(it) }
 }
 
-//TODO Decide how to handle model updates graphically
 fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model {
     val updStates = model.states.filter { announcement.check(it, model, debugger) }
     val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
@@ -52,7 +51,6 @@ fun extractProps(formula: Formula): Set<PropositionItem> {
 /**
  * Builds an immutable list of all the subformulas in the input formula, including the formula itself
  */
-//TODO Rewrite and connect states to formulas in order to handle announcements
 fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair<State, Formula>> {
     return when (formula){
         is Proposition -> listOf(Pair(state, formula))
@@ -64,7 +62,6 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
             val indishStates = getIndishStates(formula.agent, state, model)
             val initial: List<Pair<State, Formula>> = listOf(Pair(state, formula))
 
-            //TODO Optimize by building once and then mapping over? No, we need deep copies
             indishStates.map { buildSubformulaList(it, formula.inner, model) }
                     .fold(initial) { list, elements -> list.plus(elements) }
         }

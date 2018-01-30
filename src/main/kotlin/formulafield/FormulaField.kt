@@ -29,7 +29,7 @@ class FormulaField : View("My View") {
 
         hbox {
             add(inputField)
-            button("Step through") {  //TODO Find better name for button
+            button("Step through") {
                 action { debugController.startDebug(inputField.text) }
             }
         }

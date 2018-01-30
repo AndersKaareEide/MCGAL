@@ -6,7 +6,6 @@ import javafx.collections.ObservableList
 import tornadofx.*
 import utils.defaultProps
 
-//TODO Make generic superclass to reduce duplication with AgentPanelController
 class PropPanelController : Controller() {
 
     val stateController: StateController by inject()

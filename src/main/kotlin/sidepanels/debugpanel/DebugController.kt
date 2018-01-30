@@ -69,13 +69,15 @@ class DebugController: Controller(){
         }
     }
 
+    /**
+     * Function used to clear any references to old stuff when for example loading a new model from file
+     */
     fun clearDebugger(){
         canvasController.hideDebugPanelTab()
         debugEntries.clear()
         clearDebugLabels()
     }
 
-    //TODO Call when then user hits Esc or something
     fun clearDebugLabels(){
         stateController.states.forEach {
             it.debugLabels.clear()

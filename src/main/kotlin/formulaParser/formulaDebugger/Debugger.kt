@@ -139,7 +139,6 @@ object Debugger {
         val innerFormulas = announcementLabelList.map { (it.formula as Announcement).announcement }
         val announcementLabels = announcementLabelList.map { getAnnouncementLabels(it, debugLabelList) }
 
-        //TODO Fix so that only the top-level inner formula of an Announcement is flagged as an AnnouncementCheck
         for (state in canvasController.model.states){
             val labelCopies = announcementLabels.map {
                 FXCollections.observableArrayList(it.map {

@@ -13,7 +13,6 @@ object FormulaParser : Controller() {
     val agentController: AgentPanelController by inject()
     val propController: PropPanelController by inject()
 
-    //TODO Properly validate agent and propositions by reusing parser rules
     fun parse(input: String, errorMessageCallBack: (String) -> Unit): Formula {
         val errorListener = GALErrorListener(errorMessageCallBack)
 

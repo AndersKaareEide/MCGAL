@@ -25,7 +25,6 @@ class FormulaFieldController : Controller() {
     val errorMsgProperty = SimpleStringProperty("")
 
     fun validateFormString(input: String){
-        //TODO Underline part of formula causing error or something of the like
         errorMsgProperty.value = "" //Clear error message
         try {
             val formula = FormulaParser.parse(input, this::setErrorMsg)
@@ -83,7 +82,7 @@ class FormulaFieldController : Controller() {
             validating = false
         }
     }
-    //TODO Move out into LabelController
+
     fun selectLabels(label: FormulaLabel, range: IntRange){
         getLabels(label, range, labels).forEach {
             it.addClass(ModelStyles.selected)
