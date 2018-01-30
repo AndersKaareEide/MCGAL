@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
+import sidepanels.debugpanel.DebugController
 import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
@@ -23,6 +24,7 @@ class Canvas : View("GALMC") {
     private val stateController: StateController by inject()
     private val edgeController: EdgeController by inject()
     private val formulaController: FormulaFieldController by inject()
+    private val debugController: DebugController by inject()
 
     val sidePanel = TabPane()
 
@@ -85,6 +87,7 @@ class Canvas : View("GALMC") {
             } else if (it.code == KeyCode.ESCAPE) {
                 formulaController.clearValidation()
                 formulaController.clearLabels()
+                debugController.clearDebugLabels()
             } else if (it.isAltDown && it.code == KeyCode.A){
                 stateController.selectAll()
             } else if (it.isAltDown && it.code == KeyCode.C){
