@@ -18,10 +18,10 @@ class EdgeFragment(val item: Edge) : Fragment("My View") {
     private val edgeController: EdgeController by inject()
     private val canvasController: CanvasController by inject()
 
-    private val x1 = item.parent1.xProperty + STATE_CIRCLE_RADIUS
-    private val y1 = item.parent1.yProperty + STATE_CIRCLE_RADIUS
-    private val x2 = item.parent2.xProperty + STATE_CIRCLE_RADIUS
-    private val y2 = item.parent2.yProperty + STATE_CIRCLE_RADIUS
+    private val x1 = item.inParent.xProperty + STATE_CIRCLE_RADIUS
+    private val y1 = item.inParent.yProperty + STATE_CIRCLE_RADIUS
+    private val x2 = item.outParent.xProperty + STATE_CIRCLE_RADIUS
+    private val y2 = item.outParent.yProperty + STATE_CIRCLE_RADIUS
 
     override val root = anchorpane {
 

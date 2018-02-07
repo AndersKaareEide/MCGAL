@@ -1,7 +1,7 @@
 package io
 
 import canvas.data.AgentItem
-import canvas.data.Edge
+import canvas.data.Edge.Companion.edgeBetween
 import canvas.data.Model
 import canvas.data.State
 import sidepanels.propertypanel.PropositionItem
@@ -45,7 +45,7 @@ object ModelSerializer {
         }.associateBy { it.name }
 
         val serializableEdges = model.edges.map {
-            SerializableEdge(serializableStates[it.parent1.name]!!, serializableStates[it.parent2.name]!!,
+            SerializableEdge(serializableStates[it.inParent.name]!!, serializableStates[it.outParent.name]!!,
                              it.id, it.agents.map { serializableAgents[it.name]!! })
         }
 
@@ -67,7 +67,7 @@ object ModelSerializer {
         }.associateBy { it.name }
 
         val edges = deserializedModel.edges.map {
-            Edge(states[it.parent1.name]!!, states[it.parent2.name]!!, it.agents.map { agents[it.name]!! })
+            edgeBetween(states[it.parent1.name]!!, states[it.parent2.name]!!, it.agents.map { agents[it.name]!! })
         }.toMutableList()
 
         return Model(states.values.toMutableList(), edges, agents.values.toMutableList(), props.values.toMutableList())

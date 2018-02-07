@@ -19,16 +19,16 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     val outEdges = state.outEdges.filter { it.agents.contains(agent) }
     val inEdges = state.inEdges.filter { it.agents.contains(agent) }
 
-    val outStates = outEdges.map { it.parent1 }
-    val inStates = inEdges.map { it.parent2 }
+    val outStates = outEdges.map { it.inParent }
+    val inStates = inEdges.map { it.outParent }
 
     val result = listOf(state) + inStates + outStates
-    return result.filter { model.states.contains(it) }
+    return result.filter { model.states.contains(it) } //Handle updated models, states might be filtered out
 }
 
 fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model {
     val updStates = model.states.filter { announcement.check(it, model, debugger) }
-    val updEdges = model.edges.filter { (updStates.contains(it.parent1) and updStates.contains(it.parent2)) }
+    val updEdges = model.edges.filter { (updStates.contains(it.inParent) and updStates.contains(it.outParent)) }
 
     return Model(updStates, updEdges, model.agents, model.props)
 }
@@ -71,7 +71,7 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
 
             val announcements =
                     model.states.map { buildSubformulaList(it, formula.announcement, model) }
-                    .fold(initial){ list, elements -> list.plus(elements) }
+                            .fold(initial){ list, elements -> list.plus(elements) }
 
             val innerEntries = buildSubformulaList(state, formula.inner, model)
             return firstEntry + announcements + innerEntries
@@ -99,12 +99,22 @@ fun containsKnowsOp(formula: Formula): Boolean {
  * Combines the knowledge of the given agents into an updated model by removing
  * uncertainties which are not shared by all the agents
  */
+//TODO Un-retard-ify how
 fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
     val filteredEdges = model.edges.filter {
         it.agents.containsAll(agents)
     }
 
-    return Model(model.states, filteredEdges, model.agents, model.props)
+    val updatedStates = mutableListOf<State>()
+    for (state in model.states){
+        val newState = State(state.name, state.xPos, state.yPos, state.props)
+        newState.inEdges = state.inEdges.filter { filteredEdges.contains(it) }.observable()
+        newState.outEdges = state.outEdges.filter { filteredEdges.contains(it) }.observable()
+
+        updatedStates.add(newState)
+    }
+
+    return Model(updatedStates, filteredEdges, model.agents, model.props)
 }
 
 fun makeRange(needsParens: Boolean, start: Int, end: Int): IntRange {
@@ -147,4 +157,49 @@ fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLab
     return absRange
 }
 
+fun State.isBisimilarTo(other: State) : Boolean {
+    //Atoms clause
+    if (!atomsHolds(this, other))
+        return false
 
+    val sReachable = buildReachableStateTuples(this)
+    val sPrimeReachable = buildReachableStateTuples(other)
+
+    //Forth clause
+    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable)
+
+    //Back clause
+    val back = checkKnowledgePreservation(sPrimeReachable, sReachable)
+
+    return forth && back
+}
+
+/**
+ * Checks if there is a state that is either not reachable by the same agents or does
+ * not satisfy the same propositions
+ */
+private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>,
+                                       otherReachableStates: Set<AgentListStateTuple>): Boolean {
+    return reachableStates.all { reachableTuple ->
+        //Forall reachable from state, there must be a bisimilar state reachable from other
+        otherReachableStates.any {
+            //Reachable by the same agents & contains the same atoms (propositions)
+            it.agents == reachableTuple.agents && atomsHolds(it.state, reachableTuple.state)
+        }
+    }
+}
+
+/**
+ * Checks whether the Atoms clause in the definition of bisimilarity holds for the input states,
+ * i.e they 'contain' identical sets of props
+ */
+private fun atomsHolds(s1: State, s2: State) = s1.props == s2.props
+
+private fun buildReachableStateTuples(state: State): Set<AgentListStateTuple> {
+    val inTuples = state.inEdges.map { AgentListStateTuple(it.inParent, it.agents) }
+    val outTuples = state.outEdges.map { AgentListStateTuple(it.outParent, it.agents) }
+
+    return (inTuples + outTuples).toSet()
+}
+
+private data class AgentListStateTuple(val state: State, val agents: List<AgentItem>)

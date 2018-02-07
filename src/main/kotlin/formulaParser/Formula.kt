@@ -171,6 +171,11 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
     }
 }
 
+// M,s |= [G]F iff for every set {Yi: i in G} in Lel, M,s |= [^i in G KiYi]F
+// M,s |= <G>F iff there exists a set {Yi: i in G} such that M,s |= (^i in G KiYi)
+//        and M|(^i in G KiYi),s |= F
+
+//TODO Trash it all
 class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
@@ -190,6 +195,7 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
         val knownProps = extractProps.filter {
             //TODO Find out if depth + 1 is correct for these
             //TODO Find out how to display this perhaps, should debugger always be null so this doesn't clutter the logs?
+            //TODO Find out if agents.first() is correct, shouldn't it be pooledModel.agents.first()?
             Knows(agents.first(),Proposition(it, depth + 2),depth + 1).check(state, pooledModel, null)
         }
 

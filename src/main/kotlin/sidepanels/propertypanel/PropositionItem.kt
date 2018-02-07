@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.*
 
-class PropositionItem(propString: String, isSelected: Boolean): Comparable<PropositionItem>{
+class PropositionItem(propString: String, isSelected: Boolean = false): Comparable<PropositionItem>{
 
     val propStringProperty = SimpleStringProperty(this, "proposition", propString)
     var propString: String by propStringProperty

@@ -114,7 +114,7 @@ class CanvasController : Controller() {
             stateController.selectState(it)
         }
         model.edges.forEach {
-            it.id = it.parent1.name + it.parent2.name
+            it.id = it.inParent.name + it.outParent.name
             edgeController.edges.add(it)
         }
     }
@@ -149,7 +149,7 @@ class CanvasController : Controller() {
         val selectedStates = stateController.selectedStates.toList()
         clipBoardModel = Model(
                 selectedStates,
-                edgeController.edges.filter { selectedStates.contains(it.parent1) && selectedStates.contains(it.parent2) },
+                edgeController.edges.filter { selectedStates.contains(it.inParent) && selectedStates.contains(it.outParent) },
                 agentController.agents,
                 propController.propositions
         )

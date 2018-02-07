@@ -9,7 +9,8 @@ import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 import java.io.Serializable
 
-class State(name: String, xPos: Double, yPos: Double, props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent, Draggable {
+class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0,
+            props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent, Draggable {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name by nameProperty

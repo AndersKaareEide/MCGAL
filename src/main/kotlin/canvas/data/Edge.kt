@@ -5,9 +5,21 @@ import javafx.beans.property.SimpleListProperty
 import tornadofx.*
 import java.io.Serializable
 
-class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Serializable, ModelComponent {
+class Edge private constructor(val inParent: State, val outParent: State, agents: List<AgentItem>)
+    : Serializable, ModelComponent {
+    companion object {
+        fun edgeBetween(inParent: State, outParent: State, agents: List<AgentItem>): Edge {
+            val edge = Edge(inParent, outParent, agents)
 
-    var id: String = parent1.name + parent2.name
+            inParent.inEdges.add(edge)
+            outParent.outEdges.add(edge)
+            edge.hiddenProperty.bind(inParent.hiddenProperty.or(outParent.hiddenProperty))
+
+            return edge
+        }
+    }
+
+    var id: String = inParent.name + outParent.name
 
     val agentsProperty = SimpleListProperty<AgentItem>(this, "agents", agents.observable())
     var agents by agentsProperty
@@ -18,29 +30,22 @@ class Edge(val parent1: State, val parent2: State, agents: List<AgentItem>) : Se
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
     override var isSelected by selectedProperty
 
-    init {
-        parent1.inEdges.add(this)
-        parent2.outEdges.add(this)
-        hiddenProperty.bind(parent1.hiddenProperty.or(parent2.hiddenProperty))
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
         //Edges have same parents
         if (other is Edge &&
-                ((parent1 == other.parent2 && parent2 == other.parent1)
-             || (parent1 == other.parent1) && parent2 == other.parent2)) {
+                ((inParent == other.outParent && outParent == other.inParent)
+             || (inParent == other.inParent) && outParent == other.outParent)) {
             return true
         }
         return false
     }
 
     override fun hashCode(): Int {
-        var result = parent1.hashCode()
-        result = 31 * result + parent2.hashCode()
+        var result = inParent.hashCode()
+        result = 31 * result + outParent.hashCode()
         result = 31 * result + id.hashCode()
         return result
     }
 }
-
