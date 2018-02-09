@@ -2,35 +2,65 @@ import canvas.data.AgentItem
 import canvas.data.State
 
 fun State.isBisimilarTo(other: State) : Boolean {
-    if (!atomsHolds(this, other))
+    return recursiveBisimCheck(this, other, mutableSetOf())
+}
+
+private fun recursiveBisimCheck(state: State, other: State,
+                                markedStates: MutableSet<StatePair>): Boolean {
+    if (!atomsHolds(state, other))
         return false
 
-    val sReachable = buildReachableStateTuples(this)
+    markedStates.add(StatePair(state, other))
+
+    val sReachable = buildReachableStateTuples(state)
     val sPrimeReachable = buildReachableStateTuples(other)
 
     //Forth clause
-    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable)
+    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable, markedStates)
 
     //Back clause
-    val back = checkKnowledgePreservation(sPrimeReachable, sReachable)
-
-    return forth && back
+    if (forth)
+        return checkKnowledgePreservation(sPrimeReachable, sReachable, markedStates)
+    return false
 }
 
 /**
  * Checks if there is no such state that is either not reachable by the same agents or does
  * not satisfy the same propositions
  */
-private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>,
-                                       otherReachableStates: Set<AgentListStateTuple>): Boolean {
-    return reachableStates.all { reachableTuple ->
-        //Forall reachable from state, there must be a bisimilar state reachable from other
-        otherReachableStates.any {
-            //Reachable by the same agents & contains the same atoms (propositions)
-            it.agents == reachableTuple.agents && atomsHolds(it.state, reachableTuple.state)
+private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>, otherReachableStates: Set<AgentListStateTuple>,
+                                       markedStates: MutableSet<StatePair>): Boolean {
+
+    outer@ for (reachableTuple in reachableStates) {
+        for (otherTuple in otherReachableStates) {
+            if (markedStates.contains(StatePair(reachableTuple.state, otherTuple.state)))
+                continue@outer
+            else if (
+                    otherTuple.agents == reachableTuple.agents
+                    && atomsHolds(otherTuple.state, reachableTuple.state)
+                    && recursiveBisimCheck(otherTuple.state, reachableTuple.state, markedStates)
+            ) {
+                continue@outer
+            }
+            return false
         }
+        return true
     }
+    return false
 }
+
+//    return reachableStates.all { reachableTuple ->
+//        otherReachableStates.any { otherTuple ->
+//            if (markedStates.contains(StatePair(reachableTuple.state, otherTuple.state)))
+//                true
+//            else {
+//                otherTuple.agents == reachableTuple.agents
+//                        && atomsHolds(otherTuple.state, reachableTuple.state)
+//                        && recursiveBisimCheck(otherTuple.state, reachableTuple.state, markedStates)
+//            }
+//        }
+//    }
+
 
 /**
  * Checks whether the Atoms clause in the definition of bisimilarity holds for the input states,
@@ -46,3 +76,18 @@ private fun buildReachableStateTuples(state: State): Set<AgentListStateTuple> {
 }
 
 private data class AgentListStateTuple(val state: State, val agents: List<AgentItem>)
+
+data class StatePair(val state1: State, val state2: State){
+
+    override fun equals(other: Any?): Boolean {
+        return other is StatePair &&
+                ((state1 == other.state1 && state2 == other.state2)
+                        || (state1 == other.state2 && state2 == other.state1))
+    }
+
+    override fun hashCode(): Int {
+        var result = state1.hashCode()
+        result = 31 * result + state2.hashCode()
+        return result
+    }
+}
