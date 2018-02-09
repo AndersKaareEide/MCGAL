@@ -45,7 +45,7 @@ object ModelSerializer {
         }.associateBy { it.name }
 
         val serializableEdges = model.edges.map {
-            SerializableEdge(serializableStates[it.inParent.name]!!, serializableStates[it.outParent.name]!!,
+            SerializableEdge(serializableStates[it.outParent.name]!!, serializableStates[it.inParent.name]!!,
                              it.id, it.agents.map { serializableAgents[it.name]!! })
         }
 

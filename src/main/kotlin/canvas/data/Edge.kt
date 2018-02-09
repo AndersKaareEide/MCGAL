@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import tornadofx.*
 import java.io.Serializable
 
-class Edge private constructor(val inParent: State, val outParent: State, agents: List<AgentItem>)
+class Edge private constructor(val outParent: State, val inParent: State, agents: List<AgentItem>)
     : Serializable, ModelComponent {
     companion object {
         fun edgeBetween(inParent: State, outParent: State, agents: List<AgentItem>): Edge {
@@ -19,7 +19,7 @@ class Edge private constructor(val inParent: State, val outParent: State, agents
         }
     }
 
-    var id: String = inParent.name + outParent.name
+    var id: String = outParent.name + inParent.name
 
     val agentsProperty = SimpleListProperty<AgentItem>(this, "agents", agents.observable())
     var agents by agentsProperty
@@ -35,16 +35,16 @@ class Edge private constructor(val inParent: State, val outParent: State, agents
             return true
         //Edges have same parents
         if (other is Edge &&
-                ((inParent == other.outParent && outParent == other.inParent)
-             || (inParent == other.inParent) && outParent == other.outParent)) {
+                ((outParent == other.inParent && inParent == other.outParent)
+             || (outParent == other.outParent) && inParent == other.inParent)) {
             return true
         }
         return false
     }
 
     override fun hashCode(): Int {
-        var result = inParent.hashCode()
-        result = 31 * result + outParent.hashCode()
+        var result = outParent.hashCode()
+        result = 31 * result + inParent.hashCode()
         result = 31 * result + id.hashCode()
         return result
     }

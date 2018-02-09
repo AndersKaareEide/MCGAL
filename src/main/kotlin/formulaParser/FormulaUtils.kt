@@ -19,8 +19,8 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     val outEdges = state.outEdges.filter { it.agents.contains(agent) }
     val inEdges = state.inEdges.filter { it.agents.contains(agent) }
 
-    val outStates = outEdges.map { it.inParent }
-    val inStates = inEdges.map { it.outParent }
+    val outStates = outEdges.map { it.outParent }
+    val inStates = inEdges.map { it.inParent }
 
     val result = listOf(state) + inStates + outStates
     return result.filter { model.states.contains(it) } //Handle updated models, states might be filtered out
@@ -28,7 +28,7 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
 
 fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model {
     val updStates = model.states.filter { announcement.check(it, model, debugger) }
-    val updEdges = model.edges.filter { (updStates.contains(it.inParent) and updStates.contains(it.outParent)) }
+    val updEdges = model.edges.filter { (updStates.contains(it.outParent) and updStates.contains(it.inParent)) }
 
     return Model(updStates, updEdges, model.agents, model.props)
 }
