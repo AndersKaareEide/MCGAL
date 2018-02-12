@@ -8,7 +8,7 @@ import java.io.Serializable
 class Edge private constructor(val outParent: State, val inParent: State, agents: List<AgentItem>)
     : Serializable, ModelComponent {
     companion object {
-        fun edgeBetween(inParent: State, outParent: State, agents: List<AgentItem>): Edge {
+        fun makeEdgeBetween(inParent: State, outParent: State, agents: List<AgentItem>): Edge {
             val edge = Edge(inParent, outParent, agents)
 
             inParent.inEdges.add(edge)

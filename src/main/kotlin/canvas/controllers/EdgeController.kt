@@ -2,7 +2,7 @@ package canvas.controllers
 
 import canvas.data.AgentItem
 import canvas.data.Edge
-import canvas.data.Edge.Companion.edgeBetween
+import canvas.data.Edge.Companion.makeEdgeBetween
 import canvas.data.State
 import formulafield.FormulaFieldController
 import javafx.collections.FXCollections
@@ -23,7 +23,7 @@ class EdgeController: Controller() {
         formulaController.clearErrorMsg()
 
         val agents = agentController.getSelected()
-        val newEdge = edgeBetween(parent1, parent2, ArrayList(agents))
+        val newEdge = makeEdgeBetween(parent1, parent2, ArrayList(agents))
 
         if (edges.contains(newEdge)) {
             if (agents.isEmpty()){

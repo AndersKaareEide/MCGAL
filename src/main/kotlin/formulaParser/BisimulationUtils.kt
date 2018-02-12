@@ -1,26 +1,30 @@
 import canvas.data.AgentItem
 import canvas.data.State
 
-fun State.isBisimilarTo(other: State) : Boolean {
-    return recursiveBisimCheck(this, other, mutableSetOf())
+fun State.isBisimilarTo(other: State, states: List<State>) : Boolean {
+    return recursiveBisimCheck(this, other, states)
 }
 
 private fun recursiveBisimCheck(state: State, other: State,
-                                markedStates: MutableSet<StatePair>): Boolean {
+                                states: List<State>): Boolean {
     if (!atomsHolds(state, other))
         return false
 
-    markedStates.add(StatePair(state, other))
+    if (states.isEmpty() || state == other)
+        return true
 
-    val sReachable = buildReachableStateTuples(state)
-    val sPrimeReachable = buildReachableStateTuples(other)
+
+    val statesToCheck = states - listOf(state, other)
+
+    val sReachable = buildReachableStateTuples(state, statesToCheck)
+    val sPrimeReachable = buildReachableStateTuples(other, statesToCheck)
 
     //Forth clause
-    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable, markedStates)
+    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable, statesToCheck)
 
     //Back clause
     if (forth)
-        return checkKnowledgePreservation(sPrimeReachable, sReachable, markedStates)
+        return checkKnowledgePreservation(sPrimeReachable, sReachable, statesToCheck)
     return false
 }
 
@@ -29,38 +33,16 @@ private fun recursiveBisimCheck(state: State, other: State,
  * not satisfy the same propositions
  */
 private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>, otherReachableStates: Set<AgentListStateTuple>,
-                                       markedStates: MutableSet<StatePair>): Boolean {
+                                       markedStates: List<State>): Boolean {
 
-    outer@ for (reachableTuple in reachableStates) {
-        for (otherTuple in otherReachableStates) {
-            if (markedStates.contains(StatePair(reachableTuple.state, otherTuple.state)))
-                continue@outer
-            else if (
-                    otherTuple.agents == reachableTuple.agents
+    return reachableStates.all { reachableTuple ->
+        otherReachableStates.any { otherTuple ->
+            otherTuple.agents == reachableTuple.agents
                     && atomsHolds(otherTuple.state, reachableTuple.state)
                     && recursiveBisimCheck(otherTuple.state, reachableTuple.state, markedStates)
-            ) {
-                continue@outer
-            }
-            return false
         }
-        return true
     }
-    return false
 }
-
-//    return reachableStates.all { reachableTuple ->
-//        otherReachableStates.any { otherTuple ->
-//            if (markedStates.contains(StatePair(reachableTuple.state, otherTuple.state)))
-//                true
-//            else {
-//                otherTuple.agents == reachableTuple.agents
-//                        && atomsHolds(otherTuple.state, reachableTuple.state)
-//                        && recursiveBisimCheck(otherTuple.state, reachableTuple.state, markedStates)
-//            }
-//        }
-//    }
-
 
 /**
  * Checks whether the Atoms clause in the definition of bisimilarity holds for the input states,
@@ -68,26 +50,13 @@ private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>
  */
 private fun atomsHolds(s1: State, s2: State) = s1.props == s2.props
 
-private fun buildReachableStateTuples(state: State): Set<AgentListStateTuple> {
+private fun buildReachableStateTuples(state: State, statesToCheck: List<State>): Set<AgentListStateTuple> {
     val inTuples = state.inEdges.map { AgentListStateTuple(it.inParent, it.agents) }
     val outTuples = state.outEdges.map { AgentListStateTuple(it.outParent, it.agents) }
 
-    return (inTuples + outTuples).toSet()
+    return (inTuples + outTuples)
+            .filter { statesToCheck.contains(it.state) }
+            .toSet()
 }
 
 private data class AgentListStateTuple(val state: State, val agents: List<AgentItem>)
-
-data class StatePair(val state1: State, val state2: State){
-
-    override fun equals(other: Any?): Boolean {
-        return other is StatePair &&
-                ((state1 == other.state1 && state2 == other.state2)
-                        || (state1 == other.state2 && state2 == other.state1))
-    }
-
-    override fun hashCode(): Int {
-        var result = state1.hashCode()
-        result = 31 * result + state2.hashCode()
-        return result
-    }
-}
