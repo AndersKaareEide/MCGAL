@@ -1,6 +1,8 @@
 import canvas.data.AgentItem
 import canvas.data.State
 
+private data class AgentListStateTuple(val state: State, val agents: List<AgentItem>)
+
 fun State.isBisimilarTo(other: State, states: List<State>) : Boolean {
     return recursiveBisimCheck(this, other, states)
 }
@@ -13,18 +15,17 @@ private fun recursiveBisimCheck(state: State, other: State,
     if (states.isEmpty() || state == other)
         return true
 
+    val nextStates = states - listOf(state, other)
 
-    val statesToCheck = states - listOf(state, other)
-
-    val sReachable = buildReachableStateTuples(state, statesToCheck)
-    val sPrimeReachable = buildReachableStateTuples(other, statesToCheck)
+    val sReachable = buildReachableStateTuples(state, states)
+    val sPrimeReachable = buildReachableStateTuples(other, states)
 
     //Forth clause
-    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable, statesToCheck)
+    val forth = checkKnowledgePreservation(sReachable, sPrimeReachable, nextStates)
 
     //Back clause
     if (forth)
-        return checkKnowledgePreservation(sPrimeReachable, sReachable, statesToCheck)
+        return checkKnowledgePreservation(sPrimeReachable, sReachable, nextStates)
     return false
 }
 
@@ -32,14 +33,17 @@ private fun recursiveBisimCheck(state: State, other: State,
  * Checks if there is no such state that is either not reachable by the same agents or does
  * not satisfy the same propositions
  */
-private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>, otherReachableStates: Set<AgentListStateTuple>,
-                                       markedStates: List<State>): Boolean {
+private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>,
+                                       otherReachableStates: Set<AgentListStateTuple>,
+                                       nextStates: List<State>): Boolean {
 
     return reachableStates.all { reachableTuple ->
-        otherReachableStates.any { otherTuple ->
-            otherTuple.agents == reachableTuple.agents
-                    && atomsHolds(otherTuple.state, reachableTuple.state)
-                    && recursiveBisimCheck(otherTuple.state, reachableTuple.state, markedStates)
+        reachableTuple.agents.all { agent ->
+            otherReachableStates.any { otherTuple ->
+                otherTuple.agents.contains(agent)
+                        && atomsHolds(otherTuple.state, reachableTuple.state)
+                        && recursiveBisimCheck(otherTuple.state, reachableTuple.state, nextStates)
+            }
         }
     }
 }
@@ -59,4 +63,3 @@ private fun buildReachableStateTuples(state: State, statesToCheck: List<State>):
             .toSet()
 }
 
-private data class AgentListStateTuple(val state: State, val agents: List<AgentItem>)
