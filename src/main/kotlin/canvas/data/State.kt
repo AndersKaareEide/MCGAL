@@ -31,7 +31,7 @@ class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0,
     var props: ObservableList<PropositionItem> by propsProperty
 
     val validationStyleProp = SimpleObjectProperty<CssRule>(this, "validationStyle", null)
-    var validationStyle: CssRule by validationStyleProp
+    var validationStyle: CssRule? by validationStyleProp
 
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
     override var isSelected by selectedProperty
