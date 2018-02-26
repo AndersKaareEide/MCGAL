@@ -13,7 +13,7 @@ class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0,
             props: List<PropositionItem> = mutableListOf()): Serializable, ModelComponent, Draggable {
 
     val nameProperty = SimpleStringProperty(this, "name", name)
-    var name by nameProperty
+    var name: String by nameProperty
 
     override val xProperty = SimpleDoubleProperty(this, "xPos", xPos)
     override var xPos by xProperty
@@ -22,24 +22,26 @@ class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0,
     override var yPos by yProperty
 
     val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
-    var inEdges by inEdgesProperty
+    var inEdges: ObservableList<Edge> by inEdgesProperty
 
     val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
-    var outEdges by outEdgesProperty
+    var outEdges: ObservableList<Edge> by outEdgesProperty
 
     val propsProperty = SimpleListProperty<PropositionItem>(this, "props", props.observable())
-    var props by propsProperty
+    var props: ObservableList<PropositionItem> by propsProperty
 
     val validationStyleProp = SimpleObjectProperty<CssRule>(this, "validationStyle", null)
-    var validationStyle by validationStyleProp
+    var validationStyle: CssRule by validationStyleProp
 
     val selectedProperty = SimpleBooleanProperty(this, "isSelected", false)
     override var isSelected by selectedProperty
 
     val debugLabelsProperty = SimpleListProperty<ObservableList<DebugLabelItem>>(this, "debugLabels", FXCollections.observableArrayList())
-    var debugLabels by debugLabelsProperty
+    var debugLabels: ObservableList<ObservableList<DebugLabelItem>> by debugLabelsProperty
 
     val hiddenProperty = SimpleBooleanProperty(this, "isHidden", false)
     var isHidden by hiddenProperty
+
+    override fun toString(): String = name
 }
 
