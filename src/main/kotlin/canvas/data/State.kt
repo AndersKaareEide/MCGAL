@@ -15,17 +15,14 @@ class State(name: String, xPos: Double = 0.0, yPos: Double = 0.0,
     val nameProperty = SimpleStringProperty(this, "name", name)
     var name: String by nameProperty
 
+    val edgesProperty = SimpleListProperty<Edge>(this, "edges", FXCollections.observableArrayList())
+    var edges: ObservableList<Edge> by edgesProperty
+
     override val xProperty = SimpleDoubleProperty(this, "xPos", xPos)
     override var xPos by xProperty
 
     override val yProperty = SimpleDoubleProperty(this, "yPos", yPos)
     override var yPos by yProperty
-
-    val inEdgesProperty = SimpleListProperty<Edge>(this, "inEdges", FXCollections.observableArrayList())
-    var inEdges: ObservableList<Edge> by inEdgesProperty
-
-    val outEdgesProperty = SimpleListProperty<Edge>(this, "outEdges", FXCollections.observableArrayList())
-    var outEdges: ObservableList<Edge> by outEdgesProperty
 
     val propsProperty = SimpleListProperty<PropositionItem>(this, "props", props.observable())
     var props: ObservableList<PropositionItem> by propsProperty

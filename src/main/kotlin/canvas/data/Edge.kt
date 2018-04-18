@@ -11,8 +11,8 @@ class Edge private constructor(val outParent: State, val inParent: State, agents
         fun makeEdgeBetween(inParent: State, outParent: State, agents: List<AgentItem>): Edge {
             val edge = Edge(inParent, outParent, agents)
 
-            inParent.inEdges.add(edge)
-            outParent.outEdges.add(edge)
+            inParent.edges.add(edge)
+            outParent.edges.add(edge)
             edge.hiddenProperty.bind(inParent.hiddenProperty.or(outParent.hiddenProperty))
 
             return edge

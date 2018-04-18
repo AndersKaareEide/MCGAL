@@ -54,10 +54,9 @@ private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>
 private fun atomsHolds(s1: State, s2: State) = s1.props == s2.props
 
 private fun buildReachableStateTuples(state: State, statesToCheck: List<State>): Set<AgentListStateTuple> {
-    val inTuples = state.inEdges.map { AgentListStateTuple(it.inParent, it.agents) }
-    val outTuples = state.outEdges.map { AgentListStateTuple(it.outParent, it.agents) }
+    val inTuples = state.edges.map { AgentListStateTuple(it.inParent, it.agents) }
 
-    return (inTuples + outTuples)
+    return inTuples
             .filter { statesToCheck.contains(it.state) }
             .toSet()
 }

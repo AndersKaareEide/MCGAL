@@ -16,13 +16,12 @@ import tornadofx.*
  * indistinguishable from the given state
  */
 fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
-    val outEdges = state.outEdges.filter { it.agents.contains(agent) }
-    val inEdges = state.inEdges.filter { it.agents.contains(agent) }
+    val inEdges = state.edges.filter { it.agents.contains(agent) }
 
-    val outStates = outEdges.map { it.outParent }
     val inStates = inEdges.map { it.inParent }
+    val outStates = inEdges.map { it.outParent }
 
-    val result = listOf(state) + inStates + outStates
+    val result = setOf(state) + inStates + outStates
     return result.filter { model.states.contains(it) } //Handle updated models, states might be filtered out
 }
 
@@ -108,8 +107,7 @@ fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
     val updatedStates = mutableListOf<State>()
     for (state in model.states){
         val newState = State(state.name, state.xPos, state.yPos, state.props)
-        newState.inEdges = state.inEdges.filter { filteredEdges.contains(it) }.observable()
-        newState.outEdges = state.outEdges.filter { filteredEdges.contains(it) }.observable()
+        newState.edges = state.edges.filter { filteredEdges.contains(it) }.observable()
 
         updatedStates.add(newState)
     }

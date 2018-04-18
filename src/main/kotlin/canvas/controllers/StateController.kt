@@ -86,7 +86,7 @@ class StateController : Controller() {
         selectedStates.iterator().forEach {
             states.remove(it)
 
-            for (edge in it.inEdges + it.outEdges) {
+            for (edge in it.edges) {
                 edgeController.removeEdge(edge)
             }
         }
