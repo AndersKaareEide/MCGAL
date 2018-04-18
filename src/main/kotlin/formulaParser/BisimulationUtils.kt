@@ -41,7 +41,6 @@ private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>
         reachableTuple.agents.all { agent ->
             otherReachableStates.any { otherTuple ->
                 otherTuple.agents.contains(agent)
-                        && atomsHolds(otherTuple.state, reachableTuple.state)
                         && recursiveBisimCheck(otherTuple.state, reachableTuple.state, nextStates)
             }
         }
