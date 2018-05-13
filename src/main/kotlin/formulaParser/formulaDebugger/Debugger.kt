@@ -16,8 +16,7 @@ import tornadofx.*
 object Debugger {
 
     private val canvasController = find(CanvasController::class)
-
-    private lateinit var debugEntries: MutableList<DebugEntry>
+    private var debugEntries = arrayListOf<DebugEntry>()
 
     private lateinit var labelItems: List<FormulaLabelItem>
     private lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
@@ -25,7 +24,7 @@ object Debugger {
     lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
 
     fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
-        debugEntries = arrayListOf<DebugEntry>()
+
         valuationMap = initValuationMap(formula, state)
         labelItems = formula.toLabelItems()
 
@@ -55,7 +54,7 @@ object Debugger {
         val updatedFormValuation = if (debugEntries.isEmpty()){
             valuationMap + Pair(Pair(state, formula), value)
         } else {
-            debugEntries[debugEntries.lastIndex].formValues + Pair(Pair(state, formula), value)
+            debugEntries.last().formValues + Pair(Pair(state, formula), value)
         }
 
         val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
