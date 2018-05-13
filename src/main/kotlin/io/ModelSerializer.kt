@@ -17,6 +17,8 @@ object ModelSerializer {
         val outStream = ObjectOutputStream(fileOutput)
 
         outStream.writeObject(serializableModel)
+
+        fileOutput.close()
     }
 
     fun deserializeModel(file: File) : Model {
@@ -24,6 +26,9 @@ object ModelSerializer {
         val inStream = ObjectInputStream(fileInput)
 
         val deserializedModel = inStream.readObject() as SerializableModel
+
+        fileInput.close()
+
         return convertSerializableModel(deserializedModel)
     }
 
