@@ -18,6 +18,7 @@ import sidepanels.debugpanel.DebugController
 import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
+import utils.getModel
 
 @Suppress("UNCHECKED_CAST")
 class CanvasController : Controller() {
@@ -41,9 +42,13 @@ class CanvasController : Controller() {
     var clipBoardModel: Model? = null
     var stateSelectionCallback: ((State) -> Unit)? = null //Ugly hack used to start the debugger
 
-
     val model = Model(stateController.states, edgeController.edges,
             agentController.agents.items, propController.propositions)
+
+    init {
+        loadModel(getModel())
+    }
+
 
     fun handleCanvasClick(event: MouseEvent) {
         if (clickMode == ClickMode.STATES) {

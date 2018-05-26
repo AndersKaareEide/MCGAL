@@ -2,6 +2,7 @@ package utils
 
 import canvas.data.AgentItem
 import canvas.data.Edge.Companion.makeEdgeBetween
+import canvas.data.Model
 import canvas.data.State
 import javafx.collections.FXCollections
 import sidepanels.propertypanel.PropositionItem
@@ -16,9 +17,11 @@ private val state2 = State("s2", 150.0, 170.0, FXCollections.observableArrayList
 
 private val edgeS1S2 = makeEdgeBetween(state1, state2, mutableListOf(agentA))
 
-val defaultStates = listOf(state1, state2)
-val defaultEdges = listOf(edgeS1S2)
-val defaultAgents = listOf(agentA, agentB)
-val defaultProps = listOf(propP)
+private val defaultStates = listOf(state1, state2)
+private val defaultEdges = listOf(edgeS1S2)
+private val defaultAgents = listOf(agentA, agentB)
+private val defaultProps = listOf(propP)
+
+fun getModel() : Model = Model(defaultStates, defaultEdges, defaultAgents, defaultProps)
 
 

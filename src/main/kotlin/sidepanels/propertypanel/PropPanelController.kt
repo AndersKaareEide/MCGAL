@@ -4,16 +4,11 @@ import canvas.controllers.StateController
 import formulaParser.PropertyNotFoundException
 import javafx.collections.ObservableList
 import tornadofx.*
-import utils.defaultProps
 
 class PropPanelController : Controller() {
 
     val stateController: StateController by inject()
     val propositions = SortedFilteredList<PropositionItem>()
-
-    init {
-        propositions.addAll(defaultProps)
-    }
 
     fun getSelected() : ObservableList<PropositionItem> {
         return propositions.filtered { it.isSelected }!!

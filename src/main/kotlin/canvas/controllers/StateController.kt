@@ -4,12 +4,12 @@ import canvas.STATE_CIRCLE_RADIUS
 import canvas.data.State
 import canvas.views.Canvas
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.geometry.Bounds
 import javafx.geometry.Point2D
 import javafx.scene.input.MouseEvent
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
-import utils.defaultStates
 
 class StateController : Controller() {
 
@@ -18,7 +18,7 @@ class StateController : Controller() {
     val canvasController: CanvasController by inject()
     val dragController: DraggableController by inject()
 
-    val states = FXCollections.observableArrayList(defaultStates)!!
+    val states: ObservableList<State> = FXCollections.observableArrayList()!!
     val selectedStates = FXCollections.observableSet<State>()!!
 
     val canvas: Canvas by inject()

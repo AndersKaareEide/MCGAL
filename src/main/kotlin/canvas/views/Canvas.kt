@@ -1,11 +1,11 @@
 package canvas.views
 
-import formulafield.FormulaFieldController
 import canvas.controllers.CanvasController
 import canvas.controllers.DragBoxController
 import canvas.controllers.EdgeController
 import canvas.controllers.StateController
 import formulafield.FormulaField
+import formulafield.FormulaFieldController
 import javafx.geometry.Orientation
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
@@ -13,7 +13,6 @@ import javafx.scene.layout.Priority
 import menus.CanvasMenuBar
 import sidepanels.agentpanel.AgentPanel
 import sidepanels.debugpanel.DebugController
-import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropositionPanel
 import tornadofx.*
 

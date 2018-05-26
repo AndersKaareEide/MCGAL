@@ -6,17 +6,17 @@ import canvas.data.Edge.Companion.makeEdgeBetween
 import canvas.data.State
 import formulafield.FormulaFieldController
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.scene.input.MouseEvent
 import sidepanels.agentpanel.AgentPanelController
 import tornadofx.*
-import utils.defaultEdges
 
 class EdgeController: Controller() {
 
     private val agentController: AgentPanelController by inject()
     private val formulaController: FormulaFieldController by inject()
 
-    val edges = FXCollections.observableArrayList(defaultEdges)!!
+    val edges: ObservableList<Edge> = FXCollections.observableArrayList()!!
     val selectedEdges = FXCollections.observableSet<Edge>()!!
 
     fun addEdge(parent1: State, parent2: State) {
