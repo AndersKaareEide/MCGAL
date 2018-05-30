@@ -151,6 +151,18 @@ fun getAnnouncementLabels(labelItem: DebugLabelItem, debugLabelList: ObservableL
 
 fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
     val opIndex = debugLabelList.indexOf(innerLabel)
-    val absRange = IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
-    return absRange
+    return IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
+}
+
+fun State.eqClassIntersectionFor(agents: List<AgentItem>): List<State> {
+    if (agents.isEmpty())
+        return listOf(this)
+
+    return this.edges.filter { it.agents.containsAll(agents) }
+            .map {
+                if (it.inParent == this)
+                    it.outParent
+                else
+                    it.inParent
+            } + this
 }
