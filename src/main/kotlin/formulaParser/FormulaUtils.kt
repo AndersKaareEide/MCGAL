@@ -166,3 +166,28 @@ fun State.eqClassIntersectionFor(agents: List<AgentItem>): List<State> {
                     it.inParent
             } + this
 }
+
+fun generatePowerSetOfStates(states: List<State>): List<List<State>>{
+    val output = mutableListOf<List<State>>(listOf())
+
+    var currentColumn: MutableList<List<State>>
+    var nextColumn = states.map { listOf(it) }.toMutableList()
+
+    for (length in 1 until states.size) {
+        currentColumn = nextColumn
+        nextColumn = mutableListOf()
+
+        for(combination in currentColumn) {
+            for (index in states.indexOf(combination.last()) + 1 .. states.lastIndex){
+                nextColumn.add(combination + states[index])
+            }
+        }
+        output.addAll(currentColumn)
+    }
+    output.addAll(nextColumn)
+
+    return output
+}
+
+
+

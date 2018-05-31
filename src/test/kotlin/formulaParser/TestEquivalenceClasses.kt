@@ -1,4 +1,4 @@
-package formulaParser.formulaDebugger
+package formulaParser
 
 import formulaParser.eqClassIntersectionFor
 import io.ModelSerializer
