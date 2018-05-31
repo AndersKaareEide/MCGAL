@@ -154,6 +154,16 @@ fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLab
     return IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
 }
 
+fun getAnnounceableExtensions(model: Model, state: State, coalition: List<AgentItem>): List<List<State>> {
+    val powerSet = generatePowerSetOfStates(model.states)
+
+    return powerSet.filter { it.contains(state) }
+            .filter { it.hasNoOverlappingEqClassesFor(coalition)}
+}
+
+fun List<State>.hasNoOverlappingEqClassesFor(coalition: List<AgentItem>): Boolean =
+        this.all { this.containsAll(it.eqClassIntersectionFor(coalition)) }
+
 fun State.eqClassIntersectionFor(agents: List<AgentItem>): List<State> {
     if (agents.isEmpty())
         return listOf(this)
