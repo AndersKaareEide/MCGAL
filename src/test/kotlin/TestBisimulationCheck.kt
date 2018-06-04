@@ -1,12 +1,14 @@
 import canvas.data.AgentItem
 import canvas.data.Edge.Companion.makeEdgeBetween
 import canvas.data.State
+import io.ModelSerializer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import sidepanels.propertypanel.PropositionItem
+import java.io.File
 
-public class TestBisimulationCheck {
+class TestBisimulationCheck {
 
     @Test
     fun testIsBisimilarTo() {
@@ -74,5 +76,36 @@ public class TestBisimulationCheck {
                 Executable { assertTrue(s4.isBisimilarTo(s3, states)) },
                 Executable { assertTrue(s5.isBisimilarTo(s3, states)) }
         )
+    }
+
+    @Test
+    fun testBisimContractionOnSingleBisimilarity(){
+        val modelFile = "testmodels/bisimContract4StatesShouldContractTo3States.mdl"
+        val model = ModelSerializer.deserializeModel(File(modelFile))
+
+        var contracted = bisimContract(model)
+
+        assertTrue(contracted.states.size == 3)
+        assertTrue(contracted.edges.size == 2)
+        assertTrue(contracted.states.any { it.name == "s1s4" })
+        assertTrue(contracted.states.any { it.name == "s2" })
+        assertTrue(contracted.states.any { it.name == "s3" })
+        assertTrue(contracted.edges.any { it.id == "s1s4s2" || it.id == "s2s1s4" })
+        assertTrue(contracted.edges.any { it.id == "s1s4s3" || it.id == "s3s1s4" })
+    }
+
+    @Test
+    fun testBisimContractionOnMultipleBisimilarities(){
+        val modelFile = "testmodels/bisimContract4StatesShouldContractTo2States.mdl"
+        val model = ModelSerializer.deserializeModel(File(modelFile))
+
+        var contracted = bisimContract(model)
+
+        assertTrue(contracted.states.size == 2)
+        assertTrue(contracted.edges.size == 1)
+        assertTrue(contracted.states.any { it.name == "s1s4" || it.name == "s4s1" })
+        assertTrue(contracted.states.any { it.name == "s2s3" || it.name == "s3s2" })
+        assertTrue(contracted.edges.first().inParent != contracted.edges.first().outParent)
+        assertEquals(2, contracted.edges.first().agents.size)
     }
 }
