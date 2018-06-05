@@ -171,38 +171,27 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
     }
 }
 
-// M,s |= [G]F iff for every set {Yi: i in G} in Lel, M,s |= [^i in G KiYi]F
-// M,s |= <G>F iff there exists a set {Yi: i in G} such that M,s |= (^i in G KiYi)
-//        and M|(^i in G KiYi),s |= F
-
-//TODO Trash it all
+// M,s |= [G]F iff for every announcement in Anns(G,M,s), M,s |= [announcement]F
+// M,s |= <G>F iff there exists an announcement such that M,s |= announcement
+//        and M,s|announcement |= F
 class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        //Formula is already true, agents simply announce Top
-        if (inner.check(state, model, debugger)) {
-            return true
+        val result = if (agents.isEmpty() || !containsKnowsOp(inner)) {
+            //Atomic permanence and empty group is powerless
+            inner.check(state, model, debugger)
+        }
+        else {
+            //TODO "Implement generation of labeling formulas and bisimulation contraction"
+            val announceableExts = getAnnounceableExtensions(model, state, agents)
+            announceableExts.all { announcement ->
+                inner.check(state, model.restrictedTo(announcement), debugger) //Don't use debugger, would look funny since states are filtered
+            }
         }
 
-        //Atomic permanence and empty group is powerless
-        if (agents.isEmpty() || !containsKnowsOp(inner)) {
-            return inner.check(state, model, debugger)
-        }
-
-        val pooledModel = poolGroupKnowledge(agents, model)
-        val extractProps = extractProps(inner)
-        val knownProps = extractProps.filter {
-            //TODO Find out if depth + 1 is correct for these
-            //TODO Find out how to display this perhaps, should debugger always be null so this doesn't clutter the logs?
-            //TODO Find out if agents.first() is correct, shouldn't it be pooledModel.agents.first()?
-            Knows(agents.first(),Proposition(it, depth + 2),depth + 1).check(state, pooledModel, null)
-        }
-
-        //Update model by simulating successive announcements
-        //TODO Find out if these need a correct depth as well, and if it should use the debugger
-        val updatedModel = knownProps.fold(model) { acc, prop -> updateModel(Proposition(prop, 0), acc, debugger) }
-        return inner.check(state, updatedModel, debugger)
+        createDebugEntry(state, toFormulaValue(result), debugger)
+        return result
     }
 
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {

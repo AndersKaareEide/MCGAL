@@ -8,8 +8,6 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
-import sidepanels.propertypanel.PropositionItem
-import tornadofx.*
 
 /**
  * Based on an agent and a state, returns all states the given agent considers
@@ -32,19 +30,12 @@ fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model
     return Model(updStates, updEdges, model.agents, model.props)
 }
 
-/**
- * Extracts all the propositions the input formula is built on
- */
-fun extractProps(formula: Formula): Set<PropositionItem> {
-    return when (formula){
-        is Proposition -> setOf(formula.proposition)
-        is Negation -> extractProps(formula.inner)
-        is BinaryOperator -> extractProps(formula.left) + extractProps(formula.right)
-        is Knows -> extractProps(formula.inner)
-        is Announcement -> extractProps(formula.inner)
-        is GroupAnn -> extractProps(formula.inner)
-        else -> throw RuntimeException("Missing branch in extractProps for ${formula.javaClass}")
+fun Model.restrictedTo(stateList: List<State>) : Model {
+    val filteredEdges = this.edges.filter {
+        stateList.containsAll(listOf(it.inParent, it.outParent))
     }
+
+    return Model(stateList, filteredEdges, this.agents, this.props)
 }
 
 /**
@@ -75,7 +66,10 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
             val innerEntries = buildSubformulaList(state, formula.inner, model)
             return firstEntry + announcements + innerEntries
         }
-        else -> TODO("\nStepping through group announcement formulas is not implemented yet")
+        is GroupAnn -> {
+            TODO("\nStepping through group announcement formulas is not implemented yet")
+        }
+        else -> throw RuntimeException("Logic for building the set of subformulas for ${formula.javaClass} is not implemented")
     }
 }
 
@@ -92,27 +86,6 @@ fun containsKnowsOp(formula: Formula): Boolean {
         is GroupAnn -> containsKnowsOp(formula.inner)
         else -> throw RuntimeException("Missing branch in containsKnowsOp for ${formula.javaClass}")
     }
-}
-
-/**
- * Combines the knowledge of the given agents into an updated model by removing
- * uncertainties which are not shared by all the agents
- */
-//TODO Un-retard-ify how
-fun poolGroupKnowledge(agents: List<AgentItem>, model: Model) : Model {
-    val filteredEdges = model.edges.filter {
-        it.agents.containsAll(agents)
-    }
-
-    val updatedStates = mutableListOf<State>()
-    for (state in model.states){
-        val newState = State(state.name, state.xPos, state.yPos, state.props)
-        newState.edges = state.edges.filter { filteredEdges.contains(it) }.observable()
-
-        updatedStates.add(newState)
-    }
-
-    return Model(updatedStates, filteredEdges, model.agents, model.props)
 }
 
 fun makeRange(needsParens: Boolean, start: Int, end: Int): IntRange {
