@@ -1,5 +1,6 @@
 package formulaParser
 
+import bisimContract
 import canvas.data.AgentItem
 import canvas.data.Model
 import canvas.data.State
@@ -184,14 +185,25 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
         }
         else {
             //TODO "Implement generation of labeling formulas and bisimulation contraction"
-            val announceableExts = getAnnounceableExtensions(model, state, agents)
+            val pair = bisimContract(model)
+            val contractedModel = pair.first
+            val filteredStateMapping = pair.second
+
+            val contractedState = filteredStateMapping[state] ?: state
+            val announceableExts = getAnnounceableExtensions(contractedModel, contractedState, agents)
             announceableExts.all { announcement ->
-                inner.check(state, model.restrictedTo(announcement), debugger) //Don't use debugger, would look funny since states are filtered
+                inner.check(contractedState, model.restrictedTo(announcement), debugger) //Don't use debugger, would look funny since states are filtered
             }
         }
 
         createDebugEntry(state, toFormulaValue(result), debugger)
         return result
+        /** TODO Stuff below
+         * Restrict model in similar fashion
+         * Create debug entry for bisimulation contraction, shading out any filtered states similarly to how announcements are visualized
+         * Restriction func returns both filtered set of states as well as mapping for each filtered state to its bisimilar state
+         * If state got filtered, use mapping[state] instead
+         */
     }
 
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {
