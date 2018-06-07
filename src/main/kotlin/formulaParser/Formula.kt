@@ -179,6 +179,7 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
     override val needsParentheses = false
 
     override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
         val result = if (agents.isEmpty() || !containsKnowsOp(inner)) {
             //Atomic permanence and empty group is powerless
             inner.check(state, model, debugger)

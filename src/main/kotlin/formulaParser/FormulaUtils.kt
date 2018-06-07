@@ -57,17 +57,16 @@ fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair
         }
         is Announcement -> {
             val initial: List<Pair<State,Formula>> = listOf(Pair(state, formula))
-            val firstEntry = listOf(Pair(state, formula))
 
             val announcements =
                     model.states.map { buildSubformulaList(it, formula.announcement, model) }
                             .fold(initial){ list, elements -> list.plus(elements) }
 
             val innerEntries = buildSubformulaList(state, formula.inner, model)
-            return firstEntry + announcements + innerEntries
+            return initial + announcements + innerEntries
         }
         is GroupAnn -> {
-            TODO("\nStepping through group announcement formulas is not implemented yet")
+            listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner, model)
         }
         else -> throw RuntimeException("Logic for building the set of subformulas for ${formula.javaClass} is not implemented")
     }

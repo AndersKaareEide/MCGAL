@@ -75,6 +75,7 @@ class DebugController: Controller(){
     fun clearDebugger(){
         canvasController.hideDebugPanelTab()
         debugEntries.clear()
+        Debugger.clear()
         clearDebugLabels()
     }
 
@@ -108,6 +109,7 @@ class DebugController: Controller(){
      * they represent with their corresponding value from the given DebugEntry's valuationMap
      */
     fun applyValuationMap(debugEntry: DebugEntry){
+        //TODO Refactor so that debugEntry is flagged as announcementCheck, not labelItem
         formulaController.clearLabels()
         canvasController.clearSelectedComponents()
         canvasController.selectItem(debugEntry.state)
