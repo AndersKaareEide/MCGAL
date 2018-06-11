@@ -61,7 +61,7 @@ class FormulaFieldController : Controller() {
 
     fun checkFormula(formula: Formula, model: Model){
         for (state in model.states){
-            state.validationStyle = if (formula.check(state,model, null)){
+            state.validationStyle = if (formula.check(state, model, 0, null )){
                 ModelStyles.accepted
             } else {
                 ModelStyles.rejected

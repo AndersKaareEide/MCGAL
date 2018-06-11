@@ -44,7 +44,7 @@ object FormulaParser : Controller() {
                 return Implication(recursiveTransform(tree.left, depth + 1), recursiveTransform(tree.right, depth + 1), depth)
             is GALParser.AnnounceFormContext ->
                 //TODO Determine whether to give the announced and the inner formulas of announcements the same depth
-                return Announcement(recursiveTransform(tree.announced, depth + 1), recursiveTransform(tree.inner, depth + 1), depth)
+                return Announcement(recursiveTransform(tree.announced, depth + 1), recursiveTransform(tree.inner, depth + 2), depth)
             is GALParser.KnowsFormContext ->
                 return makeKnowsFormula(tree, depth)
             is GALParser.GroupannFormContext ->

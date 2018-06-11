@@ -1,12 +1,15 @@
 package formulaParser.formulaDebugger
 
 import canvas.data.State
-import formulaParser.Formula
 import formulafield.FormulaLabel
 import javafx.scene.layout.HBox
+import sidepanels.debugpanel.DebugLabelItem
 
 class DebugEntry(val state: State, val labels: List<FormulaLabel>, val value: FormulaValue,
-                 val formValues: Map<Pair<State, Formula>, FormulaValue>, val depth: Int){
+                 val valuationMap: Map<DebugLabelItem, FormulaValue>, val depth: Int,
+                 val activeStates: List<State>){
+
+
 
     val labelbox: HBox = HBox()
     val stateNameProp = state.nameProperty
@@ -14,4 +17,8 @@ class DebugEntry(val state: State, val labels: List<FormulaLabel>, val value: Fo
     init {
         labelbox.children.addAll(labels)
     }
+}
+
+enum class EntryType {
+    PlainEntry, AnnouncementEntry
 }

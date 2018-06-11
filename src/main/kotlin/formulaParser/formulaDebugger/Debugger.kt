@@ -1,166 +1,89 @@
 package formulaParser.formulaDebugger
 
-import canvas.controllers.CanvasController
 import canvas.data.Model
 import canvas.data.State
-import formulaParser.*
+import formulaParser.Formula
 import formulafield.FormulaLabel
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
-import tornadofx.*
 
 
 //TODO Find out if this belongs in the DebugPanelController
 object Debugger {
 
-    private val canvasController = find(CanvasController::class)
-    private var debugEntries = arrayListOf<DebugEntry>()
+    //State, listDepth, formula
+    private val formulaToLabelMap: MutableMap<Triple<State, Int, Formula>, DebugLabelItem> = mutableMapOf()
+    private val stateToLabelRowsMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> = mutableMapOf()
+    private var debugEntries: MutableList<DebugEntry> = mutableListOf()
 
-    private lateinit var labelItems: List<FormulaLabelItem>
-    private lateinit var valuationMap: Map<Pair<State, Formula>,FormulaValue>
+    fun startDebug(formula: Formula, state: State, model: Model): List<DebugEntry> {
+        stateToLabelRowsMap.putAll(model.states.associate { it to mutableListOf<ObservableList<DebugLabelItem>>() })
 
-    lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
-
-    fun startDebug(formula: Formula, state: State, model: Model): MutableList<DebugEntry> {
-
-        valuationMap = initValuationMap(formula, state)
-        labelItems = formula.toLabelItems()
-
-        stateLabelMap = convertToDebugLabels(labelItems, state)
-        sortLabelMap(stateLabelMap)
+        addNewLabelRow(state, formula)
 
         //Run checking to populate through calls to makeNextEntry()
-        formula.check(state, model, this)
+        formula.check(state, model, 0, this)
+
         return debugEntries
     }
 
-    private fun sortLabelMap(stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>){
-        stateLabelMap.keys.forEach {
-            stateLabelMap[it]!!.sortByDescending { it.size }
-        }
-    }
+    /**
+     * Adds a new row of DebugLabels to the input state based on the formula as well as creating mappings between them
+     * @return the index of the newly created row
+     */
+    fun addNewLabelRow(state: State, formula: Formula) : Int {
+        val formLabels = formula.toLabelItems()
+        val labelRow = createLabelRow(formLabels, state)
+        val rowIndex = getNextRowIndex(state)
 
-    //Creates a mapping of all the subformulas contained in the input formula and state to
-    private fun initValuationMap(formula: Formula, state: State): Map<Pair<State, Formula>,FormulaValue>{
-        return buildSubformulaList(state, formula, canvasController.model )
-                .associateBy({ it }, { FormulaValue.UNKNOWN })
-    }
+        stateToLabelRowsMap[state]!!.add(rowIndex, labelRow)
+        state.debugLabelsProperty.add(rowIndex, labelRow)
 
-    //Creates the next "log" entry based on the valuationMapping from the last entry
-    fun makeNextEntry(formula: Formula, state: State, value: FormulaValue) {
-        val labels = formula.toFormulaItem().labelItems.map { FormulaLabel(it) }
-        val updatedFormValuation = if (debugEntries.isEmpty()){
-            valuationMap + Pair(Pair(state, formula), value)
-        } else {
-            debugEntries.last().formValues + Pair(Pair(state, formula), value)
-        }
-
-        val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth)
-        debugEntries.add(entry)
-    }
-
-    private fun convertToDebugLabels(input: List<FormulaLabelItem>, originState: State): MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> {
-
-        val result = canvasController.model.states
-                .associate { Pair(it, mutableListOf<ObservableList<DebugLabelItem>>()) }
-                .toMutableMap()
-
-        val debugLabelList = FXCollections.observableArrayList<DebugLabelItem>()
-        debugLabelList.addAll(input.map { DebugLabelItem(it.formula, it.labelText, it.indexRange, originState) })
-
-        val originalLabels = FXCollections.observableArrayList(debugLabelList)
-        originState.debugLabels.add(originalLabels)
-        result[originState]!!.add(originalLabels)
-
-        distributeKnowsFormulas(debugLabelList, originState, result)
-        distributeAnnouncements(debugLabelList, result)
-        return result
-    }
-
-    private fun distributeKnowsFormulas(debugLabelList: ObservableList<DebugLabelItem>, originState: State,
-                                        result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
-
-        val knowsOpList = debugLabelList.filter { it.formula is Knows && !(it.labelText == "(" || it.labelText == ")") }
-        val distributionMap = knowsOpList.associate { Pair(it, mutableSetOf<State>()) }
-        val model = canvasController.model //We don't actually care about the model here, as we're not checking
-
-        for ((index, knowsOp) in knowsOpList.withIndex()){
-            //For every step right, check all forms to the left to try and find a 'parent'
-            for (innerIndex in (index - 1) downTo 0) {
-                val parentOp = knowsOpList[innerIndex]
-                if (parentOp.contains(debugLabelList, knowsOp)){
-                    val parentOpDistributionSet = distributionMap[parentOp]
-                    for (innerState in parentOpDistributionSet!!){
-                        val formula = knowsOp.formula as Knows
-                        distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, innerState, model))
-                    }
-                    //We found a 'parent' for this one, continue to next formula
-                    break
-                }
-            }
-            val formula = knowsOp.formula as Knows
-            distributionMap[knowsOp]!!.addAll(getIndishStates(formula.agent, originState, model))
-        }
-
-        for (knowsOp in distributionMap.keys){
-            val labels = getInnerLabels(knowsOp, debugLabelList)
-            stripOuterParentheses(labels)
-
-            //Actually add the labels to each state
-            for (state in distributionMap[knowsOp]!!){
-                val labelCopies = FXCollections.observableArrayList(labels.map {
-                    DebugLabelItem(it.formula, it.labelText, it.indexRange, it.state)
-                })
-                state.debugLabels.add(labelCopies)
-                result[state]!!.add(labelCopies)
-            }
-        }
-        //1. Find indishstates from all parentOp states
-        //2. Add these to distributionMap for knowsOp
-        //3. Add all indishstates from inputState as well
-        //4. Somehow map from knowsOp to the DLI that represents its inner formula
-        //5. Actually add the relevant lists of labels to the states
+        formulaToLabelMap.putAll(createLabelMappings(labelRow, rowIndex))
+        return rowIndex
     }
 
     /**
-     * Function responsible for creating DebugLabels for any announcement formulas and
-     * distributing them across the model
+     * Creates mappings from each label in a row's formula, state and index of the row it belongs to, back to the label
      */
-    private fun distributeAnnouncements(debugLabelList: ObservableList<DebugLabelItem>, result: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>) {
+    private fun createLabelMappings(labels: List<DebugLabelItem>, listIndex: Int): Map<out Triple<State, Int, Formula>, DebugLabelItem> =
+            labels.associate { Triple(it.state, listIndex, it.formula) to it }
 
-        //Announcements are weird since they are only represented as [ and ]
-        val announcementLabelList = debugLabelList
-                .filter { it.formula is Announcement }
-                .filter { (it.labelText == "[") }
+    /**
+     * Creates a new row of DebugLabels based on a formula, represented as a list of FormulaLabelItems
+     */
+    private fun createLabelRow(input: List<FormulaLabelItem>, state: State): ObservableList<DebugLabelItem> {
+        val debugLabelRow = FXCollections.observableArrayList<DebugLabelItem>()
+        debugLabelRow.addAll(input.map { DebugLabelItem(it.formula, it.labelText, it.indexRange, state) })
 
-        val innerFormulas = announcementLabelList.map { (it.formula as Announcement).announcement }
-        val announcementLabels = announcementLabelList.map { getAnnouncementLabels(it, debugLabelList) }
-
-        for (state in canvasController.model.states){
-            val labelCopies = announcementLabels.map {
-                FXCollections.observableArrayList(it.map {
-                    val isACheck = innerFormulas.contains(it.formula)
-                    DebugLabelItem(it.formula, it.labelText, it.indexRange, it.state, isAnnouncementCheck = isACheck)
-                })
-            }.toMutableList()
-
-            result[state]!!.addAll(labelCopies)
-        }
+        return debugLabelRow
     }
 
-    private fun stripOuterParentheses(labels: ObservableList<DebugLabelItem>) {
-        if (labels[0].labelText == "("){
-            labels.removeAt(0)
-            labels.removeAt(labels.lastIndex)
+    /**
+     * Returns the next available index for use when distributing DebugLabels for Knows or Announcement formulas
+     */
+    private fun getNextRowIndex(state: State): Int = stateToLabelRowsMap[state]?.size ?: 0
+
+    //Creates the next "log" entry based on the valuationMapping from the last entry
+    fun makeNextEntry(formula: Formula, state: State, listDepth: Int, value: FormulaValue, activeStates: List<State>) {
+        val labels = formula.toFormulaItem().labelItems.map { FormulaLabel(it) }
+        val debugLabelItem = formulaToLabelMap[Triple(state, listDepth, formula)]!!
+
+        val updatedFormValuation = if (debugEntries.isEmpty()){
+            mapOf(debugLabelItem to value)
+        } else {
+            debugEntries.last().valuationMap + (debugLabelItem to value)
         }
+
+        val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth, activeStates)
+        debugEntries.add(entry)
     }
 
     fun clear(){
         debugEntries.clear()
-        labelItems = emptyList()
-        valuationMap = emptyMap()
-        stateLabelMap = mutableMapOf()
+        formulaToLabelMap.clear()
+        stateToLabelRowsMap.clear()
     }
 }

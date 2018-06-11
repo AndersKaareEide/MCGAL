@@ -1,10 +1,9 @@
 package formulaParser
 
 import canvas.data.AgentItem
+import canvas.data.Edge
 import canvas.data.Model
 import canvas.data.State
-import formulaParser.formulaDebugger.Debugger
-import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import sidepanels.debugpanel.DebugLabelItem
 import sidepanels.debugpanel.FormulaLabelItem
@@ -23,53 +22,12 @@ fun getIndishStates(agent: AgentItem, state: State, model: Model): List<State> {
     return result.filter { model.states.contains(it) } //Handle updated models, states might be filtered out
 }
 
-fun updateModel(announcement: Formula, model: Model, debugger: Debugger?): Model {
-    val updStates = model.states.filter { announcement.check(it, model, debugger) }
-    val updEdges = model.edges.filter { (updStates.contains(it.outParent) and updStates.contains(it.inParent)) }
-
-    return Model(updStates, updEdges, model.agents, model.props)
-}
-
 fun Model.restrictedTo(stateList: List<State>) : Model {
     val filteredEdges = this.edges.filter {
         stateList.containsAll(listOf(it.inParent, it.outParent))
     }
 
     return Model(stateList, filteredEdges, this.agents, this.props)
-}
-
-/**
- * Builds an immutable list of all the subformulas in the input formula, including the formula itself
- */
-fun buildSubformulaList(state: State, formula: Formula, model: Model): List<Pair<State, Formula>> {
-    return when (formula){
-        is Proposition -> listOf(Pair(state, formula))
-        is Negation -> listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner, model)
-        is BinaryOperator -> listOf(Pair(state, formula)) +
-                buildSubformulaList(state, formula.left, model) +
-                buildSubformulaList(state, formula.right, model)
-        is Knows -> {
-            val indishStates = getIndishStates(formula.agent, state, model)
-            val initial: List<Pair<State, Formula>> = listOf(Pair(state, formula))
-
-            indishStates.map { buildSubformulaList(it, formula.inner, model) }
-                    .fold(initial) { list, elements -> list.plus(elements) }
-        }
-        is Announcement -> {
-            val initial: List<Pair<State,Formula>> = listOf(Pair(state, formula))
-
-            val announcements =
-                    model.states.map { buildSubformulaList(it, formula.announcement, model) }
-                            .fold(initial){ list, elements -> list.plus(elements) }
-
-            val innerEntries = buildSubformulaList(state, formula.inner, model)
-            return initial + announcements + innerEntries
-        }
-        is GroupAnn -> {
-            listOf(Pair(state, formula)) + buildSubformulaList(state, formula.inner, model)
-        }
-        else -> throw RuntimeException("Logic for building the set of subformulas for ${formula.javaClass} is not implemented")
-    }
 }
 
 /**
@@ -101,46 +59,27 @@ fun insertParentheses(list: MutableList<FormulaLabelItem>, formula: Formula){
     list.add(FormulaLabelItem(formula, ")", IntRange(-size, 0)))
 }
 
-fun getInnerLabels(knowsOp: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>): ObservableList<DebugLabelItem> {
-    val innerFormula = (knowsOp.formula as Knows).inner
-    val innerLabel = debugLabelList.find { it.formula == innerFormula }!!
-
-    val absRange = getAbsoluteIntRange(debugLabelList, innerLabel)
-
-    return FXCollections.observableArrayList(debugLabelList.slice(absRange))
-}
-
-fun getAnnouncementLabels(labelItem: DebugLabelItem, debugLabelList: ObservableList<DebugLabelItem>)
-        : ObservableList<DebugLabelItem> {
-
-    val announcement = (labelItem.formula as Announcement).announcement
-    val announcementLabel = debugLabelList.find { it.formula == announcement }!!
-
-    val absRange = getAbsoluteIntRange(debugLabelList, announcementLabel)
-
-    return FXCollections.observableArrayList(debugLabelList.slice(absRange))
-}
-
 fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLabel: DebugLabelItem): IntRange {
     val opIndex = debugLabelList.indexOf(innerLabel)
     return IntRange(innerLabel.indexRange.first + opIndex, innerLabel.indexRange.last + opIndex)
 }
 
 fun getAnnounceableExtensions(model: Model, state: State, coalition: List<AgentItem>): List<List<State>> {
+    //TODO Fix this so that filtered edges are not counted
     val powerSet = generatePowerSetOfStates(model.states)
 
     return powerSet.filter { it.contains(state) }
-            .filter { it.hasNoOverlappingEqClassesFor(coalition)}
+            .filter { it.hasNoOverlappingEqClassesFor(coalition, model.edges)}
 }
 
-fun List<State>.hasNoOverlappingEqClassesFor(coalition: List<AgentItem>): Boolean =
-        this.all { this.containsAll(it.eqClassIntersectionFor(coalition)) }
+fun List<State>.hasNoOverlappingEqClassesFor(coalition: List<AgentItem>, edges: List<Edge>): Boolean =
+        this.all { this.containsAll(it.eqClassIntersectionFor(coalition, edges)) }
 
-fun State.eqClassIntersectionFor(agents: List<AgentItem>): List<State> {
+fun State.eqClassIntersectionFor(agents: List<AgentItem>, actualEdges: List<Edge>): List<State> {
     if (agents.isEmpty())
         return listOf(this)
 
-    return this.edges.filter { it.agents.containsAll(agents) }
+    return this.edges.filter { actualEdges.contains(it) && it.agents.containsAll(agents) }
             .map {
                 if (it.inParent == this)
                     it.outParent

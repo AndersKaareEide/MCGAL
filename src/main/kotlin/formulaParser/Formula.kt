@@ -12,23 +12,19 @@ import sidepanels.propertypanel.PropositionItem
 
 abstract class Formula(val depth: Int) {
     abstract val needsParentheses: Boolean
-    abstract fun check(state: State, model: Model, debugger: Debugger?): Boolean
+    abstract fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean
     abstract fun toLabelItems(needsParens: Boolean = false): MutableList<FormulaLabelItem>
     fun toFormulaItem(): FormulaItem {
         return FormulaItem(this)
     }
 
-    fun createDebugEntry(state: State, value: FormulaValue, debugger: Debugger?){
-        debugger?.makeNextEntry(this, state, value)
+    fun createDebugEntry(state: State, value: FormulaValue, listIndex: Int, activeStates: List<State>, debugger: Debugger?){
+        debugger?.makeNextEntry(this, state, listIndex, value, activeStates)
     }
 }
 
 class FormulaItem(val formula: Formula) {
     val labelItems: MutableList<FormulaLabelItem> = formula.toLabelItems()
-
-    fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        return formula.check(state, model, debugger)
-    }
 }
 
 abstract class BinaryOperator(val left: Formula, val right: Formula, depth: Int) : Formula(depth) {
@@ -55,9 +51,9 @@ abstract class BinaryOperator(val left: Formula, val right: Formula, depth: Int)
 class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
         val result = state.props.contains(proposition)
-        createDebugEntry(state, toFormulaValue(result), debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 
@@ -68,10 +64,10 @@ class Proposition(val proposition: PropositionItem, depth: Int): Formula(depth) 
 class Negation(val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = inner.check(state, model, debugger).not()
-        createDebugEntry(state, toFormulaValue(result), debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
+        val result = inner.check(state, model, listIndex, debugger ).not()
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 
@@ -85,10 +81,10 @@ class Negation(val inner: Formula, depth: Int): Formula(depth) {
 class Disjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth) {
     override val opSymbol = "∨"
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = left.check(state, model, debugger) || right.check(state, model, debugger)
-        createDebugEntry(state, toFormulaValue(result), debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
+        val result = left.check(state, model, listIndex, debugger) || right.check(state, model, listIndex, debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 }
@@ -96,10 +92,10 @@ class Disjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 class Conjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth) {
     override val opSymbol = "Λ"
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = left.check(state, model, debugger) && right.check(state, model, debugger)
-        createDebugEntry(state, toFormulaValue(result), debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
+        val result = left.check(state, model, listIndex, debugger) && right.check(state, model, listIndex, debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 }
@@ -107,10 +103,10 @@ class Conjunction(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 class Implication(left: Formula, right: Formula, depth: Int): BinaryOperator(left, right, depth){
     override val opSymbol = "→"
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = !left.check(state, model, debugger) || right.check(state, model, debugger)
-        createDebugEntry(state, toFormulaValue(result), debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
+        val result = !left.check(state, model, listIndex, debugger) || right.check(state, model, listIndex, debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 
@@ -119,11 +115,20 @@ class Implication(left: Formula, right: Formula, depth: Int): BinaryOperator(lef
 class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
         val indishStates = getIndishStates(agent, state, model)
-        val result = indishStates.all { inner.check(it, model, debugger) }
-        createDebugEntry(state, toFormulaValue(result), debugger)
+
+        val result = if (inner.check(state, model, listIndex, debugger)) {
+            (indishStates - state).all {
+                val index = debugger?.addNewLabelRow(it, inner) ?: 0
+                inner.check(it, model, index, debugger)
+            }
+        } else {
+            false
+        }
+
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
 
     }
@@ -141,17 +146,25 @@ class Knows(val agent: AgentItem, val inner: Formula, depth: Int): Formula(depth
 class Announcement(val announcement: Formula, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = true
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
-        val result = if (!announcement.check(state, model, null)) {
-            announcement.check(state, model, debugger) //Dirty way of preventing duplicate entries
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
+
+
+        val result = if (!announcement.check(state, model, listIndex, null)) {
+            announcement.check(state, model, listIndex, debugger) //Dirty way of preventing duplicate entries
             true
         }
         else {
-            val updModel = updateModel(announcement, model, debugger)
-            inner.check(state, updModel, debugger)
+            var updatedModel = model
+            for (stateToCheck in model.states){
+                val annIndex = debugger?.addNewLabelRow(stateToCheck, announcement) ?: 0
+                if (!announcement.check(stateToCheck, updatedModel, annIndex, debugger)){
+                    updatedModel = updatedModel.restrictedTo(updatedModel.states - stateToCheck)
+                }
+            }
+            inner.check(state, updatedModel, listIndex, debugger)
         }
-        createDebugEntry(state, toFormulaValue(result), debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
     }
 
@@ -172,20 +185,17 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
     }
 }
 
-// M,s |= [G]F iff for every announcement in Anns(G,M,s), M,s |= [announcement]F
-// M,s |= <G>F iff there exists an announcement such that M,s |= announcement
-//        and M,s|announcement |= F
 class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): Formula(depth) {
     override val needsParentheses = false
 
-    override fun check(state: State, model: Model, debugger: Debugger?): Boolean {
-        createDebugEntry(state, FormulaValue.UNKNOWN, debugger)
+    override fun check(state: State, model: Model, listIndex: Int, debugger: Debugger?): Boolean {
+        createDebugEntry(state, FormulaValue.UNKNOWN, listIndex, model.states, debugger)
         val result = if (agents.isEmpty() || !containsKnowsOp(inner)) {
             //Atomic permanence and empty group is powerless
-            inner.check(state, model, debugger)
+            inner.check(state, model, listIndex, debugger)
         }
         else {
-            //TODO "Implement generation of labeling formulas and bisimulation contraction"
+            //TODO "Implement visualization of bisimulation contraction"
             val pair = bisimContract(model)
             val contractedModel = pair.first
             val filteredStateMapping = pair.second
@@ -193,11 +203,11 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
             val contractedState = filteredStateMapping[state] ?: state
             val announceableExts = getAnnounceableExtensions(contractedModel, contractedState, agents)
             announceableExts.all { announcement ->
-                inner.check(contractedState, model.restrictedTo(announcement), debugger) //Don't use debugger, would look funny since states are filtered
+                inner.check(contractedState, model.restrictedTo(announcement), listIndex, debugger)
             }
         }
 
-        createDebugEntry(state, toFormulaValue(result), debugger)
+        createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
         /** TODO Stuff below
          * Restrict model in similar fashion

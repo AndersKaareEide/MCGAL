@@ -1,9 +1,13 @@
 package formulaParser
 
+import canvas.data.AgentItem
+import canvas.data.Edge
+import canvas.data.State
 import formulaParser.eqClassIntersectionFor
 import io.ModelSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import sun.management.Agent
 import java.io.File
 
 class TestEquivalenceClasses {
@@ -16,7 +20,7 @@ class TestEquivalenceClasses {
     fun testEqClassOfStateForEmptyCoalIsSameState(){
         val s1 = basicModel.states.first()
         val expected = listOf(s1)
-        assertEquals(expected, s1.eqClassIntersectionFor(listOf()))
+        assertEquals(expected, s1.eqClassIntersectionFor(listOf(), basicModel.edges))
     }
 
     @Test
@@ -25,7 +29,7 @@ class TestEquivalenceClasses {
         val expected = setOf(s1, basicModel.states[2])
 
         val agentA = basicModel.agents.first()
-        assertEquals(expected, s1.eqClassIntersectionFor(listOf(agentA)).toSet())
+        assertEquals(expected, s1.eqClassIntersectionFor(listOf(agentA), basicModel.edges).toSet())
     }
 
     @Test
@@ -34,7 +38,7 @@ class TestEquivalenceClasses {
         val expected = setOf(s1)
 
         val coalition = basicModel.agents
-        assertEquals(expected, s1.eqClassIntersectionFor(coalition).toSet())
+        assertEquals(expected, s1.eqClassIntersectionFor(coalition, basicModel.edges).toSet())
     }
 
     @Test
@@ -47,16 +51,16 @@ class TestEquivalenceClasses {
         val coalition = listOf(agentA, agentC)
 
         val expected = setOf(s1, s3)
-        assertEquals(expected, s1.eqClassIntersectionFor(coalition).toSet())
+        assertEquals(expected, s1.eqClassIntersectionFor(coalition, basicModel.edges).toSet())
     }
 
     @Test
-    fun testEqClasOfStateForIgnorantAgent(){
+    fun testEqClassOfStateForIgnorantAgent(){
         val s1 = threeAgMdl.states.first()
 
         val agentC = threeAgMdl.agents[2]
 
         val expected = threeAgMdl.states.toSet()
-        assertEquals(expected, s1.eqClassIntersectionFor(listOf(agentC)).toSet())
+        assertEquals(expected, s1.eqClassIntersectionFor(listOf(agentC), threeAgMdl.edges).toSet())
     }
 }

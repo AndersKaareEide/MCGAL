@@ -20,12 +20,12 @@ class TestGroupAnnouncements {
         val s2 = model.states[1]
         val s3 = model.states[2]
 
-        assertFalse(makeNegatedGroupAnn("B","!KA(p&q)").check(s1, model, null))
-        assertFalse(makeNegatedGroupAnn("C","!KA(p&q)").check(s1, model, null))
-        assertTrue(makeNegatedGroupAnn("B,C","!KA(p&q)").check(s1, model, null))
+        assertFalse(makeNegatedGroupAnn("B","!KA(p&q)").check(s1, model, 0, null))
+        assertFalse(makeNegatedGroupAnn("C","!KA(p&q)").check(s1, model, 0, null))
+        assertTrue(makeNegatedGroupAnn("B,C","!KA(p&q)").check(s1, model, 0, null))
 
         assertFalse(model.states.any {state ->
-            makeNegatedGroupAnn("A", "!(KA(p)|KA(q))").check(state, model, null)
+            makeNegatedGroupAnn("A", "!(KA(p)|KA(q))").check(state, model, 0, null)
         })
     }
 

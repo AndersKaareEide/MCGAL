@@ -2,9 +2,7 @@ package sidepanels.debugpanel
 
 import canvas.controllers.CanvasController
 import canvas.controllers.StateController
-import canvas.data.Model
 import canvas.data.State
-import formulaParser.Formula
 import formulaParser.FormulaParser
 import formulaParser.FormulaParsingException
 import formulaParser.formulaDebugger.DebugEntry
@@ -13,7 +11,6 @@ import formulaParser.formulaDebugger.FormulaValue
 import formulafield.FormulaFieldController
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.ObservableList
 import javafx.scene.control.TableView
 import org.antlr.v4.runtime.RecognitionException
 import tornadofx.*
@@ -24,10 +21,9 @@ class DebugController: Controller(){
     val stateController = find(StateController::class)
     val formulaController = find(FormulaFieldController::class)
 
-    var debugEntries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
+    val debugEntries =  SimpleListProperty<DebugEntry>(mutableListOf<DebugEntry>().observable())
     var formulaText: String? = null
 
-    lateinit var stateLabelMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>>
     lateinit var tableSelection: TableView<DebugEntry>
 
     var selectedEntryProperty = SimpleObjectProperty<DebugEntry>()
@@ -53,7 +49,6 @@ class DebugController: Controller(){
             val model = canvasController.model
 
             debugEntries.setAll(Debugger.startDebug(formula, selectedState, model))
-            stateLabelMap = Debugger.stateLabelMap.toMutableMap()
 
             canvasController.showDebugPanelTab()
 
@@ -70,6 +65,26 @@ class DebugController: Controller(){
     }
 
     /**
+     * Function responsible for coloring the DebugLabels next to each State by matching the formula
+     * they represent with their corresponding value from the given DebugEntry's valuationMap
+     */
+    fun applyValuationMap(debugEntry: DebugEntry){
+        formulaController.clearLabels()
+        canvasController.clearSelectedComponents()
+        canvasController.selectItem(debugEntry.state)
+        val states = canvasController.model.states
+
+        for (state in states){
+            for (list in state.debugLabels){
+                for (labelItem in list) {
+                    labelItem.value = debugEntry.valuationMap[labelItem] ?: FormulaValue.UNKNOWN
+                }
+            }
+            state.isHidden = !debugEntry.activeStates.contains(state)
+        }
+    }
+
+    /**
      * Function used to clear any references to old stuff when for example loading a new model from file
      */
     fun clearDebugger(){
@@ -79,12 +94,12 @@ class DebugController: Controller(){
         clearDebugLabels()
     }
 
+
     fun clearDebugLabels(){
         stateController.states.forEach {
             it.debugLabels.clear()
         }
     }
-
 
     fun stepInto() {
         tableSelection.requestFocus()
@@ -101,37 +116,6 @@ class DebugController: Controller(){
                 tableSelection.selectionModel.select(index)
                 break
             }
-        }
-    }
-
-    /**
-     * Function responsible for coloring the DebugLabels next to each State by matching the formula
-     * they represent with their corresponding value from the given DebugEntry's valuationMap
-     */
-    fun applyValuationMap(debugEntry: DebugEntry){
-        //TODO Refactor so that debugEntry is flagged as announcementCheck, not labelItem
-        formulaController.clearLabels()
-        canvasController.clearSelectedComponents()
-        canvasController.selectItem(debugEntry.state)
-
-        val hiddenStates = mutableMapOf<State, Boolean>()
-        for (state in stateLabelMap.keys){
-            for (list in stateLabelMap[state]!!){
-                for (labelItem in list) {
-                    val formulaValue = debugEntry.formValues[Pair(state, labelItem.formula)]!!
-                    labelItem.value = formulaValue
-                    if(labelItem.isAnnouncementCheck && formulaValue == FormulaValue.FALSE){
-                        hiddenStates.put(state, true)
-                    }
-                }
-            }
-        }
-        assignHiddenStates(stateLabelMap.keys, hiddenStates)
-    }
-
-    private fun assignHiddenStates(states: MutableSet<State>, statesToHide: MutableMap<State, Boolean>) {
-        for (state in states){
-            state.isHidden = statesToHide[state] ?: false
         }
     }
 }
