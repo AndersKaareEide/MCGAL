@@ -51,7 +51,7 @@ class TestEquivalenceClasses {
         val coalition = listOf(agentA, agentC)
 
         val expected = setOf(s1, s3)
-        assertEquals(expected, s1.eqClassIntersectionFor(coalition, basicModel.edges).toSet())
+        assertEquals(expected, s1.eqClassIntersectionFor(coalition, threeAgMdl.edges).toSet())
     }
 
     @Test
