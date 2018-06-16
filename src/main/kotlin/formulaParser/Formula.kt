@@ -195,26 +195,16 @@ class GroupAnn(val agents: List<AgentItem>, val inner: Formula, depth: Int): For
             inner.check(state, model, listIndex, debugger)
         }
         else {
-            //TODO "Implement visualization of bisimulation contraction"
-            val pair = bisimContract(model)
-            val contractedModel = pair.first
-            val filteredStateMapping = pair.second
-
-            val contractedState = filteredStateMapping[state] ?: state
-            val announceableExts = getAnnounceableExtensions(contractedModel, contractedState, agents)
+            val contractedModel = bisimContract(state, model)
+            val announceableExts = getAnnounceableExtensions(contractedModel, state, agents)
             announceableExts.all { announcement ->
-                inner.check(contractedState, model.restrictedTo(announcement), listIndex, debugger)
+                //TODO "Create additional entries for marking each new extension we check?"
+                inner.check(state, model.restrictedTo(announcement), listIndex, debugger)
             }
         }
 
         createDebugEntry(state, toFormulaValue(result), listIndex, model.states, debugger)
         return result
-        /** TODO Stuff below
-         * Restrict model in similar fashion
-         * Create debug entry for bisimulation contraction, shading out any filtered states similarly to how announcements are visualized
-         * Restriction func returns both filtered set of states as well as mapping for each filtered state to its bisimilar state
-         * If state got filtered, use mapping[state] instead
-         */
     }
 
     override fun toLabelItems(needsParens: Boolean): MutableList<FormulaLabelItem> {

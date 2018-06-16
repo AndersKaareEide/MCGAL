@@ -83,9 +83,9 @@ class TestBisimulationCheck {
         val modelFile = "testmodels/bisimContract4StatesShouldContractTo3States.mdl"
         val model = ModelSerializer.deserializeModel(File(modelFile))
 
-        val pair = bisimContract(model)
-        val contracted = pair.first
-        val filteredStateMapping = pair.second
+        val s1 = model.states.first { it.name == "s1" }
+
+        val contracted = bisimContract(s1, model)
 
         assertTrue(contracted.states.size == 3)
         assertTrue(contracted.edges.size == 2)
@@ -93,9 +93,8 @@ class TestBisimulationCheck {
         assertTrue(contracted.states.any { it.name == "s2" })
         assertTrue(contracted.states.any { it.name == "s3" })
         assertTrue(contracted.states.none { it.name == "s4" }) //s4 should be filtered out during contraction
-        assertTrue(filteredStateMapping.keys.any { it.name == "s4" && filteredStateMapping[it]!!.name == "s1" })
 
-        assertTrue(contracted.edges.none { filteredStateMapping.containsKey(it.inParent) || filteredStateMapping.containsKey(it.outParent) })
+        assertTrue(contracted.edges.none { it.inParent.name == "s4" || it.outParent.name == "s4" })
     }
 
     @Test
@@ -103,15 +102,15 @@ class TestBisimulationCheck {
         val modelFile = "testmodels/bisimContract4StatesShouldContractTo2States.mdl"
         val model = ModelSerializer.deserializeModel(File(modelFile))
 
-        val pair = bisimContract(model)
-        val contracted = pair.first
-        val bisimMapping = pair.second
+        val s1 = model.states.first { it.name == "s1" }
+
+        val contracted = bisimContract(s1, model)
 
         assertTrue(contracted.states.size == 2)
         assertTrue(contracted.edges.size == 1)
-        assertTrue(contracted.states.any { it.name == "s1" || bisimMapping.keys.any { it.name == "s1" && bisimMapping[it]!!.name == "s4" }})
-        assertTrue(contracted.states.any { it.name == "s2" || bisimMapping.keys.any { it.name == "s2" && bisimMapping[it]!!.name == "s3" }})
+        assertTrue(contracted.states.any { it.name == "s1" })
+        assertTrue(contracted.states.any { it.name == "s2" })
 
-        assertTrue(contracted.edges.none { bisimMapping.containsKey(it.inParent) || bisimMapping.containsKey(it.outParent) })
+        assertTrue(contracted.edges.all { contracted.states.containsAll(listOf(it.inParent, it.outParent)) })
     }
 }

@@ -65,7 +65,6 @@ fun getAbsoluteIntRange(debugLabelList: ObservableList<DebugLabelItem>, innerLab
 }
 
 fun getAnnounceableExtensions(model: Model, state: State, coalition: List<AgentItem>): List<List<State>> {
-    //TODO Fix this so that filtered edges are not counted
     val powerSet = generatePowerSetOfStates(model.states)
 
     return powerSet.filter { it.contains(state) }

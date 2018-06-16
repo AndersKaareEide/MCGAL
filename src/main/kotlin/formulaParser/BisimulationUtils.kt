@@ -55,11 +55,12 @@ private fun checkKnowledgePreservation(reachableStates: Set<AgentListStateTuple>
 private fun atomsHolds(s1: State, s2: State) = s1.props == s2.props
 
 private fun buildReachableStateTuples(state: State, statesToCheck: List<State>): Set<AgentListStateTuple> {
-    val tuples = state.edges.map { if (it.inParent == state){
-        AgentListStateTuple(it.outParent, it.agents)
-    } else {
-        AgentListStateTuple(it.inParent, it.agents)
-    }
+    val tuples = state.edges.map {
+        if (it.inParent == state){
+            AgentListStateTuple(it.outParent, it.agents)
+        } else {
+            AgentListStateTuple(it.inParent, it.agents)
+        }
     }
 
     return tuples
@@ -68,13 +69,15 @@ private fun buildReachableStateTuples(state: State, statesToCheck: List<State>):
 }
 
 /**
- * Creates a new model without any bisimilar states by merging all bisimilar states in the
- * input model, creating new remapped edges as necessary
+ * Creates a new model without any bisimilar states by filtering out any bisimilar states
  */
-fun bisimContract(model: Model): Pair<Model, Map<State, State>> {
+fun bisimContract(actualState: State, model: Model): Model {
+    //Really ugly hack to put actualState at the front of the list, making sure it doesn't get filtered
+    val reorderedStates = listOf(actualState) + (model.states - actualState)
+
     //Each filtered out state points to its bisimilar state
     val bisimStatesMap = mutableMapOf<State, State>()
-    for(state in model.states){
+    for(state in reorderedStates){
         if (state in bisimStatesMap.keys){
             continue //Optimization, skip states that have already been checked
         }
@@ -89,5 +92,5 @@ fun bisimContract(model: Model): Pair<Model, Map<State, State>> {
     val contractedEdges = model.edges.filter { contractedStates.containsAll(listOf(it.inParent, it.outParent)) }
     val contractedModel = model.copy(states = contractedStates, edges = contractedEdges)
 
-    return Pair(contractedModel, bisimStatesMap)
+    return contractedModel
 }
