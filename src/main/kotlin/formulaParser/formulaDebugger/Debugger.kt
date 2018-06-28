@@ -14,7 +14,7 @@ import sidepanels.debugpanel.FormulaLabelItem
 object Debugger {
 
     //State, listDepth, formula
-    private val formulaToLabelMap: MutableMap<Triple<State, Int, Formula>, DebugLabelItem> = mutableMapOf()
+    private val formulaToLabelMap: MutableMap<Triple<State, Int, Formula>, List<DebugLabelItem>> = mutableMapOf()
     private val stateToLabelRowsMap: MutableMap<State, MutableList<ObservableList<DebugLabelItem>>> = mutableMapOf()
     private var debugEntries: MutableList<DebugEntry> = mutableListOf()
 
@@ -48,8 +48,8 @@ object Debugger {
     /**
      * Creates mappings from each label in a row's formula, state and index of the row it belongs to, back to the label
      */
-    private fun createLabelMappings(labels: List<DebugLabelItem>, listIndex: Int): Map<out Triple<State, Int, Formula>, DebugLabelItem> =
-            labels.associate { Triple(it.state, listIndex, it.formula) to it }
+    private fun createLabelMappings(labels: List<DebugLabelItem>, listIndex: Int): Map<out Triple<State, Int, Formula>, List<DebugLabelItem>> =
+            labels.groupBy { it -> Triple(it.state, listIndex, it.formula) }
 
     /**
      * Creates a new row of DebugLabels based on a formula, represented as a list of FormulaLabelItems
@@ -69,12 +69,12 @@ object Debugger {
     //Creates the next "log" entry based on the valuationMapping from the last entry
     fun makeNextEntry(formula: Formula, state: State, listDepth: Int, value: FormulaValue, activeStates: List<State>) {
         val labels = formula.toFormulaItem().labelItems.map { FormulaLabel(it) }
-        val debugLabelItem = formulaToLabelMap[Triple(state, listDepth, formula)]!!
+        val debugLabelList = formulaToLabelMap[Triple(state, listDepth, formula)]!!
 
-        val updatedFormValuation = if (debugEntries.isEmpty()){
-            mapOf(debugLabelItem to value)
+        val updatedFormValuation: Map<DebugLabelItem, FormulaValue> = if (debugEntries.isEmpty()){
+            debugLabelList.associate { it to value }
         } else {
-            debugEntries.last().valuationMap + (debugLabelItem to value)
+            debugEntries.last().valuationMap + (debugLabelList.associate { it to value })
         }
 
         val entry = DebugEntry(state, labels, value, updatedFormValuation, formula.depth, activeStates)
