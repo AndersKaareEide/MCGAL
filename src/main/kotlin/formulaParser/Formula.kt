@@ -158,7 +158,7 @@ class Announcement(val announcement: Formula, val inner: Formula, depth: Int): F
             var updatedModel = model
             for (stateToCheck in model.states){
                 val annIndex = debugger?.addNewLabelRow(stateToCheck, announcement) ?: 0
-                if (!announcement.check(stateToCheck, updatedModel, annIndex, debugger)){
+                if (!announcement.check(stateToCheck, model, annIndex, debugger)){
                     updatedModel = updatedModel.restrictedTo(updatedModel.states - stateToCheck)
                 }
             }
