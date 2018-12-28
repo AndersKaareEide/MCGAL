@@ -19,6 +19,7 @@ import sidepanels.debugpanel.DebugPanel
 import sidepanels.propertypanel.PropPanelController
 import tornadofx.*
 import utils.getModel
+import java.io.File
 
 @Suppress("UNCHECKED_CAST")
 class CanvasController : Controller() {
@@ -46,7 +47,11 @@ class CanvasController : Controller() {
             agentController.agents.items, propController.propositions)
 
     init {
-        loadModel(getModel())
+        val modelFile = File("models/defaultmodel.mdl")
+        if(modelFile.exists())
+            loadModel(ModelSerializer.deserializeModel(modelFile))
+        else
+            loadModel(getModel())
     }
 
 
