@@ -174,7 +174,7 @@ class CanvasController : Controller() {
 
     fun showDebugPanelTab(){
         if (debugTab == null) {
-            debugTab = Tab("Debugger", debugPanel.root)
+            debugTab = Tab("Stepper", debugPanel.root)
         }
         if (!canvas.sidePanel.tabs.contains(debugTab)) {
             canvas.sidePanel.tabs.add(debugTab)

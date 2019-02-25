@@ -10,13 +10,10 @@ import javafx.scene.layout.Priority
 import sidepanels.propertypanel.PropositionItem
 import tornadofx.*
 
-class DebugPanel : View("My View") {
+class DebugPanel : View() {
 
     val controller = find(CanvasController::class)
     val debugController = find(DebugController::class)
-
-    val form = Knows(AgentItem("Arne", false),
-            Proposition(PropositionItem("regn", false), 1), 0)
 
     val model = controller.model
 

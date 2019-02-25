@@ -5,7 +5,7 @@ import javafx.scene.layout.Priority
 import sidepanels.agentpanel.AgentListFragment
 import tornadofx.*
 
-class PropositionPanel : View("My View") {
+class PropositionPanel : View() {
 
     val controller: PropPanelController by inject()
 
